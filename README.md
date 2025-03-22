@@ -12,7 +12,12 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 status](https://www.r-pkg.org/badges/version/rdocdump.png)](https://CRAN.R-project.org/package=rdocdump)
 <!-- badges: end -->
 
-The goal of rdocdump is to …
+Dump R documentation and vignettes of R packages into a single file.
+Supports installed packages, tar.gz archives, and package source
+directories. If the package is not installed, only its source is
+automatically downloaded from CRAN for processing. The output is a
+single plain text file or a ‘character’, which is useful to ingest
+complete package documentation into a large language model (‘LLM’).
 
 ## Installation
 
