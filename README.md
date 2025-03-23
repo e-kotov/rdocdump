@@ -6,18 +6,22 @@
 
 <!-- badges: start -->
 
+[![Project Status:
+Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rdocdump.png)](https://CRAN.R-project.org/package=rdocdump)
+[![R-CMD-check](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Dump R documentation and vignettes of R packages into a single file.
-Supports installed packages, tar.gz archives, and package source
-directories. If the package is not installed, only its source is
-automatically downloaded from CRAN for processing. The output is a
-single plain text file or a ‘character’, which is useful to ingest
-complete package documentation into a large language model (‘LLM’).
+Dump R documentation and vignettes (**Note: vignettes are yet to be
+implemented**) of R packages into a single file. Supports installed
+packages, tar.gz archives, and package source directories. If the
+package is not installed, only its source is automatically downloaded
+from CRAN for processing. The output is a single plain text file or a
+‘character’, which is useful to ingest complete package documentation
+into a large language model (‘LLM’).
 
 ## Installation
 
@@ -30,7 +34,7 @@ pak::pak("e-kotov/rdocdump")
 
 ## Example
 
-Extract documenation of `{rJavaEnv}` package byt downloading source from
+Extract documenation of `{rJavaEnv}` package by downloading source from
 CRAN and save it to file `rJavaEnv_docs.txt`
 
 ``` r
