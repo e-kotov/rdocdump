@@ -53,7 +53,6 @@
 #'   # Print the last 3 lines
 #'   cat(tail(lines, 3), sep = "\n")
 #'   options(repos = old_repos)
-#'   #unlink(getOption("rdocdump.cache_path"), recursive = TRUE)
 #' })
 #' }
 rdd_to_txt <- function(
