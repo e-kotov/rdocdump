@@ -5,3 +5,6 @@
 ^cran-comments\.md$
 ^private$
 ^README\.qmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
