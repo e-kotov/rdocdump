@@ -59,7 +59,7 @@ docs <- rdd_to_txt("stats")
 # Extract only documentation for rJavaEnv by downloading its source from CRAN
 local({
   old_repos <- getOption("repos")
-  options(repos = c(CRAN = "https://cran.r-project.org"))
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE, content = "docs")
   lines <- unlist(strsplit(docs, "\n"))
   # Print the first 3 lines

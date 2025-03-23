@@ -73,11 +73,15 @@ test_that("resolve_pkg_path fetches package from CRAN", {
   skip_if_offline()
 
   package <- "ini" # choosing a minimal size stable package
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   pkg_info <- resolve_pkg_path(
     package,
     cache_path = tempdir(),
     force_fetch = TRUE
   )
+  options(repos = old_repos)
+
   expect_true(file.exists(pkg_info$tar_path))
   expect_true(dir.exists(pkg_info$pkg_path))
   unlink(pkg_info$pkg_path, recursive = TRUE)

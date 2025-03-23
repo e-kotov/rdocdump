@@ -213,12 +213,15 @@ test_that("rdd_to_txt keeps tar.gz archive when keep_files is 'tgz'", {
   # Call rdd_to_txt on the "ini" package.
   # force_fetch = TRUE ensures it downloads from CRAN,
   # and keep_files = "tgz" should leave the tar.gz archive in the cache.
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   out <- suppressWarnings(rdd_to_txt(
     "ini",
     force_fetch = TRUE,
     keep_files = "tgz",
     cache_path = cache_dir
   ))
+  options(repos = old_repos)
 
   # Look for any tar.gz file in the cache directory.
   tar_files <- list.files(
@@ -241,12 +244,15 @@ test_that("rdd_to_txt keeps both tar.gz archive and extracted files when keep_fi
   dir.create(cache_dir)
 
   # Call rdd_to_txt on the "ini" package with keep_files = "both".
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   out <- suppressWarnings(rdd_to_txt(
     "ini",
     force_fetch = TRUE,
     keep_files = "both",
     cache_path = cache_dir
   ))
+  options(repos = old_repos)
 
   # Check that a tar.gz file exists in the cache.
   tar_files <- list.files(
