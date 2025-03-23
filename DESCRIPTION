@@ -14,12 +14,12 @@ License: MIT + file LICENSE
 URL: https://github.com/e-kotov/rdocdump, https://www.ekotov.pro/rdocdump/
 BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests: 
-    knitr,
-    rmarkdown,
+    quarto,
     testthat (>= 3.0.0)
+VignetteBuilder: 
+    quarto
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-VignetteBuilder: knitr
