@@ -1,6 +1,7 @@
 ---
 format: gfm
 eval: false
+default-image-extension: ""
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -38,4 +39,24 @@ rdd_to_txt(
   force_fetch = TRUE, # force download even if package is installed
   keep_files = "none" # delete temp files
 )
+```
+
+
+## Citation
+
+```{r}
+#| eval: true
+#| echo: false
+#| results: 'asis'
+print(citation("rdocdump"), bibtex = FALSE)
+```
+
+BibTeX:
+```
+```{r}
+#| eval: true
+#| echo: false
+#| results: 'asis'
+toBibtex(citation("rdocdump"))
+```
 ```
