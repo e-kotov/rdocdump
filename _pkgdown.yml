@@ -31,7 +31,3 @@ navbar:
 home:
   title: 'rdocdump: Dump R Package Documentation and Vignettes into One File'
   description: 'Dump R Package Documentation and Vignettes into One File'
-
-reference:
-  - rdd_to_txt
-  - rdd_set_cache_path
