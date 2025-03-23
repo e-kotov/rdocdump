@@ -45,10 +45,14 @@ rdd_to_txt <- function(
 
   pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
   pkg_path <- pkg_info$pkg_path
-  extracted_path <- pkg_info$extracted_path
-  tar_path <- pkg_info$tar_path
 
-  rd_text <- combine_rd(pkg_path)
+  # Pass is_installed and pkg_name (if available) to combine_rd.
+  rd_text <- combine_rd(
+    pkg_path,
+    is_installed = pkg_info$is_installed,
+    pkg_name = pkg_info$pkg_name
+  )
+
   # TODO: In the future, add processing for vignettes.
   combined_text <- rd_text
 
@@ -56,34 +60,33 @@ rdd_to_txt <- function(
   if (
     keep_files %in%
       c("tgz", "both") &&
-      !is.null(tar_path) &&
+      !is.null(pkg_info$tar_path) &&
       !is.null(cache_path)
   ) {
     if (!dir.exists(cache_path)) {
       dir.create(cache_path, recursive = TRUE)
     }
-    dest_archive <- file.path(cache_path, basename(tar_path))
+    dest_archive <- file.path(cache_path, basename(pkg_info$tar_path))
     # Optionally, you might copy or leave the file in place.
   } else if (keep_files %in% c("none", "extracted")) {
-    if (!is.null(tar_path)) {
-      unlink(tar_path)
+    if (!is.null(pkg_info$tar_path)) {
+      unlink(pkg_info$tar_path)
     }
   }
-
   if (
     keep_files %in%
       c("extracted", "both") &&
-      !is.null(extracted_path) &&
+      !is.null(pkg_info$extracted_path) &&
       !is.null(cache_path)
   ) {
     if (!dir.exists(cache_path)) {
       dir.create(cache_path, recursive = TRUE)
     }
-    dest_extracted <- file.path(cache_path, basename(extracted_path))
+    dest_extracted <- file.path(cache_path, basename(pkg_info$extracted_path))
     # Optionally, you might copy or leave the folder in place.
   } else if (keep_files %in% c("none", "tgz")) {
-    if (!is.null(extracted_path)) {
-      unlink(extracted_path, recursive = TRUE)
+    if (!is.null(pkg_info$extracted_path)) {
+      unlink(pkg_info$extracted_path, recursive = TRUE)
     }
   }
 
