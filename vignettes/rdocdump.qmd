@@ -114,6 +114,60 @@ Description:
      + k*npar, where npar represents the number of parameters in the
 ```
 
+# Choosing what to dump to text
+
+You can also choose if you want just the package documentaiton, just the vignettes, or both to be combined with the `content` argument:
+
+```r
+docs <- rdd_to_txt(
+  pkg = "utils",
+  content = "vignettes"
+)
+cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
+```
+
+As you can see below, only the vignettes were combined:
+
+```
+--------------------------------------------------------------------------------
+Vignette: Sweave.Rnw
+
+% File src/library/utils/vignettes/Sweave.Rnw
+% Part of the R package, https://www.R-project.org
+% Copyright 2002-2022 Friedrich Leisch and the R Core Team
+% Distributed under GPL 2 or later
+
+\documentclass[a4paper]{article}
+
+%\VignetteIndexEntry{Sweave User Manual}
+%\VignettePackage{utils}
+%\VignetteDepends{tools, datasets, stats, graphics}
+
+\title{Sweave User Manual}
+\author{Friedrich Leisch and R Core Team}
+
+\usepackage[round]{natbib}
+\usepackage{graphicx, Rd}
+\usepackage{listings}
+
+\lstset{frame=trbl,basicstyle=\small\tt}
+\usepackage{hyperref}
+\usepackage{color}
+\definecolor{Blue}{rgb}{0,0,0.8}
+\hypersetup{%
+colorlinks,%
+plainpages=true,%
+linkcolor=black,%
+citecolor=black,%
+urlcolor=Blue,%
+%pdfstartview=FitH,% or Fit
+pdfstartview={XYZ null null 1},%
+pdfview={XYZ null null null},%
+pdfpagemode=UseNone,% for no outline
+pdfauthor={Friedrich Leisch and R Core Team},%
+pdftitle={Sweave 
+```
+
 # Handling Temporary Files
 
 The argument keep_files controls whether temporary files (the downloaded archive and/or extracted directory) are retained:

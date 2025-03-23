@@ -85,3 +85,119 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
     info = "Output should include vignette content"
   )
 })
+
+test_that("rdd_to_txt outputs only documentation when content is 'docs'", {
+  pkg_dir <- tempfile("pkg_")
+  dir.create(pkg_dir)
+
+  # Create a minimal DESCRIPTION file so that combine_rd() works.
+  desc_file <- file.path(pkg_dir, "DESCRIPTION")
+  writeLines(c("Package: testpkg", "Version: 0.1"), desc_file)
+
+  # Create a dummy 'man' directory with an Rd file (for documentation)
+  man_dir <- file.path(pkg_dir, "man")
+  dir.create(man_dir)
+  rd_file <- file.path(man_dir, "test.Rd")
+  writeLines("\\name{test}\n\\alias{test}\n\\title{Test Function}", rd_file)
+
+  # Create a 'vignettes' directory with a sample vignette file
+  vignette_dir <- file.path(pkg_dir, "vignettes")
+  dir.create(vignette_dir)
+  vign_file <- file.path(vignette_dir, "example.md")
+  writeLines("This is a vignette", vign_file)
+
+  # Stub for resolve_pkg_path() to simply return our fake package directory.
+  resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
+    list(
+      pkg_path = pkg,
+      is_installed = FALSE,
+      pkg_name = "testpkg",
+      tar_path = NULL,
+      extracted_path = NULL
+    )
+  }
+
+  assign("resolve_pkg_path", resolve_pkg_path, envir = .GlobalEnv)
+
+  out_docs <- rdd_to_txt(pkg_dir, keep_files = "none", content = "docs")
+
+  # Check that the output includes the DESCRIPTION and Rd documentation headers...
+  expect_match(
+    out_docs,
+    "Package: testpkg",
+    info = "Output should include DESCRIPTION header"
+  )
+  expect_match(
+    out_docs,
+    "Function: test\\(\\)",
+    info = "Output should include Rd documentation header"
+  )
+
+  # ...but it should NOT include the vignette header or content.
+  expect_false(
+    grepl("Vignette: example\\.md", out_docs),
+    info = "Output should not include vignette header"
+  )
+  expect_false(
+    grepl("This is a vignette", out_docs),
+    info = "Output should not include vignette content"
+  )
+})
+
+test_that("rdd_to_txt outputs only vignettes when content is 'vignettes'", {
+  pkg_dir <- tempfile("pkg_")
+  dir.create(pkg_dir)
+
+  # Create a minimal DESCRIPTION file.
+  desc_file <- file.path(pkg_dir, "DESCRIPTION")
+  writeLines(c("Package: testpkg", "Version: 0.1"), desc_file)
+
+  # Create a dummy 'man' directory with an Rd file.
+  man_dir <- file.path(pkg_dir, "man")
+  dir.create(man_dir)
+  rd_file <- file.path(man_dir, "test.Rd")
+  writeLines("\\name{test}\n\\alias{test}\n\\title{Test Function}", rd_file)
+
+  # Create a 'vignettes' directory with a sample vignette file.
+  vignette_dir <- file.path(pkg_dir, "vignettes")
+  dir.create(vignette_dir)
+  vign_file <- file.path(vignette_dir, "example.md")
+  writeLines("This is a vignette", vign_file)
+
+  # Stub resolve_pkg_path() as above.
+  resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
+    list(
+      pkg_path = pkg,
+      is_installed = FALSE,
+      pkg_name = "testpkg",
+      tar_path = NULL,
+      extracted_path = NULL
+    )
+  }
+
+  assign("resolve_pkg_path", resolve_pkg_path, envir = .GlobalEnv)
+
+  out_vignettes <- rdd_to_txt(
+    pkg_dir,
+    keep_files = "none",
+    content = "vignettes"
+  )
+
+  # Check that the output includes the vignette header and content.
+  expect_match(
+    out_vignettes,
+    "Vignette: example\\.md",
+    info = "Output should include vignette header"
+  )
+  expect_match(
+    out_vignettes,
+    "This is a vignette",
+    info = "Output should include vignette content"
+  )
+
+  # But it should NOT include the documentation header.
+  expect_false(
+    grepl("Function: test\\(\\)", out_vignettes),
+    info = "Output should not include Rd documentation header"
+  )
+})
