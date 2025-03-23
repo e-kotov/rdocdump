@@ -1,5 +1,15 @@
-combine_rd <- function(pkg_path) {
-  rd_db <- tools::Rd_db(dir = pkg_path)
+combine_rd <- function(
+  pkg_path,
+  is_installed = FALSE,
+  pkg_name = NULL
+) {
+  if (is_installed) {
+    # For installed packages, use the package name.
+    rd_db <- tools::Rd_db(package = pkg_name)
+  } else {
+    # For source packages, use the directory with the raw Rd files.
+    rd_db <- tools::Rd_db(dir = pkg_path)
+  }
 
   rd_texts <- mapply(
     function(rd, rd_name) {

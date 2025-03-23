@@ -30,13 +30,29 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
 
   if (file.exists(pkg)) {
     if (dir.exists(pkg)) {
-      # pkg is a directory; check for a DESCRIPTION file.
-      if (!file.exists(file.path(pkg, "DESCRIPTION"))) {
-        stop(
-          "The specified directory does not appear to be a package source (missing DESCRIPTION file)."
-        )
+      # Check if directory is a source package by looking for Rd files in "man/"
+      man_dir <- file.path(pkg, "man")
+      rd_files <- if (dir.exists(man_dir))
+        list.files(man_dir, pattern = "\\.Rd$", full.names = TRUE) else
+        character(0)
+      if (length(rd_files) > 0) {
+        # It is a source package
+        return(list(
+          pkg_path = pkg,
+          extracted_path = NULL,
+          tar_path = NULL,
+          is_installed = FALSE
+        ))
+      } else {
+        # No .Rd files found in "man/" -> assume it's an installed package.
+        return(list(
+          pkg_path = pkg,
+          extracted_path = NULL,
+          tar_path = NULL,
+          is_installed = TRUE,
+          pkg_name = pkg
+        ))
       }
-      return(list(pkg_path = pkg, extracted_path = NULL, tar_path = NULL))
     } else {
       # pkg is a file; assume it is a tar.gz archive.
       if (!grepl("\\.tar\\.gz$", pkg)) {
@@ -49,7 +65,6 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(pkg, exdir = extract_dir)
-
       # Flatten extra top-level folder if necessary.
       subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
       if (length(subdirs) == 1L) {
@@ -62,11 +77,11 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
         file.copy(files, extract_dir, recursive = TRUE)
         unlink(subdirs[1], recursive = TRUE)
       }
-
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
-        tar_path = NULL
+        tar_path = NULL,
+        is_installed = FALSE
       ))
     }
   } else {
@@ -75,7 +90,14 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
     pkg_found <- if (!force_fetch)
       tryCatch(find.package(pkg), error = function(e) NULL) else NULL
     if (!is.null(pkg_found)) {
-      return(list(pkg_path = pkg_found, extracted_path = NULL, tar_path = NULL))
+      # Installed package found.
+      return(list(
+        pkg_path = pkg_found,
+        extracted_path = NULL,
+        tar_path = NULL,
+        is_installed = TRUE,
+        pkg_name = pkg
+      ))
     } else {
       message("Fetching package source from CRAN...")
       dest_dir <- if (!is.null(cache_path)) cache_path else tempdir()
@@ -85,20 +107,17 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
       }
       archive <- dp[, 2]
       base_name <- basename(archive)
-
       # If cache_path is provided, move the archive there.
       if (!is.null(cache_path)) {
         dest_archive <- file.path(cache_path, base_name)
         file.rename(archive, dest_archive)
         archive <- dest_archive
       }
-
       extract_dir <- get_extract_dir(archive)
       if (!dir.exists(extract_dir)) {
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(archive, exdir = extract_dir)
-
       subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
       if (length(subdirs) == 1L) {
         files <- list.files(
@@ -110,11 +129,11 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
         file.copy(files, extract_dir, recursive = TRUE)
         unlink(subdirs[1], recursive = TRUE)
       }
-
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
-        tar_path = archive
+        tar_path = archive,
+        is_installed = FALSE
       ))
     }
   }
