@@ -13,7 +13,7 @@ combine_rd <- function(
 
   rd_texts <- mapply(
     function(rd, rd_name) {
-      txt <- capture.output(tools::Rd2txt(Rd = rd))
+      txt <- utils::capture.output(tools::Rd2txt(Rd = rd))
       txt_clean <- gsub("_\b", "", txt, fixed = TRUE)
       # Extract function name by removing ".Rd" suffix from the file name.
       fname <- sub("\\.Rd$", "", rd_name)
