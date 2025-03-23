@@ -101,6 +101,9 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
     } else {
       message("Fetching package source from CRAN...")
       dest_dir <- if (!is.null(cache_path)) cache_path else tempdir()
+      if (!dir.exists(dest_dir)) {
+        dir.create(dest_dir, recursive = TRUE)
+      }
       dp <- utils::download.packages(pkg, destdir = dest_dir, type = "source")
       if (nrow(dp) < 1L) {
         stop("Package not found on CRAN.")
