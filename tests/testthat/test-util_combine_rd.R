@@ -28,3 +28,23 @@ test_that("combine_rd works for source packages", {
 
   unlink(temp_pkg, recursive = TRUE)
 })
+
+test_that("combine_rd errors when DESCRIPTION file is missing", {
+  temp_pkg <- tempfile("pkg_no_desc")
+  dir.create(temp_pkg)
+
+  # Do not create a DESCRIPTION file.
+  man_dir <- file.path(temp_pkg, "man")
+  dir.create(man_dir)
+  writeLines(
+    "\\name{nodef}\n\\alias{nodef}\n\\title{No Def Function}",
+    file.path(man_dir, "nodef.Rd")
+  )
+
+  expect_error(
+    combine_rd(temp_pkg, is_installed = FALSE),
+    "Files 'DESCRIPTION' and 'DESCRIPTION.in' are missing."
+  )
+
+  unlink(temp_pkg, recursive = TRUE)
+})
