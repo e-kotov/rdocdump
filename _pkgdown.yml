@@ -29,8 +29,8 @@ navbar:
     right: [search, github, lightswitch]
 
 home:
-  title: 'rdocdump: Dump 'R' Package Documentation and Vignettes into One File'
-  description: 'Dump 'R' Package Documentation and Vignettes into One File'
+  title: 'rdocdump: Dump R Package Documentation and Vignettes into One File'
+  description: 'Dump R Package Documentation and Vignettes into One File'
 
 reference:
   - rdd_to_txt
