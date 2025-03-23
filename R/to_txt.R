@@ -43,18 +43,22 @@ rdd_to_txt <- function(
     )
   }
 
+  # Resolve package source path using existing helper.
   pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
   pkg_path <- pkg_info$pkg_path
 
-  # Pass is_installed and pkg_name (if available) to combine_rd.
+  # Process Rd documentation.
   rd_text <- combine_rd(
     pkg_path,
     is_installed = pkg_info$is_installed,
     pkg_name = pkg_info$pkg_name
   )
 
-  # TODO: In the future, add processing for vignettes.
-  combined_text <- rd_text
+  # Process vignettes using the new helper function.
+  vignettes_text <- combine_vignettes(pkg_path)
+
+  # Combine Rd docs and vignettes.
+  combined_text <- paste(rd_text, "\n\n", vignettes_text, sep = "")
 
   # Decide whether to keep or delete temporary files.
   if (
@@ -73,6 +77,7 @@ rdd_to_txt <- function(
       unlink(pkg_info$tar_path)
     }
   }
+
   if (
     keep_files %in%
       c("extracted", "both") &&
@@ -94,5 +99,6 @@ rdd_to_txt <- function(
     writeLines(combined_text, con = file)
     return(file)
   }
+
   return(combined_text)
 }
