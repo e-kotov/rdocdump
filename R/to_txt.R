@@ -1,19 +1,17 @@
 #' Create Combined Package Documentation as Text
 #'
-#' This function produces a single text output for a package by processing its Rd
-#' files. The package can be provided as an installed package name, a package source
-#' directory, a tar.gz archive, or a package name to download from CRAN. (In the future,
-#' vignettes will be processed as well.)
+#' @description
+#' This function produces a single text output for a package by processing its documentation (Rd files from package source, or the documentation from alteady installed packages) and vignettes (from `*.Rmd`, `*.qmd`, `*.md`, ` and `*.Rnw` files). The user can provide the function with an installed package name, a package source directory, a tar.gz archive, or a package name to download from CRAN.
 #'
-#' @param pkg A character string specifying the package. This can be:
+#' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
 #'   \item an installed package name,
 #'   \item a full path to a package source directory,
 #'   \item a full path to a package archive file (tar.gz), or
 #'   \item a package name not installed (which will then be downloaded from CRAN).
 #' }
-#' @param file Optional. Full path for the output text file.
-#' @param keep_files Character value controlling whether temporary files should be kept.
+#' @param file Optional. Save path for the output text file. If set, the function will return back the path to the file instead of the combined text.
+#' @param keep_files A `character` value controlling whether temporary files should be kept.
 #' Possible values are:
 #' \itemize{
 #'   \item `"none"`: Delete both the tar.gz archive and the extracted files (default).
@@ -21,14 +19,30 @@
 #'   \item `"extracted"`: Keep only the extracted files.
 #'   \item `"both"`: Keep both the tar.gz archive and the extracted files.
 #' }
-#' @param cache_path Character string specifying the directory where kept temporary files
-#' will be stored. By default, it uses the value of option("rdocdump.cache_path").
-#' @param force_fetch Logical. If TRUE, the package source will be fetched from CRAN
-#' as a tar.gz archive even if the package is already installed locally.
-#' Default is FALSE.
+#' @param cache_path A `character` string specifying the directory where kept temporary files will be stored. By default, it uses the value of option("rdocdump.cache_path") which sets the cache directory to the temporary directory of the current R session.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally Default is `FALSE`.
 #'
-#' @return A single string containing the combined package documentation.
+#' @return A single string containing the combined package documentation. If `file` argument is set, returns path to the file.
 #' @export
+#' @examples
+#' # extract documentation for built-in `stats` package
+#' docs <- rdd_to_txt("stats")
+#'
+#' \donttest{
+#' # extract documentation for rJavaEnv by downloading its source from CRAN
+#' local({
+#'   old_repos <- getOption("repos")
+#'   options(repos = c(CRAN = "https://cran.r-project.org"))
+#'   docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE)
+#'   lines <- unlist(strsplit(docs, "\n"))
+#'   # Print the first 3 lines
+#'   cat(head(lines, 3), sep = "\n")
+#'   # Print the last 3 lines
+#'   cat(tail(lines, 3), sep = "\n")
+#'   options(repos = old_repos)
+#'   #unlink(getOption("rdocdump.cache_path"), recursive = TRUE)
+#' })
+#' }
 rdd_to_txt <- function(
   pkg,
   file = NULL,

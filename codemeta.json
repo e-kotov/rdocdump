@@ -1,0 +1,99 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "rdocdump",
+  "description": "Dump R documentation and vignettes of R packages into a single file. Supports installed packages, tar.gz archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a 'character', which is useful to ingest complete package documentation into a large language model ('LLM').",
+  "name": "rdocdump: Dump 'R' Package Documentation and Vignettes into One File",
+  "relatedLink": "https://www.ekotov.pro/rdocdump/",
+  "codeRepository": "https://github.com/e-kotov/rdocdump",
+  "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
+  "license": "https://spdx.org/licenses/MIT",
+  "version": "0.0.0.9000",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Egor",
+      "familyName": "Kotov",
+      "email": "kotov.egor@gmail.com",
+      "@id": "https://orcid.org/0000-0001-6690-5345"
+    }
+  ],
+  "copyrightHolder": [
+    {
+      "@type": "Person",
+      "givenName": "Egor",
+      "familyName": "Kotov",
+      "email": "kotov.egor@gmail.com",
+      "@id": "https://orcid.org/0000-0001-6690-5345"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Egor",
+      "familyName": "Kotov",
+      "email": "kotov.egor@gmail.com",
+      "@id": "https://orcid.org/0000-0001-6690-5345"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "quarto",
+      "name": "quarto",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=quarto"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
+  "softwareRequirements": {
+    "SystemRequirements": null
+  },
+  "fileSize": "33.224KB",
+  "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2025",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Egor",
+          "familyName": "Kotov",
+          "email": "kotov.egor@gmail.com",
+          "@id": "https://orcid.org/0000-0001-6690-5345"
+        }
+      ],
+      "name": "rdocdump: Dump R Package Documentation and Vignettes into One File",
+      "identifier": "10.32614/CRAN.package.rdocdump",
+      "url": "https://github.com/e-kotov/rdocdump",
+      "@id": "https://doi.org/10.32614/CRAN.package.rdocdump",
+      "sameAs": "https://doi.org/10.32614/CRAN.package.rdocdump"
+    }
+  ],
+  "readme": "https://github.com/e-kotov/rdocdump/blob/main/README.md",
+  "contIntegration": "https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml",
+  "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"]
+}

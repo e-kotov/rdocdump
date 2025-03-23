@@ -11,8 +11,13 @@ Description: Dump R documentation and vignettes of R packages into a
     single plain text file or a 'character', which is useful to ingest
     complete package documentation into a large language model ('LLM').
 License: MIT + file LICENSE
+URL: https://github.com/e-kotov/rdocdump, https://www.ekotov.pro/rdocdump/
+BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests: 
+    quarto,
     testthat (>= 3.0.0)
+VignetteBuilder: 
+    quarto
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en

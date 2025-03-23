@@ -1,0 +1,129 @@
+---
+title: "Quick Start: dump R docs and vignettes to text files for LLMs"
+vignette: >
+  %\VignetteIndexEntry{Quick Start: dump R docs and vignettes to text files for LLMs}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  eval: false
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-overflow: wrap
+---
+
+# Introduction
+
+`{rdocdump}` is an R package designed to combine an R package’s documentation and vignettes into a single plain text file. This is particularly useful when you want to ingest complete package documentation into large language models (LLMs) or for archival purposes. `{rdocdump}` works with installed packages, source directories, tar.gz archives, or package sources available on CRAN.
+
+# Installation
+
+To install the development version of `{rdocdump}` from GitHub, run the following commands:
+
+```r
+# install.packages("pak") # Uncomment if pak is not installed
+pak::pak("e-kotov/rdocdump")
+```
+
+# Setting the Cache Path
+
+By default, `{rdocdump}` stores temporary files in a directory within R’s temporary directory. You can override this by setting a custom cache path using the helper function `rdd_set_cache_path()`. For example:
+
+```r
+# Set a custom cache directory
+cache_dir <- file.path(tempdir(), "my_rdocdump_cache")
+rdd_set_cache_path(cache_dir)
+```
+
+```
+rdocdump.cache_path set to: /private/var/folders/gb/t5zr5rn15sldqybrmqbyh6y80000gn/T/Rtmpp5wRxV/my_rdocdump_cache
+```
+
+This ensures that temporary tar.gz archives and extracted files are stored in your specified directory.
+
+# Extracting Documentation
+
+The main function in rdocdump is `rdd_to_txt()`, which accepts several types of inputs for the `pkg` argument:
+
+- An installed package name (e.g., `"stats"`).
+
+- A full path to a package source directory.
+
+- A full path to a package archive (tar.gz).
+
+- A package name available on CRAN (downloaded automatically if not installed).
+
+Here is an example that downloads the source for the package `{rJavaEnv}` from CRAN, extracts its documentation, and saves it to a file:
+
+```r
+# Extract documentation for 'rJavaEnv' and save to a text file.
+rdd_to_txt(
+  pkg = "rJavaEnv",
+  file = "rJavaEnv_docs.txt",
+  force_fetch = TRUE,    # Force download even if the package is installed.
+  keep_files = "none"      # Delete temporary files after extraction.
+)
+```
+
+```
+Fetching package source from CRAN...
+trying URL 'https://cran.rstudio.com/src/contrib/rJavaEnv_0.2.2.tar.gz'
+Content type 'application/x-gzip' length 138667 bytes (135 KB)
+==================================================
+downloaded 135 KB
+
+[1] "rJavaEnv_docs.txt"
+```
+
+If you prefer to simply get the combined documentation as a character string, call the function without the `file` argument:
+
+```r
+# Extract and capture the combined documentation in a variable.
+docs <- rdd_to_txt(pkg = "stats")
+cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
+```
+
+```
+DESCRIPTION:
+Package: stats
+Version: 4.4.3
+Priority: base
+Title: The R Stats Package
+Author: R Core Team and contributors worldwide
+Maintainer: R Core Team <do-use-Contact-address@r-project.org>
+Contact: R-help mailing list <r-help@r-project.org>
+Description: R statistical functions.
+License: Part of R 4.4.3
+Imports: utils, grDevices, graphics
+Suggests: MASS, Matrix, SuppDists, methods, stats4
+NeedsCompilation: yes
+Encoding: UTF-8
+Enhances: Kendall, coin, multcomp, pcaPP, pspearman, robustbase
+Built: R 4.4.3; aarch64-apple-darwin20; 2025-02-28 21:20:18 UTC; unix
+
+--------------------------------------------------------------------------------
+Function: AIC()
+Akaike's An Information Criterion
+
+Description:
+
+     Generic function calculating Akaike's ‘An Information Criterion’
+     for one or several fitted model objects for which a log-likelihood
+     value can be obtained, according to the formula -2*log-likelihood
+     + k*npar, where npar represents the number of parameters in the
+```
+
+# Handling Temporary Files
+
+The argument keep_files controls whether temporary files (the downloaded archive and/or extracted directory) are retained:
+
+- `"none"` (default): Delete both the tar.gz archive and the extracted files.
+
+- `"tgz"`: Keep only the tar.gz archive.
+
+- `"extracted"`: Keep only the extracted files.
+
+- `"both"`: Keep both the tar.gz archive and the extracted files.
+
+Choose the option that best fits your workflow.
