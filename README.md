@@ -2,7 +2,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rdocdump
+# rdocdump: Dump ‘R’ Package Documentation and Vignettes into One File <a href="https://www.ekotov.pro/rdocdump/"><img src="man/figures/logo.png" align="right" width="200" alt="rdocdump website" /></a>
 
 <!-- badges: start -->
 
