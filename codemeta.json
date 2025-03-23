@@ -45,6 +45,18 @@
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "curl",
+      "name": "curl",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=curl"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "quarto",
       "name": "quarto",
       "provider": {
@@ -72,7 +84,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "33.224KB",
+  "fileSize": "45.372KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -94,6 +106,6 @@
     }
   ],
   "readme": "https://github.com/e-kotov/rdocdump/blob/main/README.md",
-  "contIntegration": "https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml",
+  "contIntegration": ["https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml", "https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck"],
   "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"]
 }
