@@ -201,3 +201,77 @@ test_that("rdd_to_txt outputs only vignettes when content is 'vignettes'", {
     info = "Output should not include Rd documentation header"
   )
 })
+
+test_that("rdd_to_txt keeps tar.gz archive when keep_files is 'tgz'", {
+  skip_on_cran()
+  skip_if_offline()
+
+  # Create a unique cache directory for this test.
+  cache_dir <- tempfile("cache_tgz")
+  dir.create(cache_dir)
+
+  # Call rdd_to_txt on the "ini" package.
+  # force_fetch = TRUE ensures it downloads from CRAN,
+  # and keep_files = "tgz" should leave the tar.gz archive in the cache.
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+  out <- suppressWarnings(rdd_to_txt(
+    "ini",
+    force_fetch = TRUE,
+    keep_files = "tgz",
+    cache_path = cache_dir
+  ))
+  options(repos = old_repos)
+
+  # Look for any tar.gz file in the cache directory.
+  tar_files <- list.files(
+    cache_dir,
+    pattern = "\\.tar\\.gz$",
+    full.names = TRUE
+  )
+  expect_true(length(tar_files) > 0)
+
+  # Clean up the cache directory.
+  unlink(cache_dir, recursive = TRUE)
+})
+
+test_that("rdd_to_txt keeps both tar.gz archive and extracted files when keep_files is 'both'", {
+  skip_on_cran()
+  skip_if_offline()
+
+  # Create a unique cache directory.
+  cache_dir <- tempfile("cache_both")
+  dir.create(cache_dir)
+
+  # Call rdd_to_txt on the "ini" package with keep_files = "both".
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+  out <- suppressWarnings(rdd_to_txt(
+    "ini",
+    force_fetch = TRUE,
+    keep_files = "both",
+    cache_path = cache_dir
+  ))
+  options(repos = old_repos)
+
+  # Check that a tar.gz file exists in the cache.
+  tar_files <- list.files(
+    cache_dir,
+    pattern = "\\.tar\\.gz$",
+    full.names = TRUE
+  )
+  expect_true(length(tar_files) > 0)
+
+  # For the extracted package: resolve_pkg_path creates an extraction directory
+  # as file.path(cache_dir, <pkgname>, <version>). For package "ini", we expect a subdirectory
+  # named "ini" to exist under cache_dir.
+  extracted_dir <- file.path(cache_dir, "ini")
+  expect_true(dir.exists(extracted_dir))
+
+  # There should be at least one directory inside the "ini" folder.
+  subdirs <- list.dirs(extracted_dir, recursive = FALSE, full.names = TRUE)
+  expect_true(length(subdirs) > 0)
+
+  # Clean up the cache directory.
+  unlink(cache_dir, recursive = TRUE)
+})
