@@ -52,7 +52,7 @@ local({
   old_repos <- getOption("repos")
   options(repos = c(CRAN = "https://cran.r-project.org"))
   docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE)
-  lines <- unlist(strsplit(long_text, "\n"))
+  lines <- unlist(strsplit(docs, "\n"))
   # Print the first 3 lines
   cat(head(lines, 3), sep = "\n")
   # Print the last 3 lines
