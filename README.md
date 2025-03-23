@@ -15,13 +15,12 @@ status](https://www.r-pkg.org/badges/version/rdocdump.png)](https://CRAN.R-proje
 [![R-CMD-check](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Dump R documentation and vignettes (**Note: vignettes are yet to be
-implemented**) of R packages into a single file. Supports installed
-packages, tar.gz archives, and package source directories. If the
-package is not installed, only its source is automatically downloaded
-from CRAN for processing. The output is a single plain text file or a
-‘character’, which is useful to ingest complete package documentation
-into a large language model (‘LLM’).
+Dump R documentation and vignettes of R packages into a single file.
+Supports installed packages, tar.gz archives, and package source
+directories. If the package is not installed, only its source is
+automatically downloaded from CRAN for processing. The output is a
+single plain text file or a ‘character’, which is useful to ingest
+complete package documentation into a large language model (‘LLM’).
 
 ## Installation
 
