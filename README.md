@@ -14,6 +14,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.org/package=rdocdump)
 [![R-CMD-check](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/e-kotov/rdocdump/workflows/pkgcheck/badge.svg)](https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg)](https://doi.org/10.5281/zenodo.15072446)
 <!-- badges: end -->
 
 Dump R documentation and vignettes of R packages into a single file.
