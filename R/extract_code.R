@@ -3,8 +3,8 @@
 #' @description
 #' This function extracts the R source code from a package. For installed packages, it retrieves the
 #' package namespace and deparses all functions found in the package. For package source directories
-#' or archives (non-installed packages), it reads all `.R` files from the `R` directory and, optionally, from the `tests`
-#' directory.
+#' or archives (non-installed packages), it reads all `.R` files from the `R` directory and, optionally,
+#' from the `tests` directory. Optionally, it can include roxygen2 documentation from these files.
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
@@ -15,25 +15,31 @@
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
 #' @param include_tests `logical`. If `TRUE`, for non-installed packages, the function will also include R source code from the `tests` directory. Defaults to `FALSE`.
+#' @param include_roxygen `logical`. If `TRUE`, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to `FALSE`.
 #' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`.
 #' @param cache_path A `character` string specifying the directory to use as a cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
 #'
-#' @return A single string containing the combined R source code from the package.
+#' @return A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
 #'
 #' @export
 #'
 #' @examples
-#' # Extract only R source code from an installed package.
+#' # Extract only R source code (excluding roxygen2 documentation) from an installed package.
 #' code <- rdd_extract_code("stats")
 #' cat(code)
 #'
-#' # Extract R source code from a package source directory (and optionally include test files).
+#' # Extract R source code including roxygen2 documentation from a package source directory.
+#' code_with_roxygen <- rdd_extract_code("mypackage", include_roxygen = TRUE)
+#' cat(code_with_roxygen)
+#'
+#' # Extract R source code from a package source directory, including test files but excluding roxygen2 docs.
 #' code_with_tests <- rdd_extract_code("mypackage", include_tests = TRUE)
 #' cat(code_with_tests)
 rdd_extract_code <- function(
   pkg,
   file = NULL,
   include_tests = FALSE,
+  include_roxygen = FALSE,
   force_fetch = FALSE,
   cache_path = getOption("rdocdump.cache_path")
 ) {
@@ -49,7 +55,11 @@ rdd_extract_code <- function(
     combined_code <- extract_code_installed(pkg_info$pkg_name)
   } else {
     # For non-installed packages, read the source files.
-    combined_code <- extract_code_source(pkg_info$pkg_path, include_tests)
+    combined_code <- extract_code_source(
+      pkg_info$pkg_path,
+      include_tests,
+      include_roxygen
+    )
   }
 
   if (!is.null(file)) {
@@ -82,7 +92,11 @@ extract_code_installed <- function(pkg_name) {
 }
 
 # Helper function to extract code from package source files.
-extract_code_source <- function(pkg_path, include_tests = FALSE) {
+extract_code_source <- function(
+  pkg_path,
+  include_tests = FALSE,
+  include_roxygen = FALSE
+) {
   code_text <- ""
   # Read all .R files in the R directory.
   r_dir <- file.path(pkg_path, "R")
@@ -91,6 +105,10 @@ extract_code_source <- function(pkg_path, include_tests = FALSE) {
     for (rf in r_files) {
       header <- paste0(strrep("-", 80), "\nFile: ", basename(rf), "\n")
       file_content <- readLines(rf, warn = FALSE)
+      # Exclude roxygen2 documentation if not requested.
+      if (!include_roxygen) {
+        file_content <- file_content[!grepl("^#'", file_content)]
+      }
       code_text <- paste(
         code_text,
         header,
@@ -115,6 +133,9 @@ extract_code_source <- function(pkg_path, include_tests = FALSE) {
       for (tf in test_files) {
         header <- paste0(strrep("-", 80), "\nTest File: ", basename(tf), "\n")
         file_content <- readLines(tf, warn = FALSE)
+        if (!include_roxygen) {
+          file_content <- file_content[!grepl("^#'", file_content)]
+        }
         code_text <- paste(
           code_text,
           header,

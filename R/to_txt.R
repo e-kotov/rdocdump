@@ -103,10 +103,13 @@ rdd_to_txt <- function(
   }
 
   if ("code" %in% effective_content) {
+    # Note: When extracting code for non-installed packages, we do not include roxygen2 docs,
+    # as the documentation is already imported from the Rd files.
     code_text <- rdd_extract_code(
       pkg,
       file = NULL,
       include_tests = FALSE,
+      include_roxygen = FALSE,
       force_fetch = force_fetch,
       cache_path = cache_path
     )
