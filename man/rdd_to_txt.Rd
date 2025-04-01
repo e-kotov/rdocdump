@@ -30,7 +30,7 @@ Possible values are:
 \item \code{"all"}: Include Rd documentation, vignettes, and R source code (default).
 \item \code{"docs"}: Include only the Rd documentation.
 \item \code{"vignettes"}: Include only the vignettes.
-\item \code{"code"}: Include only the R source code.
+\item \code{"code"}: Include only the R source code. When extracting code for non-installed packages, the function will not include roxygen2 documentation, as the documentation can be imported from the Rd files. If you want to extract the R source code with the roxygen2 documentation, use \code{\link{rdd_extract_code}} and set \code{include_roxygen} to \code{TRUE}.
 }
 You can specify multiple options (e.g., \code{c("docs", "code")} to include both documentation and source code).}
 

@@ -8,6 +8,7 @@ rdd_extract_code(
   pkg,
   file = NULL,
   include_tests = FALSE,
+  include_roxygen = FALSE,
   force_fetch = FALSE,
   cache_path = getOption("rdocdump.cache_path")
 )
@@ -25,25 +26,31 @@ rdd_extract_code(
 
 \item{include_tests}{\code{logical}. If \code{TRUE}, for non-installed packages, the function will also include R source code from the \code{tests} directory. Defaults to \code{FALSE}.}
 
+\item{include_roxygen}{\code{logical}. If \code{TRUE}, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to \code{FALSE}.}
+
 \item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}.}
 
 \item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
 }
 \value{
-A single string containing the combined R source code from the package.
+A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
 }
 \description{
 This function extracts the R source code from a package. For installed packages, it retrieves the
 package namespace and deparses all functions found in the package. For package source directories
-or archives (non-installed packages), it reads all \code{.R} files from the \code{R} directory and, optionally, from the \code{tests}
-directory.
+or archives (non-installed packages), it reads all \code{.R} files from the \code{R} directory and, optionally,
+from the \code{tests} directory. Optionally, it can include roxygen2 documentation from these files.
 }
 \examples{
-# Extract only R source code from an installed package.
+# Extract only R source code (excluding roxygen2 documentation) from an installed package.
 code <- rdd_extract_code("stats")
 cat(code)
 
-# Extract R source code from a package source directory (and optionally include test files).
+# Extract R source code including roxygen2 documentation from a package source directory.
+code_with_roxygen <- rdd_extract_code("mypackage", include_roxygen = TRUE)
+cat(code_with_roxygen)
+
+# Extract R source code from a package source directory, including test files but excluding roxygen2 docs.
 code_with_tests <- rdd_extract_code("mypackage", include_tests = TRUE)
 cat(code_with_tests)
 }

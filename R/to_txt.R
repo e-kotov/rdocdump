@@ -19,7 +19,7 @@
 #'   \item `"all"`: Include Rd documentation, vignettes, and R source code (default).
 #'   \item `"docs"`: Include only the Rd documentation.
 #'   \item `"vignettes"`: Include only the vignettes.
-#'   \item `"code"`: Include only the R source code.
+#'   \item `"code"`: Include only the R source code. When extracting code for non-installed packages, the function will not include roxygen2 documentation, as the documentation can be imported from the Rd files. If you want to extract the R source code with the roxygen2 documentation, use \code{\link{rdd_extract_code}} and set `include_roxygen` to `TRUE`.
 #' }
 #' You can specify multiple options (e.g., `c("docs", "code")` to include both documentation and source code).
 #' @param keep_files A `character` value controlling whether temporary files should be kept.
