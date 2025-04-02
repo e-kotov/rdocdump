@@ -108,16 +108,12 @@ rdd_to_txt <- function(
       pkg_name = pkg_info$pkg_name
     )
   }
-
   if ("vignettes" %in% effective_content) {
     vignettes_text <- combine_vignettes(pkg_path)
   }
-
   if ("code" %in% effective_content) {
-    # Note: When extracting code for non-installed packages, we do not include roxygen2 docs,
-    # as the documentation is already imported from the Rd files.
     code_text <- rdd_extract_code(
-      pkg,
+      pkg = if (pkg_info$is_installed) pkg else pkg_path,
       file = NULL,
       include_tests = FALSE,
       include_roxygen = FALSE,
@@ -137,7 +133,6 @@ rdd_to_txt <- function(
   if ("code" %in% effective_content && nzchar(code_text)) {
     components <- c(components, code_text)
   }
-
   combined_text <- paste(components, collapse = "\n\n")
 
   # Decide whether to keep or delete temporary files.
@@ -157,7 +152,6 @@ rdd_to_txt <- function(
       unlink(pkg_info$tar_path)
     }
   }
-
   if (
     keep_files %in%
       c("extracted", "both") &&
@@ -174,11 +168,9 @@ rdd_to_txt <- function(
       unlink(pkg_info$extracted_path, recursive = TRUE)
     }
   }
-
   if (!is.null(file)) {
     writeLines(combined_text, con = file)
     return(file)
   }
-
   return(combined_text)
 }
