@@ -104,6 +104,9 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
       if (!dir.exists(dest_dir)) {
         dir.create(dest_dir, recursive = TRUE)
       }
+      old_repos <- getOption("repos")
+      options(repos = c(CRAN = "https://cloud.r-project.org"))
+      on.exit(options(repos = old_repos))
       dp <- utils::download.packages(pkg, destdir = dest_dir, type = "source")
       if (nrow(dp) < 1L) {
         stop("Package not found on CRAN.")
