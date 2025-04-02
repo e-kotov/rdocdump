@@ -5,6 +5,6 @@
   }
   # Set default repository option for rdocdump
   if (is.null(getOption("rdocdump.repos"))) {
-    options(rdocdump.repos = getOption("repos"))
+    options(rdocdump.repos = c("CRAN" = "https://cloud.r-project.org"))
   }
 }
