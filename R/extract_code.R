@@ -19,6 +19,8 @@
 #' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`.
 #' @param cache_path A `character` string specifying the directory to use as a cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
 #'
+#' @inheritParams rdd_to_txt
+#'
 #' @return A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
 #'
 #' @export
@@ -30,28 +32,26 @@
 #'
 #' # Extract R source code including roxygen2 documentation from a package source directory.
 #' local({
-#'  old_repos <- getOption("repos")
-#'  options(repos = c(CRAN = "https://cran.r-project.org"))
 #'  code_with_roxygen <- rdd_extract_code(
 #'   "ini",
 #'   include_roxygen = TRUE,
-#'   force_fetch = TRUE)
+#'   force_fetch = TRUE,
+#'   repos = c("CRAN" = "https://cran.r-project.org")
+#' )
 #'  cat(substr(code_with_roxygen, 1, 1000))
-#'  options(repos = old_repos)
 #'})
 #'
 #' # Extract R source code from a package source directory,
 #' # including test files but excluding roxygen2 docs.
 #' local({
-#'  old_repos <- getOption("repos")
-#'  options(repos = c(CRAN = "https://cran.r-project.org"))
 #'  code_with_tests <- rdd_extract_code(
 #'   "ini",
 #'   include_roxygen = TRUE,
 #'   include_tests = TRUE,
-#'   force_fetch = TRUE)
+#'   force_fetch = TRUE,
+#'   repos = c("CRAN" = "https://cran.r-project.org")
+#' )
 #'  cat(substr(code_with_tests, 1, 1000))
-#'  options(repos = old_repos)
 #'})
 #'
 rdd_extract_code <- function(
@@ -60,7 +60,8 @@ rdd_extract_code <- function(
   include_tests = FALSE,
   include_roxygen = FALSE,
   force_fetch = FALSE,
-  cache_path = getOption("rdocdump.cache_path")
+  cache_path = getOption("rdocdump.cache_path"),
+  repos = getOption("rdocdump.repos", getOption("repos"))
 ) {
   pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
 

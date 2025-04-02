@@ -10,7 +10,8 @@ rdd_extract_code(
   include_tests = FALSE,
   include_roxygen = FALSE,
   force_fetch = FALSE,
-  cache_path = getOption("rdocdump.cache_path")
+  cache_path = getOption("rdocdump.cache_path"),
+  repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ rdd_extract_code(
 \item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}.}
 
 \item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
+
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
 A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
@@ -48,28 +51,26 @@ cat(substr(code, 1, 1000))
 
 # Extract R source code including roxygen2 documentation from a package source directory.
 local({
- old_repos <- getOption("repos")
- options(repos = c(CRAN = "https://cran.r-project.org"))
  code_with_roxygen <- rdd_extract_code(
   "ini",
   include_roxygen = TRUE,
-  force_fetch = TRUE)
+  force_fetch = TRUE,
+  repos = c("CRAN" = "https://cran.r-project.org")
+)
  cat(substr(code_with_roxygen, 1, 1000))
- options(repos = old_repos)
 })
 
 # Extract R source code from a package source directory,
 # including test files but excluding roxygen2 docs.
 local({
- old_repos <- getOption("repos")
- options(repos = c(CRAN = "https://cran.r-project.org"))
  code_with_tests <- rdd_extract_code(
   "ini",
   include_roxygen = TRUE,
   include_tests = TRUE,
-  force_fetch = TRUE)
+  force_fetch = TRUE,
+  repos = c("CRAN" = "https://cran.r-project.org")
+)
  cat(substr(code_with_tests, 1, 1000))
- options(repos = old_repos)
 })
 
 }

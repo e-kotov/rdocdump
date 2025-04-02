@@ -10,7 +10,8 @@ rdd_to_txt(
   content = "all",
   force_fetch = FALSE,
   keep_files = "none",
-  cache_path = getOption("rdocdump.cache_path")
+  cache_path = getOption("rdocdump.cache_path"),
+  repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
 \arguments{
@@ -47,6 +48,8 @@ Possible values are:
 
 \item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
 By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
+
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
 A single string containing the combined package documentation, vignettes, and/or code as specified by the \code{content} argument.
@@ -63,17 +66,17 @@ cat(substr(docs, 1, 500))
 
 \donttest{
 # Extract only documentation for rJavaEnv by downloading its source from CRAN
-local({
-  old_repos <- getOption("repos")
-  options(repos = c(CRAN = "https://cran.r-project.org"))
-  docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE, content = "docs")
-  lines <- unlist(strsplit(docs, "\n"))
-  # Print the first 3 lines
-  cat(head(lines, 3), sep = "\n")
-  # Print the last 3 lines
-  cat(tail(lines, 3), sep = "\n")
-  options(repos = old_repos)
-})
+docs <- rdd_to_txt(
+  "rJavaEnv",
+  force_fetch = TRUE,
+  content = "docs",
+  repos = c("CRAN" = "https://cran.r-project.org")
+)
+lines <- unlist(strsplit(docs, "\n"))
+# Print the first 3 lines
+cat(head(lines, 3), sep = "\n")
+# Print the last 3 lines
+cat(tail(lines, 3), sep = "\n")
 }
 
 }
