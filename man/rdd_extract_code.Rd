@@ -44,13 +44,32 @@ from the \code{tests} directory. Optionally, it can include roxygen2 documentati
 \examples{
 # Extract only R source code (excluding roxygen2 documentation) from an installed package.
 code <- rdd_extract_code("stats")
-cat(code)
+cat(substr(code, 1, 1000))
 
 # Extract R source code including roxygen2 documentation from a package source directory.
-code_with_roxygen <- rdd_extract_code("mypackage", include_roxygen = TRUE)
-cat(code_with_roxygen)
+local({
+ old_repos <- getOption("repos")
+ options(repos = c(CRAN = "https://cran.r-project.org"))
+ code_with_roxygen <- rdd_extract_code(
+  "ini",
+  include_roxygen = TRUE,
+  force_fetch = TRUE)
+ cat(substr(code_with_roxygen, 1, 1000))
+ options(repos = old_repos)
+})
 
-# Extract R source code from a package source directory, including test files but excluding roxygen2 docs.
-code_with_tests <- rdd_extract_code("mypackage", include_tests = TRUE)
-cat(code_with_tests)
+# Extract R source code from a package source directory,
+# including test files but excluding roxygen2 docs.
+local({
+ old_repos <- getOption("repos")
+ options(repos = c(CRAN = "https://cran.r-project.org"))
+ code_with_tests <- rdd_extract_code(
+  "ini",
+  include_roxygen = TRUE,
+  include_tests = TRUE
+  force_fetch = TRUE)
+ cat(substr(code_with_tests, 1, 1000))
+ options(repos = old_repos)
+})
+
 }
