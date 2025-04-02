@@ -113,7 +113,7 @@ rdd_to_txt <- function(
   }
   if ("code" %in% effective_content) {
     code_text <- rdd_extract_code(
-      pkg_path,
+      pkg = if (pkg_info$is_installed) pkg else pkg_path,
       file = NULL,
       include_tests = FALSE,
       include_roxygen = FALSE,
