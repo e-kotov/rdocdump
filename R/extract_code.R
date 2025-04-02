@@ -48,7 +48,7 @@
 #'  code_with_tests <- rdd_extract_code(
 #'   "ini",
 #'   include_roxygen = TRUE,
-#'   include_tests = TRUE
+#'   include_tests = TRUE,
 #'   force_fetch = TRUE)
 #'  cat(substr(code_with_tests, 1, 1000))
 #'  options(repos = old_repos)
