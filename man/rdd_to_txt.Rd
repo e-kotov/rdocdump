@@ -57,15 +57,23 @@ This function produces a single text output for a package by processing its docu
 or the documentation from already installed packages), vignettes, and/or R source code.
 }
 \examples{
-# Extract all components (documentation, vignettes, and code) from the built-in 'stats' package.
-all_components <- rdd_to_txt("stats")
-cat(all_components)
+# Extract documentation for built-in `stats` package (both docs and vignettes).
+docs <- rdd_to_txt("stats")
+cat(substr(docs, 1, 500))
 
-# Extract only Rd documentation.
-docs_only <- rdd_to_txt("stats", content = "docs")
-cat(docs_only)
+\donttest{
+# Extract only documentation for rJavaEnv by downloading its source from CRAN
+local({
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cran.r-project.org"))
+  docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE, content = "docs")
+  lines <- unlist(strsplit(docs, "\n"))
+  # Print the first 3 lines
+  cat(head(lines, 3), sep = "\n")
+  # Print the last 3 lines
+  cat(tail(lines, 3), sep = "\n")
+  options(repos = old_repos)
+})
+}
 
-# Extract both documentation and R source code.
-docs_and_code <- rdd_to_txt("stats", content = c("docs", "code"))
-cat(docs_and_code)
 }
