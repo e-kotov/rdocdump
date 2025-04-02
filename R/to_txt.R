@@ -45,17 +45,17 @@
 #'
 #' \donttest{
 #' # Extract only documentation for rJavaEnv by downloading its source from CRAN
-#' local({
-#'   old_repos <- getOption("repos")
-#'   options(repos = c(CRAN = "https://cran.r-project.org"))
-#'   docs <- rdd_to_txt("rJavaEnv", force_fetch = TRUE, content = "docs")
-#'   lines <- unlist(strsplit(docs, "\n"))
-#'   # Print the first 3 lines
-#'   cat(head(lines, 3), sep = "\n")
-#'   # Print the last 3 lines
-#'   cat(tail(lines, 3), sep = "\n")
-#'   options(repos = old_repos)
-#' })
+#' docs <- rdd_to_txt(
+#'   "rJavaEnv",
+#'   force_fetch = TRUE,
+#'   content = "docs",
+#'   repos = c("CRAN" = "https://cran.r-project.org")
+#' )
+#' lines <- unlist(strsplit(docs, "\n"))
+#' # Print the first 3 lines
+#' cat(head(lines, 3), sep = "\n")
+#' # Print the last 3 lines
+#' cat(tail(lines, 3), sep = "\n")
 #' }
 #'
 rdd_to_txt <- function(
@@ -64,7 +64,8 @@ rdd_to_txt <- function(
   content = "all",
   force_fetch = FALSE,
   keep_files = "none",
-  cache_path = getOption("rdocdump.cache_path")
+  cache_path = getOption("rdocdump.cache_path"),
+  repos = getOption("rdocdump.repos", getOption("repos"))
 ) {
   # Validate keep_files argument.
   if (!keep_files %in% c("none", "tgz", "extracted", "both")) {

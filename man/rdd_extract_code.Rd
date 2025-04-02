@@ -10,7 +10,8 @@ rdd_extract_code(
   include_tests = FALSE,
   include_roxygen = FALSE,
   force_fetch = FALSE,
-  cache_path = getOption("rdocdump.cache_path")
+  cache_path = getOption("rdocdump.cache_path"),
+  repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
 \arguments{
@@ -48,28 +49,26 @@ cat(substr(code, 1, 1000))
 
 # Extract R source code including roxygen2 documentation from a package source directory.
 local({
- old_repos <- getOption("repos")
- options(repos = c(CRAN = "https://cran.r-project.org"))
  code_with_roxygen <- rdd_extract_code(
   "ini",
   include_roxygen = TRUE,
-  force_fetch = TRUE)
+  force_fetch = TRUE,
+  repos = c("CRAN" = "https://cran.r-project.org")
+)
  cat(substr(code_with_roxygen, 1, 1000))
- options(repos = old_repos)
 })
 
 # Extract R source code from a package source directory,
 # including test files but excluding roxygen2 docs.
 local({
- old_repos <- getOption("repos")
- options(repos = c(CRAN = "https://cran.r-project.org"))
  code_with_tests <- rdd_extract_code(
   "ini",
   include_roxygen = TRUE,
   include_tests = TRUE,
-  force_fetch = TRUE)
+  force_fetch = TRUE,
+  repos = c("CRAN" = "https://cran.r-project.org")
+)
  cat(substr(code_with_tests, 1, 1000))
- options(repos = old_repos)
 })
 
 }

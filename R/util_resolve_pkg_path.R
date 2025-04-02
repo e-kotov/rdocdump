@@ -1,4 +1,9 @@
-resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
+resolve_pkg_path <- function(
+  pkg,
+  cache_path = NULL,
+  force_fetch = FALSE,
+  repos = getOption("rdocdump.repos", getOption("repos"))
+) {
   if (!is.character(pkg) || length(pkg) != 1L) {
     stop("Argument 'pkg' must be a single character string.")
   }
@@ -104,10 +109,20 @@ resolve_pkg_path <- function(pkg, cache_path = NULL, force_fetch = FALSE) {
       if (!dir.exists(dest_dir)) {
         dir.create(dest_dir, recursive = TRUE)
       }
-      old_repos <- getOption("repos")
-      options(repos = c(CRAN = "https://cloud.r-project.org"))
-      on.exit(options(repos = old_repos))
-      dp <- utils::download.packages(pkg, destdir = dest_dir, type = "source")
+      # Warn if repos contains known problematic URLs.
+      if (
+        any(grepl("posit\\.co|r-universe\\.dev", repos, ignore.case = TRUE))
+      ) {
+        warning(
+          "Using a repository URL from posit.co or r-universe.dev may result in pre-built binaries being downloaded instead of the package source."
+        )
+      }
+      dp <- utils::download.packages(
+        pkg,
+        destdir = dest_dir,
+        type = "source",
+        repos = repos
+      )
       if (nrow(dp) < 1L) {
         stop("Package not found on CRAN.")
       }
