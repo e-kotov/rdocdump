@@ -33,6 +33,8 @@
 #' @param cache_path A `character` string specifying the directory where kept temporary files will be stored.
 #' By default, it uses the value of `getOption("rdocdump.cache_path")` which sets the cache directory to the temporary directory of the current R session.
 #'
+#' @param repos A `character` vector of repository URLs. By default, it uses the value of `getOption("rdocdump.repos")` which sets the repository URLs to the default R repositories and is itself set to `c("CRAN" = "https://cloud.r-project.org")` on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.
+#'
 #' @return A single string containing the combined package documentation, vignettes, and/or code as specified by the `content` argument.
 #' If the `file` argument is set, returns the path to the file.
 #'

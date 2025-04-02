@@ -19,6 +19,8 @@
 #' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`.
 #' @param cache_path A `character` string specifying the directory to use as a cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
 #'
+#' @inheritParams rdd_to_txt
+#'
 #' @return A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
 #'
 #' @export

@@ -48,6 +48,8 @@ Possible values are:
 
 \item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
 By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
+
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
 A single string containing the combined package documentation, vignettes, and/or code as specified by the \code{content} argument.

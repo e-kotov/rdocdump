@@ -32,6 +32,8 @@ rdd_extract_code(
 \item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}.}
 
 \item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
+
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
 A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
