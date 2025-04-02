@@ -62,7 +62,8 @@ from the <code>tests</code> directory. Optionally, it can include roxygen2 docum
 <span>  include_tests <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  include_roxygen <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  force_fetch <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span></span>
+<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.repos"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,6 +97,10 @@ from the <code>tests</code> directory. Optionally, it can include roxygen2 docum
 
 <dt id="arg-cache-path">cache_path<a class="anchor" aria-label="anchor" href="#arg-cache-path"></a></dt>
 <dd><p>A <code>character</code> string specifying the directory to use as a cache. Defaults to the value of <code>getOption("rdocdump.cache_path")</code>.</p></dd>
+
+
+<dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
+<dd><p>A <code>character</code> vector of repository URLs. By default, it uses the value of <code>getOption("rdocdump.repos")</code> which sets the repository URLs to the default R repositories and is itself set to <code>c("CRAN" = "https://cloud.r-project.org")</code> on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -143,14 +148,13 @@ from the <code>tests</code> directory. Optionally, it can include roxygen2 docum
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract R source code including roxygen2 documentation from a package source directory.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span> <span class="va">old_repos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="va">code_with_roxygen</span> <span class="op">&lt;-</span> <span class="fu">rdd_extract_code</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"ini"</span>,</span></span>
 <span class="r-in"><span>  include_roxygen <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  force_fetch <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  force_fetch <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRAN"</span> <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">code_with_roxygen</span>, <span class="fl">1</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="va">old_repos</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fetching package source from CRAN...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -198,15 +202,14 @@ from the <code>tests</code> directory. Optionally, it can include roxygen2 docum
 <span class="r-in"><span><span class="co"># Extract R source code from a package source directory,</span></span></span>
 <span class="r-in"><span><span class="co"># including test files but excluding roxygen2 docs.</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span> <span class="va">old_repos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="va">code_with_tests</span> <span class="op">&lt;-</span> <span class="fu">rdd_extract_code</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"ini"</span>,</span></span>
 <span class="r-in"><span>  include_roxygen <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  include_tests <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  force_fetch <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  force_fetch <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRAN"</span> <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">code_with_tests</span>, <span class="fl">1</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="va">old_repos</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fetching package source from CRAN...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

@@ -10,7 +10,9 @@
 <url><loc>https://www.ekotov.pro/rdocdump/index.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/index.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_extract_code.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_get_repos.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_set_cache_path.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_set_repos.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_to_txt.html</loc></url>
 </urlset>
 

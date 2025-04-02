@@ -56,7 +56,8 @@ or the documentation from already installed packages), vignettes, and/or R sourc
 <span>  content <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  force_fetch <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  keep_files <span class="op">=</span> <span class="st">"none"</span>,</span>
-<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span></span>
+<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.repos"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -102,6 +103,10 @@ Possible values are:</p><ul><li><p><code>"none"</code>: Delete both the tar.gz a
 <dd><p>A <code>character</code> string specifying the directory where kept temporary files will be stored.
 By default, it uses the value of <code>getOption("rdocdump.cache_path")</code> which sets the cache directory to the temporary directory of the current R session.</p></dd>
 
+
+<dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
+<dd><p>A <code>character</code> vector of repository URLs. By default, it uses the value of <code>getOption("rdocdump.repos")</code> which sets the repository URLs to the default R repositories and is itself set to <code>c("CRAN" = "https://cloud.r-project.org")</code> on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -133,21 +138,21 @@ If the <code>file</code> argument is set, returns the path to the file.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Extract only documentation for rJavaEnv by downloading its source from CRAN</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">old_repos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">docs</span> <span class="op">&lt;-</span> <span class="fu">rdd_to_txt</span><span class="op">(</span><span class="st">"rJavaEnv"</span>, force_fetch <span class="op">=</span> <span class="cn">TRUE</span>, content <span class="op">=</span> <span class="st">"docs"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">docs</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="co"># Print the first 3 lines</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lines</span>, <span class="fl">3</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="co"># Print the last 3 lines</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">lines</span>, <span class="fl">3</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="va">old_repos</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">docs</span> <span class="op">&lt;-</span> <span class="fu">rdd_to_txt</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"rJavaEnv"</span>,</span></span>
+<span class="r-in"><span>  force_fetch <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  content <span class="op">=</span> <span class="st">"docs"</span>,</span></span>
+<span class="r-in"><span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CRAN"</span> <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fetching package source from CRAN...</span>
+<span class="r-in"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">docs</span>, <span class="st">"\n"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Print the first 3 lines</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lines</span>, <span class="fl">3</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> DESCRIPTION:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Package: rJavaEnv</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Title: 'Java' Environments for R Projects</span>
+<span class="r-in"><span><span class="co"># Print the last 3 lines</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">lines</span>, <span class="fl">3</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      "17" == java_check_version_rjava(quiet = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      ## End(Not run)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      </span>
