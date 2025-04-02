@@ -15,3 +15,8 @@ Invisibly returns the new repository URLs.
 \description{
 This function sets the repository URLs used by rdocdump when fetching package sources.
 }
+\examples{
+# Set rdocdump repository options
+rdd_set_repos(c("CRAN" = "https://cloud.r-project.org"))
+
+}

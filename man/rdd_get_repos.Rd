@@ -12,3 +12,8 @@ A character vector of repository URLs.
 \description{
 This function returns the current repository URLs used by rdocdump.
 }
+\examples{
+# Get current rdocdump repository options
+rdd_get_repos()
+
+}
