@@ -10,11 +10,13 @@ license: MIT
 title: 'rdocdump: Dump ''R'' Package Documentation and Vignettes into One File'
 version: 0.0.0.9000
 doi: 10.32614/CRAN.package.rdocdump
-abstract: Dump R documentation and vignettes of R packages into a single file. Supports
-  installed packages, tar.gz archives, and package source directories. If the package
-  is not installed, only its source is automatically downloaded from CRAN for processing.
-  The output is a single plain text file or a 'character', which is useful to ingest
-  complete package documentation into a large language model ('LLM').
+abstract: Dump source code, documentation and vignettes of R packages into a single
+  file. Supports installed packages, tar.gz archives, and package source directories.
+  If the package is not installed, only its source is automatically downloaded from
+  CRAN for processing. The output is a single plain text file or a 'character', which
+  is useful to ingest complete package documentation into a large language model ('LLM')
+  or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar>
+  to create a Retrieval-Augmented Generation (RAG) workflow.
 authors:
 - family-names: Kotov
   given-names: Egor
@@ -51,6 +53,7 @@ references:
     email: jeroenooms@gmail.com
     orcid: https://orcid.org/0000-0002-4035-0289
   year: '2025'
+  doi: 10.32614/CRAN.package.curl
 - type: software
   title: quarto
   abstract: 'quarto: R Interface to ''Quarto'' Markdown Publishing System'
@@ -67,6 +70,7 @@ references:
     email: cderv@posit.co
     orcid: https://orcid.org/0000-0003-4474-2498
   year: '2025'
+  doi: 10.32614/CRAN.package.quarto
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'
@@ -78,5 +82,6 @@ references:
     given-names: Hadley
     email: hadley@posit.co
   year: '2025'
+  doi: 10.32614/CRAN.package.testthat
   version: '>= 3.0.0'
 
