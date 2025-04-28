@@ -40,7 +40,7 @@ pak::pak("e-kotov/rdocdump")
 
 ## Example
 
-Extract documenation and source code of `{rJavaEnv}` package by
+Extract documentation and source code of `{rJavaEnv}` package by
 downloading source from CRAN and save it to file `rJavaEnv_docs.txt`
 
 ``` r
