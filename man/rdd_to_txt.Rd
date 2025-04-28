@@ -2,7 +2,7 @@
 % Please edit documentation in R/to_txt.R
 \name{rdd_to_txt}
 \alias{rdd_to_txt}
-\title{Create Combined Package Documentation as Text}
+\title{Dump Package Source, Documentationm and Vignettes into Plain Text}
 \usage{
 rdd_to_txt(
   pkg,
@@ -56,8 +56,7 @@ A single string containing the combined package documentation, vignettes, and/or
 If the \code{file} argument is set, returns the path to the file.
 }
 \description{
-This function produces a single text output for a package by processing its documentation (Rd files from the package source
-or the documentation from already installed packages), vignettes, and/or R source code.
+This function produces a single text output for an R package by processing its documentation (Rd files from the package source or the documentation from already installed packages), vignettes, and/or R source code.
 }
 \examples{
 # Extract documentation for built-in `stats` package (both docs and vignettes).

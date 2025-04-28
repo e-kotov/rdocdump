@@ -7,15 +7,16 @@ cff-version: 1.2.0
 message: 'To cite package "rdocdump" in publications use:'
 type: software
 license: MIT
-title: 'rdocdump: Dump ''R'' Package Documentation and Vignettes into One File'
+title: 'rdocdump: Dump ''R'' Package Source, Documentation, and Vignettes into One
+  File'
 version: 0.0.0.9000
 doi: 10.32614/CRAN.package.rdocdump
-abstract: Dump source code, documentation and vignettes of R packages into a single
+abstract: Dump source code, documentation and vignettes of an R package into a single
   file. Supports installed packages, tar.gz archives, and package source directories.
   If the package is not installed, only its source is automatically downloaded from
   CRAN for processing. The output is a single plain text file or a 'character', which
-  is useful to ingest complete package documentation into a large language model ('LLM')
-  or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar>
+  is useful to ingest complete package documentation and source into a large language
+  model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar>
   to create a Retrieval-Augmented Generation (RAG) workflow.
 authors:
 - family-names: Kotov
@@ -24,7 +25,7 @@ authors:
   orcid: https://orcid.org/0000-0001-6690-5345
 preferred-citation:
   type: manual
-  title: 'rdocdump: Dump R Package Documentation and Vignettes into One File'
+  title: 'rdocdump: Dump R Package Source, Documentation, and Vignettes into One File'
   authors:
   - family-names: Kotov
     given-names: Egor
@@ -40,6 +41,11 @@ contact:
   given-names: Egor
   email: kotov.egor@gmail.com
   orcid: https://orcid.org/0000-0001-6690-5345
+keywords:
+- llm
+- r-package
+- rag
+- text
 references:
 - type: software
   title: curl

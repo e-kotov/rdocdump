@@ -1,8 +1,7 @@
-#' Create Combined Package Documentation as Text
+#' Dump Package Source, Documentationm and Vignettes into Plain Text
 #'
 #' @description
-#' This function produces a single text output for a package by processing its documentation (Rd files from the package source
-#' or the documentation from already installed packages), vignettes, and/or R source code.
+#' This function produces a single text output for an R package by processing its documentation (Rd files from the package source or the documentation from already installed packages), vignettes, and/or R source code.
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
