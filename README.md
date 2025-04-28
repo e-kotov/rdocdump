@@ -22,7 +22,7 @@ Dump source code, documentation and vignettes of an R package into a
 single file. Supports installed packages, tar.gz archives, and package
 source directories. If the package is not installed, only its source is
 automatically downloaded from CRAN for processing. The output is a
-single plain text file or a ‘character’, which is useful to ingest
+single plain text file or a `character`, which is useful to ingest
 complete package documentation and source into a large language model
 (‘LLM’) or pass it further to other tools, such as
 <a href="https://github.com/tidyverse/ragnar"
@@ -40,7 +40,7 @@ pak::pak("e-kotov/rdocdump")
 
 ## Example
 
-Extract documentation and source code of `{rJavaEnv}` package by
+Extract documenation and source code of `{rJavaEnv}` package by
 downloading source from CRAN and save it to file `rJavaEnv_docs.txt`
 
 ``` r
@@ -56,15 +56,15 @@ rdd_to_txt(
 
 To cite package ‘rdocdump’ in publications use:
 
-Kotov E (2025). *rdocdump: Dump R Package Documentation and Vignettes
-into One File*. doi:10.32614/CRAN.package.rdocdump
+Kotov E (2025). *rdocdump: Dump R Package Source, Documentation, and
+Vignettes into One File*. doi:10.32614/CRAN.package.rdocdump
 <https://doi.org/10.32614/CRAN.package.rdocdump>,
 <https://github.com/e-kotov/rdocdump>.
 
 BibTeX:
 
     @Manual{rdocdump,
-      title = {rdocdump: Dump R Package Documentation and Vignettes into One File},
+      title = {rdocdump: Dump R Package Source, Documentation, and Vignettes into One File},
       author = {Egor Kotov},
       year = {2025},
       url = {https://github.com/e-kotov/rdocdump},
