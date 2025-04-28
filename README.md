@@ -2,7 +2,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rdocdump: Dump ‘R’ Package Documentation and Vignettes into One File <a href="https://www.ekotov.pro/rdocdump/"><img src="man/figures/logo.png" align="right" width="200" alt="rdocdump website" /></a>
+# rdocdump: Dump ‘R’ Package Source, Documentation, and Vignettes into One File <a href="https://www.ekotov.pro/rdocdump/"><img src="man/figures/logo.png" align="right" width="200" alt="rdocdump website" /></a>
 
 <!-- badges: start -->
 
@@ -18,13 +18,13 @@ status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.o
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg)](https://doi.org/10.5281/zenodo.15072446)
 <!-- badges: end -->
 
-Dump source code, documentation and vignettes of R packages into a
+Dump source code, documentation and vignettes of an R package into a
 single file. Supports installed packages, tar.gz archives, and package
 source directories. If the package is not installed, only its source is
 automatically downloaded from CRAN for processing. The output is a
 single plain text file or a ‘character’, which is useful to ingest
-complete package documentation into a large language model (‘LLM’) or
-pass it further to other tools, such as
+complete package documentation and source into a large language model
+(‘LLM’) or pass it further to other tools, such as
 <a href="https://github.com/tidyverse/ragnar"
 target="_blank"><code>{ragnar}</code></a> to create a
 Retrieval-Augmented Generation (RAG) workflow.
@@ -40,8 +40,8 @@ pak::pak("e-kotov/rdocdump")
 
 ## Example
 
-Extract documenation of `{rJavaEnv}` package by downloading source from
-CRAN and save it to file `rJavaEnv_docs.txt`
+Extract documenation and source code of `{rJavaEnv}` package by
+downloading source from CRAN and save it to file `rJavaEnv_docs.txt`
 
 ``` r
 rdd_to_txt(

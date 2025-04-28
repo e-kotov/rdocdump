@@ -2,8 +2,8 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "rdocdump",
-  "description": "Dump source code, documentation and vignettes of R packages into a single file. Supports installed packages, tar.gz archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a 'character', which is useful to ingest complete package documentation into a large language model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar> to create a Retrieval-Augmented Generation (RAG) workflow.",
-  "name": "rdocdump: Dump 'R' Package Documentation and Vignettes into One File",
+  "description": "Dump source code, documentation and vignettes of an R package into a single file. Supports installed packages, tar.gz archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a 'character', which is useful to ingest complete package documentation and source into a large language model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar> to create a Retrieval-Augmented Generation (RAG) workflow.",
+  "name": "rdocdump: Dump 'R' Package Source, Documentation, and Vignettes into One File",
   "relatedLink": "https://www.ekotov.pro/rdocdump/",
   "codeRepository": "https://github.com/e-kotov/rdocdump",
   "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
+  "runtimePlatform": "R version 4.5.0 (2025-04-11)",
   "author": [
     {
       "@type": "Person",
@@ -84,7 +84,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "104.575KB",
+  "fileSize": "60.699KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -98,7 +98,7 @@
           "@id": "https://orcid.org/0000-0001-6690-5345"
         }
       ],
-      "name": "rdocdump: Dump R Package Documentation and Vignettes into One File",
+      "name": "rdocdump: Dump R Package Source, Documentation, and Vignettes into One File",
       "identifier": "10.32614/CRAN.package.rdocdump",
       "url": "https://github.com/e-kotov/rdocdump",
       "@id": "https://doi.org/10.32614/CRAN.package.rdocdump",
@@ -107,5 +107,6 @@
   ],
   "readme": "https://github.com/e-kotov/rdocdump/blob/main/README.md",
   "contIntegration": ["https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml", "https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck"],
-  "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"]
+  "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"],
+  "keywords": ["llm", "r-package", "rag", "text"]
 }
