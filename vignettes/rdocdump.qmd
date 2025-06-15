@@ -19,12 +19,28 @@ format:
 
 # Installation
 
-To install the development version of `{rdocdump}` from GitHub, run the following commands:
+
+Install the latest stable release of `rdocdump` from CRAN with:
 
 ```r
-# install.packages("pak") # Uncomment if pak is not installed
+install.packages("rdocdump")
+```
+
+You can install the development version of `rdocdump` from R Universe with:
+
+```r
+install.packages('rdocdump',
+ repos = c('https://e-kotov.r-universe.dev', 'https://cloud.r-project.org')
+)
+```
+
+or from GitHub with:
+
+```r
+# install.packages("pak")
 pak::pak("e-kotov/rdocdump")
 ```
+
 
 # Setting the Cache Path
 

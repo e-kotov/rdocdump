@@ -2,19 +2,19 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "rdocdump",
-  "description": "Dump source code, documentation and vignettes of an R package into a single file. Supports installed packages, tar.gz archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a 'character', which is useful to ingest complete package documentation and source into a large language model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar> to create a Retrieval-Augmented Generation (RAG) workflow.",
+  "description": "Dump source code, documentation and vignettes of an 'R' package into a single file. Supports installed packages, 'tar.gz' archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a 'character', which is useful to ingest complete package documentation and source into a large language model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar> to create a Retrieval-Augmented Generation (RAG) workflow.",
   "name": "rdocdump: Dump 'R' Package Source, Documentation, and Vignettes into One File",
   "relatedLink": "https://www.ekotov.pro/rdocdump/",
   "codeRepository": "https://github.com/e-kotov/rdocdump",
   "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.0.0.9000",
+  "version": "0.1.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.0 (2025-04-11)",
+  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
   "author": [
     {
       "@type": "Person",
@@ -45,18 +45,6 @@
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
-      "identifier": "curl",
-      "name": "curl",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=curl"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "quarto",
       "name": "quarto",
       "provider": {
@@ -84,7 +72,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "60.699KB",
+  "fileSize": "61.025KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -105,6 +93,7 @@
       "sameAs": "https://doi.org/10.32614/CRAN.package.rdocdump"
     }
   ],
+  "releaseNotes": "https://github.com/e-kotov/rdocdump/blob/master/NEWS.md",
   "readme": "https://github.com/e-kotov/rdocdump/blob/main/README.md",
   "contIntegration": ["https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml", "https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck"],
   "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"],
