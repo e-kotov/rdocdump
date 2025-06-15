@@ -1,10 +1,7 @@
 #' Extract R Source Code from a Package
 #'
 #' @description
-#' This function extracts the R source code from a package. For installed packages, it retrieves the
-#' package namespace and deparses all functions found in the package. For package source directories
-#' or archives (non-installed packages), it reads all `.R` files from the `R` directory and, optionally,
-#' from the `tests` directory. Optionally, it can include roxygen2 documentation from these files.
+#' This function extracts the R source code from a package. For installed packages, it retrieves the package namespace and deparses all functions found in the package. For package source directories or archives (non-installed packages), it reads all `.R` files from the `R` directory and, optionally, from the `tests` directory. Optionally, it can include roxygen2 documentation from these files.
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
@@ -27,10 +24,11 @@
 #'
 #' @examples
 #' # Extract only R source code (excluding roxygen2 documentation) from an installed package.
-#' code <- rdd_extract_code("stats")
+#' code <- rdd_extract_code("splines")
 #' cat(substr(code, 1, 1000))
 #'
 #' # Extract R source code including roxygen2 documentation from a package source directory.
+#' \donttest{
 #' local({
 #'  code_with_roxygen <- rdd_extract_code(
 #'   "ini",
@@ -53,6 +51,7 @@
 #' )
 #'  cat(substr(code_with_tests, 1, 1000))
 #'})
+#' }
 #'
 rdd_extract_code <- function(
   pkg,

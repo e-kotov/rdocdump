@@ -186,7 +186,7 @@ pdftitle={Sweave
 
 # Handling Temporary Files
 
-The argument keep_files controls whether temporary files (the downloaded archive and/or extracted directory) are retained:
+The argument `keep_files` controls whether temporary files (the downloaded archive and/or extracted directory) are retained:
 
 - `"none"` (default): Delete both the tar.gz archive and the extracted files.
 

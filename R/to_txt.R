@@ -41,7 +41,7 @@
 #'
 #' @examples
 #' # Extract documentation for built-in `stats` package (both docs and vignettes).
-#' docs <- rdd_to_txt("stats")
+#' docs <- rdd_to_txt("splines")
 #' cat(substr(docs, 1, 500))
 #'
 #' \donttest{

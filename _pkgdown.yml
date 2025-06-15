@@ -38,3 +38,15 @@ navbar:
 home:
   title: 'rdocdump: Dump R Package Documentation and Vignettes into One File'
   description: 'Dump R Package Documentation and Vignettes into One File'
+
+reference:
+  - title: "Main functions"
+    contents:
+      - rdd_to_txt
+      - rdd_extract_code
+  - title: "Helper functions"
+    contents:
+      - rdd_set_cache_path
+      - rdd_set_repos
+      - rdd_get_repos
+      

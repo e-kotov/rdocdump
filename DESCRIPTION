@@ -17,6 +17,7 @@ License: MIT + file LICENSE
 URL: https://github.com/e-kotov/rdocdump, https://www.ekotov.pro/rdocdump/
 BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests:
+    curl,
     quarto,
     testthat (>= 3.0.0)
 VignetteBuilder: 

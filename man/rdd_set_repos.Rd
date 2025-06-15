@@ -2,7 +2,7 @@
 % Please edit documentation in R/get-or-set-repos.R
 \name{rdd_set_repos}
 \alias{rdd_set_repos}
-\title{Set rdocdump Repository Options}
+\title{Set \code{rdocdump} Repository Options}
 \usage{
 rdd_set_repos(repos)
 }
@@ -13,7 +13,7 @@ rdd_set_repos(repos)
 Invisibly returns the new repository URLs.
 }
 \description{
-This function sets the repository URLs used by rdocdump when fetching package sources.
+This function sets the package repository URLs used by \code{rdocdump} when fetching package sources. May be useful for setting custom repositories or mirrors. This does not affect the repositories used by \code{install.packages()} in your current R session and/or project.
 }
 \examples{
 # Set rdocdump repository options

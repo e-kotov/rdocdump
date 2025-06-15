@@ -2,7 +2,7 @@
 % Please edit documentation in R/get-or-set-repos.R
 \name{rdd_get_repos}
 \alias{rdd_get_repos}
-\title{Get Current rdocdump Repository Options}
+\title{Get Current \code{rdocdump} Repository Options}
 \usage{
 rdd_get_repos()
 }
@@ -10,7 +10,7 @@ rdd_get_repos()
 A character vector of repository URLs.
 }
 \description{
-This function returns the current repository URLs used by rdocdump.
+This function returns the current repository URLs used by \code{rdocdump}. The default is set to the CRAN repository at "https://cloud.r-project.org". This does not affect the repositories used by \code{install.packages()} in your current R session and/or project. To set repository options, use \code{\link{rdd_set_repos}}.
 }
 \examples{
 # Get current rdocdump repository options
