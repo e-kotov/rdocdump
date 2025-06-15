@@ -13,3 +13,4 @@
 ^codemeta\.json$
 ^man/figures/logo\.png$
 ^man/figures/card\.png$
+^CRAN-SUBMISSION$
