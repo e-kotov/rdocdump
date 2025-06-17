@@ -9,11 +9,17 @@
 <url><loc>https://www.ekotov.pro/rdocdump/authors.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/index.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/news/index.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/cleanup_files.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/combine_rd.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/combine_vignettes.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/extract_code_installed.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/extract_code_source.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/index.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_extract_code.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_get_repos.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_set_cache_path.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_set_repos.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/rdd_to_txt.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/resolve_pkg_path.html</loc></url>
 </urlset>
 

@@ -71,12 +71,20 @@
 <!-- badges: start -->
 
 <p><a href="https://doi.org/10.5281/zenodo.15072446" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg" alt="DOI"></a> <!-- badges: end --></p>
-<p>Dump source code, documentation and vignettes of an R package into a single file. Supports installed packages, tar.gz archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a <code>character</code>, which is useful to ingest complete package documentation and source into a large language model (‘LLM’) or pass it further to other tools, such as <a href="https://github.com/tidyverse/ragnar" target="_blank" class="external-link"><code>{ragnar}</code></a> to create a Retrieval-Augmented Generation (RAG) workflow.</p>
+<p>Dump source code, documentation and vignettes of an <code>R</code> package into a single file. Supports installed packages, <code>tar.gz</code> archives, and package source directories. If the package is not installed, only its source is automatically downloaded from CRAN for processing. The output is a single plain text file or a <code>character</code> vector, which is useful to ingest complete package documentation and source into a large language model (LLM) or pass it further to other tools, such as <a href="https://github.com/tidyverse/ragnar" target="_blank" class="external-link"><code>{ragnar}</code></a> to create a Retrieval-Augmented Generation (RAG) workflow.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of rdocdump from GitHub with:</p>
+<p>Install the latest stable release of <code>rdocdump</code> from CRAN with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"rdocdump"</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version of <code>rdocdump</code> from R Universe with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'rdocdump'</span>,</span>
+<span> repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'https://e-kotov.r-universe.dev'</span>, <span class="st">'https://cloud.r-project.org'</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>or from GitHub with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"e-kotov/rdocdump"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -84,7 +92,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>Extract documenation and source code of <a href="https://github.com/e-kotov/rJavaEnv" class="external-link">rJavaEnv</a> package by downloading source from CRAN and save it to file <code>rJavaEnv_docs.txt</code></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/rdd_to_txt.html">rdd_to_txt</a></span><span class="op">(</span></span>
 <span>  pkg <span class="op">=</span> <span class="st">"rJavaEnv"</span>,</span>
 <span>  file <span class="op">=</span> <span class="st">"rJavaEnv_docs.txt"</span>,</span>
@@ -98,13 +106,13 @@
 <p>To cite package ‘rdocdump’ in publications use:</p>
 <p>Kotov E (2025). <em>rdocdump: Dump R Package Source, Documentation, and Vignettes into One File</em>. <a href="doi:10.32614/CRAN.package.rdocdump" class="uri">doi:10.32614/CRAN.package.rdocdump</a> <a href="https://doi.org/10.32614/CRAN.package.rdocdump" class="external-link uri">https://doi.org/10.32614/CRAN.package.rdocdump</a>, <a href="https://github.com/e-kotov/rdocdump" class="external-link uri">https://github.com/e-kotov/rdocdump</a>.</p>
 <p>BibTeX:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">@</span>Manual{rdocdump,</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  title <span class="ot">=</span> {rdocdump<span class="sc">:</span> Dump R Package Source, Documentation, and Vignettes into One File},</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  author <span class="ot">=</span> {Egor Kotov},</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2025</span>},</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>e<span class="sc">-</span>kotov<span class="sc">/</span>rdocdump},</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.32614</span><span class="sc">/</span>CRAN.package.rdocdump},</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">@</span>Manual{rdocdump,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  title <span class="ot">=</span> {rdocdump<span class="sc">:</span> Dump R Package Source, Documentation, and Vignettes into One File},</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  author <span class="ot">=</span> {Egor Kotov},</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2025</span>},</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>e<span class="sc">-</span>kotov<span class="sc">/</span>rdocdump},</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  doi <span class="ot">=</span> {<span class="fl">10.32614</span><span class="sc">/</span>CRAN.package.rdocdump},</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

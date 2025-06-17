@@ -55,6 +55,7 @@
 <span>  include_roxygen <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  force_fetch <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span>,</span>
+<span>  keep_files <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.repos"</span>, <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"repos"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -89,6 +90,15 @@
 
 <dt id="arg-cache-path">cache_path<a class="anchor" aria-label="anchor" href="#arg-cache-path"></a></dt>
 <dd><p>A <code>character</code> string specifying the directory to use as a cache. Defaults to the value of <code>getOption("rdocdump.cache_path")</code>.</p></dd>
+
+
+<dt id="arg-keep-files">keep_files<a class="anchor" aria-label="anchor" href="#arg-keep-files"></a></dt>
+<dd><p>A <code>character</code> value controlling whether temporary files should be kept.
+Possible values are:</p><ul><li><p><code>"none"</code>: Delete both the tar.gz archive and the extracted files (default).</p></li>
+<li><p><code>"tgz"</code>: Keep only the tar.gz archive.</p></li>
+<li><p><code>"extracted"</code>: Keep only the extracted files.</p></li>
+<li><p><code>"both"</code>: Keep both the tar.gz archive and the extracted files.</p></li>
+</ul></dd>
 
 
 <dt id="arg-repos">repos<a class="anchor" aria-label="anchor" href="#arg-repos"></a></dt>
@@ -140,6 +150,10 @@
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract R source code including roxygen2 documentation from a package source directory.</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># set cache directory for `rdocdump`</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="rdd_set_cache_path.html">rdd_set_cache_path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/rdocdump_cache"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> rdocdump.cache_path set to: /tmp/RtmpQEvSgA/rdocdump_cache</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span> <span class="va">code_with_roxygen</span> <span class="op">&lt;-</span> <span class="fu">rdd_extract_code</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"ini"</span>,</span></span>
@@ -246,6 +260,8 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> read.ini &lt;- function(filepath, encoding = getOption("encoding")) {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   index &lt;- function(x, run</span>
+<span class="r-in"><span><span class="co"># clean cache directory</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"rdocdump.cache_path"</span><span class="op">)</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, force <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
