@@ -54,7 +54,7 @@ Extract documenation and source code of `{rJavaEnv}` package by downloading sour
 ```r
 rdd_to_txt(
   pkg = "rJavaEnv",
-  file = "rJavaEnv_docs.txt",
+  file = tempfile("rJavaEnv_docs_", fileext = ".txt"),
   force_fetch = TRUE, # force download even if package is installed
   keep_files = "none" # delete temp files
 )

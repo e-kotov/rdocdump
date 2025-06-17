@@ -76,7 +76,7 @@ Here is an example that downloads the source for the package `{rJavaEnv}` from C
 # Extract documentation for 'rJavaEnv' and save to a text file.
 rdd_to_txt(
   pkg = "rJavaEnv",
-  file = "rJavaEnv_docs.txt",
+  file = tempfile("rJavaEnv_docs_", fileext = ".txt"),
   force_fetch = TRUE,    # Force download even if the package is installed.
   keep_files = "none"      # Delete temporary files after extraction.
 )
@@ -84,50 +84,60 @@ rdd_to_txt(
 
 ```
 Fetching package source from CRAN...
-trying URL 'https://cran.rstudio.com/src/contrib/rJavaEnv_0.2.2.tar.gz'
-Content type 'application/x-gzip' length 138667 bytes (135 KB)
+trying URL 'https://cloud.r-project.org/src/contrib/rJavaEnv_0.3.0.tar.gz'
+Content type 'application/x-gzip' length 104016 bytes (101 KB)
 ==================================================
-downloaded 135 KB
+downloaded 101 KB
 
-[1] "rJavaEnv_docs.txt"
+[1] "/private/var/folders/gb/t5zr5rn15sldqybrmqbyh6y80000gn/T/Rtmpp5wRxV/rJavaEnv_docs_c0736421bbc2.txt"
 ```
 
 If you prefer to simply get the combined documentation as a character string, call the function without the `file` argument:
 
 ```r
 # Extract and capture the combined documentation in a variable.
-docs <- rdd_to_txt(pkg = "stats")
+docs <- rdd_to_txt(pkg = "splines")
 cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
 ```
 
 ```
 DESCRIPTION:
-Package: stats
-Version: 4.4.3
+Package: splines
+Version: 4.5.1
 Priority: base
-Title: The R Stats Package
-Author: R Core Team and contributors worldwide
+Imports: graphics, stats
+Title: Regression Spline Functions and Classes
+Author: Douglas M. Bates <bates@stat.wisc.edu> and
+ William N. Venables <Bill.Venables@csiro.au>
 Maintainer: R Core Team <do-use-Contact-address@r-project.org>
 Contact: R-help mailing list <r-help@r-project.org>
-Description: R statistical functions.
-License: Part of R 4.4.3
-Imports: utils, grDevices, graphics
-Suggests: MASS, Matrix, SuppDists, methods, stats4
+Description: Regression spline functions and classes.
+License: Part of R 4.5.1
+Suggests: Matrix, methods
 NeedsCompilation: yes
-Encoding: UTF-8
-Enhances: Kendall, coin, multcomp, pcaPP, pspearman, robustbase
-Built: R 4.4.3; aarch64-apple-darwin20; 2025-02-28 21:20:18 UTC; unix
+Built: R 4.5.1; aarch64-apple-darwin20; 2025-06-14 01:29:30 UTC; unix
 
 --------------------------------------------------------------------------------
-Function: AIC()
-Akaike's An Information Criterion
+Function: asVector()
+Coerce an Object to a Vector
 
 Description:
 
-     Generic function calculating Akaike's ‘An Information Criterion’
-     for one or several fitted model objects for which a log-likelihood
-     value can be obtained, according to the formula -2*log-likelihood
-     + k*npar, where npar represents the number of parameters in the
+     This is a generic function.  Methods for this function coerce
+     objects of given classes to vectors.
+
+Usage:
+
+     asVector(object)
+     
+Arguments:
+
+  object: An object.
+
+Details:
+
+     Methods for vector coercion in new classes must be created for the
+     ‘asVector’ generic instead of ‘as.vector’.
 ```
 
 # Choosing what to dump to text
