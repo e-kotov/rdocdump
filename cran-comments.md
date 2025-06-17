@@ -8,7 +8,9 @@
 
 * Revised examples to cleanup temporary files and folders created during examples execution.
 
-* Added a helper used in main user facing functions that cleans up the cache even in temporary folder during normal package usage more reliably.
+* Added an internal helper function that is used in exported functions to clean up the cache more reliably.
+
+* Using tempdir() in examples in README and vignettes.
 
 
 # Original submission:
