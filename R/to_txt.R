@@ -45,6 +45,9 @@
 #' cat(substr(docs, 1, 500))
 #'
 #' \donttest{
+#' # set cache directory for `rdocdump`
+#' rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
+#'
 #' # Extract only documentation for rJavaEnv by downloading its source from CRAN
 #' docs <- rdd_to_txt(
 #'   "rJavaEnv",
@@ -57,6 +60,9 @@
 #' cat(head(lines, 3), sep = "\n")
 #' # Print the last 3 lines
 #' cat(tail(lines, 3), sep = "\n")
+#'
+#' # clean cache directory
+#' unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
 #' }
 #'
 rdd_to_txt <- function(
@@ -117,7 +123,8 @@ rdd_to_txt <- function(
       include_tests = FALSE,
       include_roxygen = FALSE,
       force_fetch = force_fetch,
-      cache_path = cache_path
+      cache_path = cache_path,
+      keep_files = "both", # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
     )
   }
 
@@ -134,39 +141,9 @@ rdd_to_txt <- function(
   }
   combined_text <- paste(components, collapse = "\n\n")
 
-  # Decide whether to keep or delete temporary files.
-  if (
-    keep_files %in%
-      c("tgz", "both") &&
-      !is.null(pkg_info$tar_path) &&
-      !is.null(cache_path)
-  ) {
-    if (!dir.exists(cache_path)) {
-      dir.create(cache_path, recursive = TRUE)
-    }
-    dest_archive <- file.path(cache_path, basename(pkg_info$tar_path))
-    # Optionally, you might copy or leave the file in place.
-  } else if (keep_files %in% c("none", "extracted")) {
-    if (!is.null(pkg_info$tar_path)) {
-      unlink(pkg_info$tar_path)
-    }
-  }
-  if (
-    keep_files %in%
-      c("extracted", "both") &&
-      !is.null(pkg_info$extracted_path) &&
-      !is.null(cache_path)
-  ) {
-    if (!dir.exists(cache_path)) {
-      dir.create(cache_path, recursive = TRUE)
-    }
-    dest_extracted <- file.path(cache_path, basename(pkg_info$extracted_path))
-    # Optionally, you might copy or leave the folder in place.
-  } else if (keep_files %in% c("none", "tgz")) {
-    if (!is.null(pkg_info$extracted_path)) {
-      unlink(pkg_info$extracted_path, recursive = TRUE)
-    }
-  }
+  # Clean up temporary files according to keep_files
+  cleanup_result <- cleanup_files(pkg_info, keep_files)
+
   if (!is.null(file)) {
     writeLines(combined_text, con = file)
     return(file)

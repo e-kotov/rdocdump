@@ -1,4 +1,7 @@
-# Helper function: combine_vignettes
+#' Helper function to combine package vignettes
+#' @param pkg_path Path to the package source directory.
+#' @return A single string containing the combined vignettes from the package.
+#' @keywords internal
 combine_vignettes <- function(pkg_path) {
   # Check for a "vignettes" directory; if not present, try "doc"
   if (dir.exists(file.path(pkg_path, "vignettes"))) {

@@ -1,3 +1,10 @@
+#' Combine Rd files into a single character vector.
+#' This function reads the Rd files from a package source directory or an installed package and combines them into a single string.
+#' @param pkg_path Path to the package source directory or the installed package.
+#' @param is_installed Logical indicating whether the package is installed (`TRUE`) or a source package (`FALSE`).
+#' @param pkg_name Optional package name if the package is installed.
+#' @return A single string containing the combined Rd documentation.
+#' @keywords internal
 combine_rd <- function(
   pkg_path,
   is_installed = FALSE,

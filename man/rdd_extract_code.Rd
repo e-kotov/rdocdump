@@ -11,6 +11,7 @@ rdd_extract_code(
   include_roxygen = FALSE,
   force_fetch = FALSE,
   cache_path = getOption("rdocdump.cache_path"),
+  keep_files = "none",
   repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
@@ -33,6 +34,15 @@ rdd_extract_code(
 
 \item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
 
+\item{keep_files}{A \code{character} value controlling whether temporary files should be kept.
+Possible values are:
+\itemize{
+\item \code{"none"}: Delete both the tar.gz archive and the extracted files (default).
+\item \code{"tgz"}: Keep only the tar.gz archive.
+\item \code{"extracted"}: Keep only the extracted files.
+\item \code{"both"}: Keep both the tar.gz archive and the extracted files.
+}}
+
 \item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
@@ -48,6 +58,9 @@ cat(substr(code, 1, 1000))
 
 # Extract R source code including roxygen2 documentation from a package source directory.
 \donttest{
+# set cache directory for `rdocdump`
+rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
+
 local({
  code_with_roxygen <- rdd_extract_code(
   "ini",
@@ -70,6 +83,8 @@ local({
 )
  cat(substr(code_with_tests, 1, 1000))
 })
+# clean cache directory
+unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
 }
 
 }

@@ -1,3 +1,15 @@
+#' Resolve the path to a package directory or tarball
+#' @description
+#' This function resolves the path to a package directory or tarball, handling both installed packages and source packages from CRAN.
+#' @inheritParams rdd_to_txt
+#' @return A list containing:
+#' - `pkg_path`: Path to the package directory or tarball.
+#' - `extracted_path`: Path to the extracted package directory (if applicable).
+#' - `tar_path`: Path to the tarball if it was downloaded.
+#' - `is_installed`: Logical indicating if the package is installed.
+#'
+#' @keywords internal
+#'
 resolve_pkg_path <- function(
   pkg,
   cache_path = NULL,
@@ -37,9 +49,11 @@ resolve_pkg_path <- function(
     if (dir.exists(pkg)) {
       # Check if directory is a source package by looking for Rd files in "man/"
       man_dir <- file.path(pkg, "man")
-      rd_files <- if (dir.exists(man_dir))
-        list.files(man_dir, pattern = "\\.Rd$", full.names = TRUE) else
+      rd_files <- if (dir.exists(man_dir)) {
+        list.files(man_dir, pattern = "\\.Rd$", full.names = TRUE)
+      } else {
         character(0)
+      }
       if (length(rd_files) > 0) {
         # It is a source package
         return(list(
@@ -92,8 +106,11 @@ resolve_pkg_path <- function(
   } else {
     # pkg is not an existing file/directory: treat it as a package name.
     # If force_fetch is TRUE, ignore any locally installed package.
-    pkg_found <- if (!force_fetch)
-      tryCatch(find.package(pkg), error = function(e) NULL) else NULL
+    pkg_found <- if (!force_fetch) {
+      tryCatch(find.package(pkg), error = function(e) NULL)
+    } else {
+      NULL
+    }
     if (!is.null(pkg_found)) {
       # Installed package found.
       return(list(
