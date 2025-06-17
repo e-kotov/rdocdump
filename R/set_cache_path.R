@@ -11,7 +11,16 @@
 #' # set cache directory for `rdocdump`
 #' rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
 #'
-rdd_set_cache_path <- function(path) {
+rdd_set_cache_path <- function(
+  path
+) {
+  # Validate the input path
+  if (!is.character(path) || length(path) != 1) {
+    stop(
+      "`path` argument must be a single character string specifying the cache directory."
+    )
+  }
+
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE)
   }
