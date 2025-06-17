@@ -18,5 +18,6 @@ This function sets the cache path used by \code{rdocdump} to store temporary fil
 \examples{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-
+# default cache directory
+unlink(getOption("rdocdump.cache_path"), recursive = TRUE)
 }
