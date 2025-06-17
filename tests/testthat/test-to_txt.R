@@ -43,8 +43,8 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
   vign_file <- file.path(vignette_dir, "example.md")
   writeLines("This is a vignette", vign_file)
 
-  # Stub for resolve_pkg_path() to simply return our fake package directory.
-  resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
+  # Stub resolve_pkg_path() to simply return our fake package directory.
+  fake_resolve <- function(pkg, cache_path, force_fetch) {
     list(
       pkg_path = pkg,
       is_installed = FALSE,
@@ -53,9 +53,10 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
       extracted_path = NULL
     )
   }
-
-  # Attach the stubbed function to the global environment for testing.
-  assign("resolve_pkg_path", resolve_pkg_path, envir = .GlobalEnv)
+  local_mocked_bindings(
+    resolve_pkg_path = fake_resolve,
+    .package = "rdocdump"
+  )
 
   out <- rdd_to_txt(pkg_dir, keep_files = "none")
 
@@ -85,6 +86,7 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
     info = "Output should include vignette content"
   )
 })
+
 
 test_that("rdd_to_txt outputs only documentation when content is 'docs'", {
   pkg_dir <- tempfile("pkg_")
