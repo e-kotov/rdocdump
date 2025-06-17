@@ -1,3 +1,14 @@
+# Tests for the rdd_to_txt function in the rdocdump package
+fake_resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
+  list(
+    pkg_path = pkg,
+    is_installed = FALSE,
+    pkg_name = "testpkg",
+    tar_path = NULL,
+    extracted_path = NULL
+  )
+}
+
 test_that("rdd_to_txt works for installed packages", {
   # Use an installed package such as "stats".
   txt <- rdd_to_txt("stats", keep_files = "none")
@@ -43,18 +54,8 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
   vign_file <- file.path(vignette_dir, "example.md")
   writeLines("This is a vignette", vign_file)
 
-  # Stub resolve_pkg_path() to simply return our fake package directory.
-  fake_resolve <- function(pkg, cache_path, force_fetch) {
-    list(
-      pkg_path = pkg,
-      is_installed = FALSE,
-      pkg_name = "testpkg",
-      tar_path = NULL,
-      extracted_path = NULL
-    )
-  }
   local_mocked_bindings(
-    resolve_pkg_path = fake_resolve,
+    resolve_pkg_path = fake_resolve_pkg_path,
     .package = "rdocdump"
   )
 
@@ -108,18 +109,10 @@ test_that("rdd_to_txt outputs only documentation when content is 'docs'", {
   vign_file <- file.path(vignette_dir, "example.md")
   writeLines("This is a vignette", vign_file)
 
-  # Stub for resolve_pkg_path() to simply return our fake package directory.
-  resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
-    list(
-      pkg_path = pkg,
-      is_installed = FALSE,
-      pkg_name = "testpkg",
-      tar_path = NULL,
-      extracted_path = NULL
-    )
-  }
-
-  assign("resolve_pkg_path", resolve_pkg_path, envir = .GlobalEnv)
+  local_mocked_bindings(
+    resolve_pkg_path = fake_resolve_pkg_path,
+    .package = "rdocdump"
+  )
 
   out_docs <- rdd_to_txt(pkg_dir, keep_files = "none", content = "docs")
 
@@ -166,18 +159,10 @@ test_that("rdd_to_txt outputs only vignettes when content is 'vignettes'", {
   vign_file <- file.path(vignette_dir, "example.md")
   writeLines("This is a vignette", vign_file)
 
-  # Stub resolve_pkg_path() as above.
-  resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
-    list(
-      pkg_path = pkg,
-      is_installed = FALSE,
-      pkg_name = "testpkg",
-      tar_path = NULL,
-      extracted_path = NULL
-    )
-  }
-
-  assign("resolve_pkg_path", resolve_pkg_path, envir = .GlobalEnv)
+  local_mocked_bindings(
+    resolve_pkg_path = fake_resolve_pkg_path,
+    .package = "rdocdump"
+  )
 
   out_vignettes <- rdd_to_txt(
     pkg_dir,
