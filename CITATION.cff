@@ -12,11 +12,11 @@ title: 'rdocdump: Dump ''R'' Package Source, Documentation, and Vignettes into O
 version: 0.1.0
 doi: 10.32614/CRAN.package.rdocdump
 abstract: Dump source code, documentation and vignettes of an 'R' package into a single
-  file. Supports installed packages, 'tar.gz' archives, and package source directories.
+  file. Supports installed packages, tar.gz archives, and package source directories.
   If the package is not installed, only its source is automatically downloaded from
-  CRAN for processing. The output is a single plain text file or a 'character', which
-  is useful to ingest complete package documentation and source into a large language
-  model ('LLM') or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar>
+  CRAN for processing. The output is a single plain text file or a character vector,
+  which is useful to ingest complete package documentation and source into a large
+  language model (LLM) or pass it further to other tools, such as 'ragnar' <https://github.com/tidyverse/ragnar>
   to create a Retrieval-Augmented Generation (RAG) workflow.
 authors:
 - family-names: Kotov
@@ -90,4 +90,29 @@ references:
   year: '2025'
   doi: 10.32614/CRAN.package.testthat
   version: '>= 3.0.0'
+- type: software
+  title: withr
+  abstract: 'withr: Run Code ''With'' Temporarily Modified Global State'
+  notes: Suggests
+  url: https://withr.r-lib.org
+  repository: https://CRAN.R-project.org/package=withr
+  authors:
+  - family-names: Hester
+    given-names: Jim
+  - family-names: Henry
+    given-names: Lionel
+    email: lionel@posit.co
+  - family-names: Müller
+    given-names: Kirill
+    email: krlmlr+r@mailbox.org
+  - family-names: Ushey
+    given-names: Kevin
+    email: kevinushey@gmail.com
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  - family-names: Chang
+    given-names: Winston
+  year: '2025'
+  doi: 10.32614/CRAN.package.withr
 
