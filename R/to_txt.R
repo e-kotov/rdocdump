@@ -140,39 +140,20 @@ rdd_to_txt <- function(
   }
   combined_text <- paste(components, collapse = "\n\n")
 
-  # Decide whether to keep or delete temporary files.
-  if (
-    keep_files %in%
-      c("tgz", "both") &&
-      !is.null(pkg_info$tar_path) &&
-      !is.null(cache_path)
-  ) {
-    if (!dir.exists(cache_path)) {
-      dir.create(cache_path, recursive = TRUE)
-    }
-    dest_archive <- file.path(cache_path, basename(pkg_info$tar_path))
-    # Optionally, you might copy or leave the file in place.
-  } else if (keep_files %in% c("none", "extracted")) {
-    if (!is.null(pkg_info$tar_path)) {
-      unlink(pkg_info$tar_path)
-    }
+  # Decide whether to delete the .tar.gz
+  if (!keep_files %in% c("tgz", "both") && !is.null(pkg_info$tar_path)) {
+    unlink(pkg_info$tar_path)
   }
+
+  # Decide whether to delete the unpacked folder
   if (
-    keep_files %in%
-      c("extracted", "both") &&
-      !is.null(pkg_info$extracted_path) &&
-      !is.null(cache_path)
+    !keep_files %in% c("extracted", "both") && !is.null(pkg_info$extracted_path)
   ) {
-    if (!dir.exists(cache_path)) {
-      dir.create(cache_path, recursive = TRUE)
-    }
-    dest_extracted <- file.path(cache_path, basename(pkg_info$extracted_path))
-    # Optionally, you might copy or leave the folder in place.
-  } else if (keep_files %in% c("none", "tgz")) {
-    if (!is.null(pkg_info$extracted_path)) {
-      unlink(pkg_info$extracted_path, recursive = TRUE)
-    }
+    pkg_parent <- dirname(pkg_info$extracted_path)
+    message("Removing unpacked folder: ", pkg_parent)
+    unlink(pkg_parent, recursive = TRUE)
   }
+
   if (!is.null(file)) {
     writeLines(combined_text, con = file)
     return(file)
