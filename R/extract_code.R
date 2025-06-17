@@ -65,36 +65,46 @@ rdd_extract_code <- function(
   include_roxygen = FALSE,
   force_fetch = FALSE,
   cache_path = getOption("rdocdump.cache_path"),
+  keep_files = "none",
   repos = getOption("rdocdump.repos", getOption("repos"))
 ) {
-  pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
+  pkg_info <- resolve_pkg_path(
+    pkg,
+    cache_path,
+    force_fetch = force_fetch,
+    repos = repos
+  )
 
-  combined_code <- ""
-
-  if (!is.null(pkg_info$is_installed) && pkg_info$is_installed) {
-    # For installed packages, extract code via the package namespace.
+  combined_code <- if (
+    !is.null(pkg_info$is_installed) && pkg_info$is_installed
+  ) {
     if (is.null(pkg_info$pkg_name)) {
       stop("Installed package does not provide pkg_name information.")
     }
-    combined_code <- extract_code_installed(pkg_info$pkg_name)
+    extract_code_installed(pkg_info$pkg_name)
   } else {
-    # For non-installed packages, read the source files.
-    combined_code <- extract_code_source(
+    extract_code_source(
       pkg_info$pkg_path,
       include_tests,
       include_roxygen
     )
   }
 
+  # Clean up temporary files according to keep_files
+  cleanup_files(pkg_info, keep_files)
+
   if (!is.null(file)) {
     writeLines(combined_code, con = file)
     return(file)
   }
-
-  return(combined_code)
+  combined_code
 }
 
-# Helper function to extract code from an installed package using its namespace.
+#' Extract code from an installed package using its namespace.
+#' This function retrieves all functions from the package namespace and deparses them to get their source code.
+#' @param pkg_name The name of the installed package.
+#' @return A single string containing the source code of all functions in the package.
+#' @keywords internal
 extract_code_installed <- function(pkg_name) {
   # Load the namespace of the installed package.
   ns <- asNamespace(pkg_name)
@@ -115,7 +125,13 @@ extract_code_installed <- function(pkg_name) {
   return(combined_code)
 }
 
-# Helper function to extract code from package source files.
+#' Helper function to extract code from package source files.
+#' This function reads all `.R` files in the `R` directory and optionally includes files from the `tests` directory.
+#' It can also exclude roxygen2 documentation lines.
+#' @param pkg_path Path to the package source directory.
+#' @inheritParams rdd_extract_code
+#' @return A single string containing the source code from the package's R files.
+#' @keywords internal
 extract_code_source <- function(
   pkg_path,
   include_tests = FALSE,

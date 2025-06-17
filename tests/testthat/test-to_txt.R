@@ -1,5 +1,5 @@
 # Tests for the rdd_to_txt function in the rdocdump package
-fake_resolve_pkg_path <- function(pkg, cache_path, force_fetch) {
+fake_resolve_pkg_path <- function(pkg, cache_path, force_fetch, repos) {
   list(
     pkg_path = pkg,
     is_installed = FALSE,
