@@ -45,6 +45,9 @@
 #' cat(substr(docs, 1, 500))
 #'
 #' \donttest{
+#' # set cache directory for `rdocdump`
+#' rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
+#'
 #' # Extract only documentation for rJavaEnv by downloading its source from CRAN
 #' docs <- rdd_to_txt(
 #'   "rJavaEnv",
@@ -57,6 +60,9 @@
 #' cat(head(lines, 3), sep = "\n")
 #' # Print the last 3 lines
 #' cat(tail(lines, 3), sep = "\n")
+#'
+#' # clean cache directory
+#' unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
 #' }
 #'
 rdd_to_txt <- function(

@@ -48,6 +48,9 @@ cat(substr(code, 1, 1000))
 
 # Extract R source code including roxygen2 documentation from a package source directory.
 \donttest{
+# set cache directory for `rdocdump`
+rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
+
 local({
  code_with_roxygen <- rdd_extract_code(
   "ini",
@@ -70,6 +73,8 @@ local({
 )
  cat(substr(code_with_tests, 1, 1000))
 })
+# clean cache directory
+unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
 }
 
 }
