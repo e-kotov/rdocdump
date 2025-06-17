@@ -18,20 +18,35 @@ status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.o
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg)](https://doi.org/10.5281/zenodo.15072446)
 <!-- badges: end -->
 
-Dump source code, documentation and vignettes of an R package into a
-single file. Supports installed packages, tar.gz archives, and package
+Dump source code, documentation and vignettes of an `R` package into a
+single file. Supports installed packages, `tar.gz` archives, and package
 source directories. If the package is not installed, only its source is
 automatically downloaded from CRAN for processing. The output is a
-single plain text file or a `character`, which is useful to ingest
-complete package documentation and source into a large language model
-(‘LLM’) or pass it further to other tools, such as
+single plain text file or a `character` vector, which is useful to
+ingest complete package documentation and source into a large language
+model (LLM) or pass it further to other tools, such as
 <a href="https://github.com/tidyverse/ragnar"
 target="_blank"><code>{ragnar}</code></a> to create a
 Retrieval-Augmented Generation (RAG) workflow.
 
 ## Installation
 
-You can install the development version of rdocdump from GitHub with:
+Install the latest stable release of `rdocdump` from CRAN with:
+
+``` r
+install.packages("rdocdump")
+```
+
+You can install the development version of `rdocdump` from R Universe
+with:
+
+``` r
+install.packages('rdocdump',
+ repos = c('https://e-kotov.r-universe.dev', 'https://cloud.r-project.org')
+)
+```
+
+or from GitHub with:
 
 ``` r
 # install.packages("pak")
