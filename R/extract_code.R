@@ -91,7 +91,7 @@ rdd_extract_code <- function(
   }
 
   # Clean up temporary files according to keep_files
-  cleanup_files(pkg_info, keep_files)
+  cleanup_result <- cleanup_files(pkg_info, keep_files)
 
   if (!is.null(file)) {
     writeLines(combined_code, con = file)

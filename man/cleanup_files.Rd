@@ -19,7 +19,7 @@ Possible values are:
 }}
 }
 \value{
-Invisibly returns \code{NULL} after deleting the specified files.
+Invisibly returns \code{NULL}. If there are any issues with file deletion, warnings are issued.
 }
 \description{
 Clean up temporary package archive and extracted files according to a keep_files policy.

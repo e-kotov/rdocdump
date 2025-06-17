@@ -142,7 +142,7 @@ rdd_to_txt <- function(
   combined_text <- paste(components, collapse = "\n\n")
 
   # Clean up temporary files according to keep_files
-  cleanup_files(pkg_info, keep_files)
+  cleanup_result <- cleanup_files(pkg_info, keep_files)
 
   if (!is.null(file)) {
     writeLines(combined_text, con = file)
