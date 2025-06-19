@@ -16,7 +16,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rdocdump</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Extract R Source Code from a Package</h1>
-      <small class="dont-index">Source: <a href="https://github.com/e-kotov/rdocdump/blob/v0.1.0/R/extract_code.R" class="external-link"><code>R/extract_code.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/e-kotov/rdocdump/blob/main/R/extract_code.R" class="external-link"><code>R/extract_code.R</code></a></small>
       <div class="d-none name"><code>rdd_extract_code.Rd</code></div>
     </div>
 
@@ -152,7 +152,7 @@ Possible values are:</p><ul><li><p><code>"none"</code>: Delete both the tar.gz a
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># set cache directory for `rdocdump`</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rdd_set_cache_path.html">rdd_set_cache_path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/rdocdump_cache"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> rdocdump.cache_path set to: /tmp/RtmpsL9H8e/rdocdump_cache</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> rdocdump.cache_path set to: /tmp/RtmpHZmOWr/rdocdump_cache</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span> <span class="va">code_with_roxygen</span> <span class="op">&lt;-</span> <span class="fu">rdd_extract_code</span><span class="op">(</span></span></span>
