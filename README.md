@@ -12,9 +12,18 @@ Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repost
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.org/package=rdocdump)
+<a href="https://CRAN.R-project.org/package=rdocdump"
+target="_blank"><img
+src="https://cranlogs.r-pkg.org/badges/grand-total/rdocdump?color=blue"
+alt="CRAN/METACRAN Total downloads" /></a>
+<a href="https://CRAN.R-project.org/package=rdocdump"
+target="_blank"><img
+src="https://cranlogs.r-pkg.org/badges/rdocdump?color=blue"
+alt="CRAN/METACRAN Downloads per month" /></a>
 [![R-CMD-check](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/e-kotov/rdocdump/workflows/pkgcheck/badge.svg)](https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck)
 
+[![DOI](https://zenodo.org/badge/DOI/10.32614/CRAN.package.rdocdump.svg)](https://doi.org/10.32614/CRAN.package.rdocdump)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg)](https://doi.org/10.5281/zenodo.15072446)
 <!-- badges: end -->
 
@@ -61,7 +70,7 @@ downloading source from CRAN and save it to file `rJavaEnv_docs.txt`
 ``` r
 rdd_to_txt(
   pkg = "rJavaEnv",
-  file = "rJavaEnv_docs.txt",
+  file = tempfile("rJavaEnv_docs_", fileext = ".txt"),
   force_fetch = TRUE, # force download even if package is installed
   keep_files = "none" # delete temp files
 )

@@ -13,10 +13,12 @@ default-image-extension: ""
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.org/package=rdocdump)
+[![CRAN/METACRAN Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rdocdump?color=blue)](https://CRAN.R-project.org/package=rdocdump){target="_blank"}
+[![CRAN/METACRAN Downloads per month](https://cranlogs.r-pkg.org/badges/rdocdump?color=blue)](https://CRAN.R-project.org/package=rdocdump){target="_blank"}
 [![R-CMD-check](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/e-kotov/rdocdump/workflows/pkgcheck/badge.svg)](https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck)
 
-
+[![DOI](https://zenodo.org/badge/DOI/10.32614/CRAN.package.rdocdump.svg)](https://doi.org/10.32614/CRAN.package.rdocdump)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15072446.svg)](https://doi.org/10.5281/zenodo.15072446)
 <!-- badges: end -->
 
