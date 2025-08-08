@@ -262,3 +262,45 @@ test_that("rdd_to_txt keeps both tar.gz archive and extracted files when keep_fi
   # Clean up the cache directory.
   unlink(cache_dir, recursive = TRUE)
 })
+
+test_that("rdd_to_txt fetches a specific package version when 'version' is provided", {
+  skip_on_cran()
+  skip_if_offline()
+
+  cache_dir <- tempfile("cache_version_test")
+  dir.create(cache_dir)
+
+  # Use a package with a known version history, e.g., "jsonlite"
+  # and a version that is not the latest.
+  pkg_name <- "jsonlite"
+  pkg_version <- "1.7"
+
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+  # Fetch the package with the specified version.
+  out <- suppressWarnings(rdd_to_txt(
+    pkg_name,
+    version = pkg_version,
+    force_fetch = TRUE,
+    keep_files = "extracted",
+    cache_path = cache_dir
+  ))
+
+  options(repos = old_repos)
+
+  # Check that the extracted directory for the correct version exists.
+  expected_dir <- file.path(cache_dir, pkg_name, pkg_version)
+  expect_true(dir.exists(expected_dir))
+
+  # Verify the version from the DESCRIPTION file.
+  desc_file <- file.path(expected_dir, "DESCRIPTION")
+  expect_true(file.exists(desc_file))
+
+  desc_content <- readLines(desc_file)
+  version_line <- grep("Version:", desc_content, value = TRUE)
+  expect_true(grepl(pkg_version, version_line))
+
+  # Clean up the cache directory.
+  unlink(cache_dir, recursive = TRUE)
+})

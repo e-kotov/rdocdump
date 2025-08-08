@@ -70,6 +70,7 @@ rdd_to_txt <- function(
   file = NULL,
   content = "all",
   force_fetch = FALSE,
+  version = NULL,
   keep_files = "none",
   cache_path = getOption("rdocdump.cache_path"),
   repos = getOption("rdocdump.repos", getOption("repos"))
@@ -98,7 +99,13 @@ rdd_to_txt <- function(
   }
 
   # Resolve package source path using the existing helper.
-  pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
+  pkg_info <- resolve_pkg_path(
+    pkg,
+    cache_path,
+    force_fetch = force_fetch,
+    version = version,
+    repos = repos
+  )
   pkg_path <- pkg_info$pkg_path
 
   # Initialize component texts.
