@@ -11,7 +11,8 @@
 #'   \item a package name not installed (which will then be downloaded from CRAN).
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
-#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
+#' @param version Optional. A `character` string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.
 #' @param content A character vector specifying which components to include in the output.
 #' Possible values are:
 #' \itemize{
@@ -102,7 +103,7 @@ rdd_to_txt <- function(
   pkg_info <- resolve_pkg_path(
     pkg,
     cache_path,
-    force_fetch = force_fetch,
+    force_fetch = force_fetch || !is.null(version),
     version = version,
     repos = repos
   )
@@ -129,9 +130,9 @@ rdd_to_txt <- function(
       file = NULL,
       include_tests = FALSE,
       include_roxygen = FALSE,
-      force_fetch = force_fetch,
+      force_fetch = force_fetch || !is.null(version),
       cache_path = cache_path,
-      keep_files = "both", # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
+      keep_files = "both" # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
     )
   }
 

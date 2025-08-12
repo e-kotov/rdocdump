@@ -15,13 +15,14 @@ rdd_to_txt(
   repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
-\arguments{#\item{pkg}{A \code{character} string specifying the package. This can be:
+\arguments{
+\item{pkg}{A \code{character} string specifying the package. This can be:
 \itemize{
 \item an installed package name,
 \item a full path to a package source directory,
 \item a full path to a package archive file (tar.gz), or
 \item a package name not installed (which will then be downloaded from CRAN).
-}
+}}
 
 \item{file}{Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to \code{NULL}.}
 
@@ -35,9 +36,9 @@ Possible values are:
 }
 You can specify multiple options (e.g., \code{c("docs", "code")} to include both documentation and source code).}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
 
-\item{version}{A \code{character} string specifying the package version to fetch from CRAN. If \code{NULL} (the default), the latest version is fetched. This parameter is ignored if `pkg` is a path to a local directory or file.}
+\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
 
 \item{keep_files}{A \code{character} value controlling whether temporary files should be kept.
 Possible values are:
@@ -46,13 +47,12 @@ Possible values are:
 \item \code{"tgz"}: Keep only the tar.gz archive.
 \item \code{"extracted"}: Keep only the extracted files.
 \item \code{"both"}: Keep both the tar.gz archive and the extracted files.
-}
+}}
 
 \item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
 By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
 
-\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \c
-ode{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }
 \value{
 A single string containing the combined package documentation, vignettes, and/or code as specified by the \code{content} argument.

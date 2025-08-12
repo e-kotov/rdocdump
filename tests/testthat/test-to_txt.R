@@ -1,10 +1,17 @@
 # Tests for the rdd_to_txt function in the rdocdump package
-fake_resolve_pkg_path <- function(pkg, cache_path, force_fetch, repos) {
+fake_resolve_pkg_path <- function(
+  pkg,
+  cache_path,
+  force_fetch,
+  version,
+  repos
+) {
   list(
     pkg_path = pkg,
     is_installed = FALSE,
     pkg_name = "testpkg",
     tar_path = NULL,
+    version = NULL,
     extracted_path = NULL
   )
 }
@@ -272,8 +279,8 @@ test_that("rdd_to_txt fetches a specific package version when 'version' is provi
 
   # Use a package with a known version history, e.g., "jsonlite"
   # and a version that is not the latest.
-  pkg_name <- "jsonlite"
-  pkg_version <- "1.7"
+  pkg_name <- "ini"
+  pkg_version <- "0.1"
 
   old_repos <- getOption("repos")
   options(repos = c(CRAN = "https://cloud.r-project.org"))
@@ -303,4 +310,145 @@ test_that("rdd_to_txt fetches a specific package version when 'version' is provi
 
   # Clean up the cache directory.
   unlink(cache_dir, recursive = TRUE)
+})
+
+test_that("rdd_to_txt sets force_fetch=TRUE internally whenever 'version' is provided", {
+  calls <- new.env(parent = emptyenv())
+  calls$resolve_force_fetch <- NULL
+  calls$rdd_force_fetch <- NULL
+
+  fake_resolve_pkg_path_spy <- function(
+    pkg,
+    cache_path,
+    force_fetch,
+    version,
+    repos
+  ) {
+    calls$resolve_force_fetch <- force_fetch
+    list(
+      pkg_path = tempfile("pkg_"),
+      is_installed = FALSE,
+      pkg_name = "ini",
+      tar_path = NULL,
+      version = version,
+      extracted_path = NULL
+    )
+  }
+
+  fake_rdd_extract_code_spy <- function(
+    pkg,
+    file,
+    include_tests,
+    include_roxygen,
+    force_fetch,
+    cache_path,
+    keep_files
+  ) {
+    calls$rdd_force_fetch <- force_fetch
+    "CODE"
+  }
+
+  # No-op helpers to avoid touching filesystem or requiring real pkg content
+  fake_cleanup_files <- function(pkg_info, keep_files) invisible(NULL)
+  fake_combine_rd <- function(...) "" # not used when content = "code"
+  fake_combine_vignettes <- function(...) "" # not used when content = "code"
+
+  local_mocked_bindings(
+    resolve_pkg_path = fake_resolve_pkg_path_spy,
+    rdd_extract_code = fake_rdd_extract_code_spy,
+    cleanup_files = fake_cleanup_files,
+    combine_rd = fake_combine_rd,
+    combine_vignettes = fake_combine_vignettes,
+    .package = "rdocdump"
+  )
+
+  out <- rdd_to_txt(
+    "ini",
+    version = "0.1", # << the trigger
+    force_fetch = FALSE, # user-specified FALSE should be overridden
+    content = "code",
+    keep_files = "none"
+  )
+
+  expect_identical(out, "CODE")
+  expect_true(isTRUE(calls$resolve_force_fetch))
+  expect_true(isTRUE(calls$rdd_force_fetch))
+})
+
+test_that("rdd_to_txt passes through force_fetch unchanged when 'version' is NULL", {
+  calls <- new.env(parent = emptyenv())
+  calls$resolve_force_fetch <- NULL
+  calls$rdd_force_fetch <- NULL
+
+  fake_resolve_pkg_path_spy <- function(
+    pkg,
+    cache_path,
+    force_fetch,
+    version,
+    repos
+  ) {
+    calls$resolve_force_fetch <- force_fetch
+    list(
+      pkg_path = tempfile("pkg_"),
+      is_installed = FALSE,
+      pkg_name = "ini",
+      tar_path = NULL,
+      version = version,
+      extracted_path = NULL
+    )
+  }
+
+  fake_rdd_extract_code_spy <- function(
+    pkg,
+    file,
+    include_tests,
+    include_roxygen,
+    force_fetch,
+    cache_path,
+    keep_files
+  ) {
+    calls$rdd_force_fetch <- force_fetch
+    "CODE"
+  }
+
+  fake_cleanup_files <- function(pkg_info, keep_files) invisible(NULL)
+  fake_combine_rd <- function(...) ""
+  fake_combine_vignettes <- function(...) ""
+
+  local_mocked_bindings(
+    resolve_pkg_path = fake_resolve_pkg_path_spy,
+    rdd_extract_code = fake_rdd_extract_code_spy,
+    cleanup_files = fake_cleanup_files,
+    combine_rd = fake_combine_rd,
+    combine_vignettes = fake_combine_vignettes,
+    .package = "rdocdump"
+  )
+
+  # Case A: user passes force_fetch = FALSE, version = NULL -> internal should be FALSE
+  out_A <- rdd_to_txt(
+    "ini",
+    version = NULL,
+    force_fetch = FALSE,
+    content = "code",
+    keep_files = "none"
+  )
+  expect_identical(out_A, "CODE")
+  expect_false(isTRUE(calls$resolve_force_fetch))
+  expect_false(isTRUE(calls$rdd_force_fetch))
+
+  # Reset captured values
+  calls$resolve_force_fetch <- NULL
+  calls$rdd_force_fetch <- NULL
+
+  # Case B: user passes force_fetch = TRUE, version = NULL -> internal should be TRUE
+  out_B <- rdd_to_txt(
+    "ini",
+    version = NULL,
+    force_fetch = TRUE,
+    content = "code",
+    keep_files = "none"
+  )
+  expect_identical(out_B, "CODE")
+  expect_true(isTRUE(calls$resolve_force_fetch))
+  expect_true(isTRUE(calls$rdd_force_fetch))
 })

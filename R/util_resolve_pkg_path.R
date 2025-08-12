@@ -24,7 +24,7 @@ resolve_pkg_path <- function(
   # Helper function to parse tarball filename into package name and version.
   parse_tarball_name <- function(tar_path) {
     base_name <- basename(tar_path) # e.g., "rJavaEnv_0.2.2.tar.gz"
-    folder_name <- sub("\.tar\.gz$", "", base_name)
+    folder_name <- sub("\\.tar\\.gz$", "", base_name)
     parts <- strsplit(folder_name, "_")[[1]]
     if (length(parts) < 2) {
       stop(
@@ -51,7 +51,7 @@ resolve_pkg_path <- function(
       # Check if directory is a source package by looking for Rd files in "man/"
       man_dir <- file.path(pkg, "man")
       rd_files <- if (dir.exists(man_dir)) {
-        list.files(man_dir, pattern = "\.Rd$", full.names = TRUE)
+        list.files(man_dir, pattern = "\\.Rd$", full.names = TRUE)
       } else {
         character(0)
       }
@@ -75,7 +75,7 @@ resolve_pkg_path <- function(
       }
     } else {
       # pkg is a file; assume it is a tar.gz archive.
-      if (!grepl("\.tar\.gz$", pkg)) {
+      if (!grepl("\\.tar\\.gz$", pkg)) {
         stop(
           "The specified file is not a recognized package archive (expected extension .tar.gz)."
         )
@@ -129,7 +129,7 @@ resolve_pkg_path <- function(
       }
       # Warn if repos contains known problematic URLs.
       if (
-        any(grepl("posit\.co|r-universe\.dev", repos, ignore.case = TRUE))
+        any(grepl("posit\\.co|r-universe\\.dev", repos, ignore.case = TRUE))
       ) {
         warning(
           "Using a repository URL from posit.co or r-universe.dev may result in pre-built binaries being downloaded instead of the package source."
@@ -145,7 +145,12 @@ resolve_pkg_path <- function(
         # Try downloading.
         res <- try(
           suppressWarnings(
-            utils::download.file(url, destfile = file.path(dest_dir, tar_filename), mode = "wb", quiet = TRUE)
+            utils::download.file(
+              url,
+              destfile = file.path(dest_dir, tar_filename),
+              mode = "wb",
+              quiet = TRUE
+            )
           ),
           silent = TRUE
         )
@@ -154,7 +159,12 @@ resolve_pkg_path <- function(
           url <- file.path(repo_url, "src/contrib", tar_filename)
           res <- try(
             suppressWarnings(
-              utils::download.file(url, destfile = file.path(dest_dir, tar_filename), mode = "wb", quiet = TRUE)
+              utils::download.file(
+                url,
+                destfile = file.path(dest_dir, tar_filename),
+                mode = "wb",
+                quiet = TRUE
+              )
             ),
             silent = TRUE
           )
@@ -162,7 +172,10 @@ resolve_pkg_path <- function(
         if (inherits(res, "try-error") || res != 0) {
           stop(paste("Could not download package", pkg, "version", version))
         }
-        dp <- matrix(c(tar_filename, file.path(dest_dir, tar_filename)), nrow = 1)
+        dp <- matrix(
+          c(tar_filename, file.path(dest_dir, tar_filename)),
+          nrow = 1
+        )
       } else {
         dp <- utils::download.packages(
           pkg,
