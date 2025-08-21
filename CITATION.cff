@@ -9,8 +9,11 @@ type: software
 license: MIT
 title: 'rdocdump: Dump ''R'' Package Source, Documentation, and Vignettes into One
   File'
-version: 0.1.0
+version: 0.1.1
 doi: 10.32614/CRAN.package.rdocdump
+identifiers:
+- type: doi
+  value: 10.32614/CRAN.package.rdocdump
 abstract: Dump source code, documentation and vignettes of an 'R' package into a single
   file. Supports installed packages, tar.gz archives, and package source directories.
   If the package is not installed, only its source is automatically downloaded from
@@ -34,6 +37,7 @@ preferred-citation:
   year: '2025'
   url: https://github.com/e-kotov/rdocdump
   doi: 10.32614/CRAN.package.rdocdump
+repository: https://CRAN.R-project.org/package=rdocdump
 repository-code: https://github.com/e-kotov/rdocdump
 url: https://www.ekotov.pro/rdocdump/
 contact:
