@@ -8,6 +8,7 @@ resolve_pkg_path(
   pkg,
   cache_path = NULL,
   force_fetch = FALSE,
+  version = NULL,
   repos = getOption("rdocdump.repos", getOption("repos"))
 )
 }
@@ -23,7 +24,9 @@ resolve_pkg_path(
 \item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
 By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+
+\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
 
 \item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
 }

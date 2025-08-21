@@ -11,7 +11,8 @@
 #'   \item a package name not installed (which will then be downloaded from CRAN).
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
-#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
+#' @param version Optional. A `character` string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.
 #' @param content A character vector specifying which components to include in the output.
 #' Possible values are:
 #' \itemize{
@@ -70,6 +71,7 @@ rdd_to_txt <- function(
   file = NULL,
   content = "all",
   force_fetch = FALSE,
+  version = NULL,
   keep_files = "none",
   cache_path = getOption("rdocdump.cache_path"),
   repos = getOption("rdocdump.repos", getOption("repos"))
@@ -98,7 +100,13 @@ rdd_to_txt <- function(
   }
 
   # Resolve package source path using the existing helper.
-  pkg_info <- resolve_pkg_path(pkg, cache_path, force_fetch = force_fetch)
+  pkg_info <- resolve_pkg_path(
+    pkg,
+    cache_path,
+    force_fetch = force_fetch || !is.null(version),
+    version = version,
+    repos = repos
+  )
   pkg_path <- pkg_info$pkg_path
 
   # Initialize component texts.
@@ -122,9 +130,9 @@ rdd_to_txt <- function(
       file = NULL,
       include_tests = FALSE,
       include_roxygen = FALSE,
-      force_fetch = force_fetch,
+      force_fetch = force_fetch || !is.null(version),
       cache_path = cache_path,
-      keep_files = "both", # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
+      keep_files = "both" # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
     )
   }
 

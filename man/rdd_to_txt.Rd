@@ -9,6 +9,7 @@ rdd_to_txt(
   file = NULL,
   content = "all",
   force_fetch = FALSE,
+  version = NULL,
   keep_files = "none",
   cache_path = getOption("rdocdump.cache_path"),
   repos = getOption("rdocdump.repos", getOption("repos"))
@@ -35,7 +36,9 @@ Possible values are:
 }
 You can specify multiple options (e.g., \code{c("docs", "code")} to include both documentation and source code).}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+
+\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
 
 \item{keep_files}{A \code{character} value controlling whether temporary files should be kept.
 Possible values are:
