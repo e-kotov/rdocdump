@@ -5,15 +5,16 @@
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
-#'   \item an installed package name,
-#'   \item a full path to a package source directory,
-#'   \item a full path to a package archive file (tar.gz), or
-#'   \item a package name not installed (which will then be downloaded from CRAN).
+#' \item an installed package name,
+#' \item a full path to a package source directory,
+#' \item a full path to a package archive file (tar.gz), or
+#' \item a package name not installed (which will then be downloaded from CRAN).
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
 #' @param include_tests `logical`. If `TRUE`, for non-installed packages, the function will also include R source code from the `tests` directory. Defaults to `FALSE`.
 #' @param include_roxygen `logical`. If `TRUE`, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to `FALSE`.
-#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
+#' @param version Optional. A `character` string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.
 #' @param cache_path A `character` string specifying the directory to use as a cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
 #'
 #' @inheritParams rdd_to_txt
@@ -33,26 +34,26 @@
 #' rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
 #'
 #' local({
-#'  code_with_roxygen <- rdd_extract_code(
-#'   "ini",
-#'   include_roxygen = TRUE,
-#'   force_fetch = TRUE,
-#'   repos = c("CRAN" = "https://cran.r-project.org")
+#' code_with_roxygen <- rdd_extract_code(
+#' "ini",
+#' include_roxygen = TRUE,
+#' force_fetch = TRUE,
+#' repos = c("CRAN" = "https://cran.r-project.org")
 #' )
-#'  cat(substr(code_with_roxygen, 1, 1000))
+#' cat(substr(code_with_roxygen, 1, 1000))
 #'})
 #'
 #' # Extract R source code from a package source directory,
 #' # including test files but excluding roxygen2 docs.
 #' local({
-#'  code_with_tests <- rdd_extract_code(
-#'   "ini",
-#'   include_roxygen = TRUE,
-#'   include_tests = TRUE,
-#'   force_fetch = TRUE,
-#'   repos = c("CRAN" = "https://cran.r-project.org")
+#' code_with_tests <- rdd_extract_code(
+#' "ini",
+#' include_roxygen = TRUE,
+#' include_tests = TRUE,
+#' force_fetch = TRUE,
+#' repos = c("CRAN" = "https://cran.r-project.org")
 #' )
-#'  cat(substr(code_with_tests, 1, 1000))
+#' cat(substr(code_with_tests, 1, 1000))
 #'})
 #' # clean cache directory
 #' unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
@@ -64,14 +65,17 @@ rdd_extract_code <- function(
   include_tests = FALSE,
   include_roxygen = FALSE,
   force_fetch = FALSE,
+  version = NULL,
   cache_path = getOption("rdocdump.cache_path"),
   keep_files = "none",
   repos = getOption("rdocdump.repos", getOption("repos"))
 ) {
+  # Pass version to resolve_pkg_path and force fetching if a version is specified.
   pkg_info <- resolve_pkg_path(
     pkg,
     cache_path,
-    force_fetch = force_fetch,
+    force_fetch = force_fetch || !is.null(version),
+    version = version,
     repos = repos
   )
 
@@ -97,6 +101,7 @@ rdd_extract_code <- function(
     writeLines(combined_code, con = file)
     return(file)
   }
+
   combined_code
 }
 
@@ -108,7 +113,9 @@ rdd_extract_code <- function(
 extract_code_installed <- function(pkg_name) {
   # Load the namespace of the installed package.
   ns <- asNamespace(pkg_name)
+
   obj_names <- ls(ns, all.names = TRUE)
+
   code_strings <- lapply(obj_names, function(nm) {
     obj <- get(nm, envir = ns)
     if (is.function(obj)) {
@@ -120,8 +127,10 @@ extract_code_installed <- function(pkg_name) {
       NULL
     }
   })
+
   # Combine all function source codes.
   combined_code <- paste(unlist(code_strings), collapse = "\n\n")
+
   return(combined_code)
 }
 
@@ -138,6 +147,7 @@ extract_code_source <- function(
   include_roxygen = FALSE
 ) {
   code_text <- ""
+
   # Read all .R files in the R directory.
   r_dir <- file.path(pkg_path, "R")
   if (dir.exists(r_dir)) {
@@ -145,10 +155,12 @@ extract_code_source <- function(
     for (rf in r_files) {
       header <- paste0(strrep("-", 80), "\nFile: ", basename(rf), "\n")
       file_content <- readLines(rf, warn = FALSE)
+
       # Exclude roxygen2 documentation if not requested.
       if (!include_roxygen) {
         file_content <- file_content[!grepl("^#'", file_content)]
       }
+
       code_text <- paste(
         code_text,
         header,
@@ -170,6 +182,7 @@ extract_code_source <- function(
         pattern = "\\.[rR]$",
         full.names = TRUE
       )
+
       for (tf in test_files) {
         header <- paste0(strrep("-", 80), "\nTest File: ", basename(tf), "\n")
         file_content <- readLines(tf, warn = FALSE)

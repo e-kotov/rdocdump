@@ -10,6 +10,7 @@ rdd_extract_code(
   include_tests = FALSE,
   include_roxygen = FALSE,
   force_fetch = FALSE,
+  version = NULL,
   cache_path = getOption("rdocdump.cache_path"),
   keep_files = "none",
   repos = getOption("rdocdump.repos", getOption("repos"))
@@ -30,7 +31,9 @@ rdd_extract_code(
 
 \item{include_roxygen}{\code{logical}. If \code{TRUE}, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to \code{FALSE}.}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+
+\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
 
 \item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
 
@@ -62,26 +65,26 @@ cat(substr(code, 1, 1000))
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
 
 local({
- code_with_roxygen <- rdd_extract_code(
-  "ini",
-  include_roxygen = TRUE,
-  force_fetch = TRUE,
-  repos = c("CRAN" = "https://cran.r-project.org")
+code_with_roxygen <- rdd_extract_code(
+"ini",
+include_roxygen = TRUE,
+force_fetch = TRUE,
+repos = c("CRAN" = "https://cran.r-project.org")
 )
- cat(substr(code_with_roxygen, 1, 1000))
+cat(substr(code_with_roxygen, 1, 1000))
 })
 
 # Extract R source code from a package source directory,
 # including test files but excluding roxygen2 docs.
 local({
- code_with_tests <- rdd_extract_code(
-  "ini",
-  include_roxygen = TRUE,
-  include_tests = TRUE,
-  force_fetch = TRUE,
-  repos = c("CRAN" = "https://cran.r-project.org")
+code_with_tests <- rdd_extract_code(
+"ini",
+include_roxygen = TRUE,
+include_tests = TRUE,
+force_fetch = TRUE,
+repos = c("CRAN" = "https://cran.r-project.org")
 )
- cat(substr(code_with_tests, 1, 1000))
+cat(substr(code_with_tests, 1, 1000))
 })
 # clean cache directory
 unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)

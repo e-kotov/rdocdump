@@ -341,6 +341,7 @@ test_that("rdd_to_txt sets force_fetch=TRUE internally whenever 'version' is pro
     include_tests,
     include_roxygen,
     force_fetch,
+    version,
     cache_path,
     keep_files
   ) {
@@ -405,6 +406,7 @@ test_that("rdd_to_txt passes through force_fetch unchanged when 'version' is NUL
     include_roxygen,
     force_fetch,
     cache_path,
+    version,
     keep_files
   ) {
     calls$rdd_force_fetch <- force_fetch

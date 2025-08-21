@@ -131,6 +131,7 @@ rdd_to_txt <- function(
       include_tests = FALSE,
       include_roxygen = FALSE,
       force_fetch = force_fetch || !is.null(version),
+      version = version,
       cache_path = cache_path,
       keep_files = "both" # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
     )
