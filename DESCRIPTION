@@ -1,6 +1,6 @@
 Package: rdocdump
 Title: Dump 'R' Package Source, Documentation, and Vignettes into One File
-Version: 0.1.1
+Version: 0.1.1.9000
 Authors@R: 
     person("Egor", "Kotov", , "kotov.egor@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-6690-5345"))
