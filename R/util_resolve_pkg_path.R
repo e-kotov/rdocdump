@@ -170,7 +170,14 @@ resolve_pkg_path <- function(
           )
         }
         if (inherits(res, "try-error") || res != 0) {
-          stop(paste("Could not download package", pkg, "version", version))
+          stop(paste(
+            "Could not download package",
+            pkg,
+            "version",
+            version,
+            "from",
+            url
+          ))
         }
         dp <- matrix(
           c(tar_filename, file.path(dest_dir, tar_filename)),
