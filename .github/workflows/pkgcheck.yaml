@@ -12,9 +12,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   pkgcheck:
@@ -23,5 +20,3 @@ jobs:
       issues: write
     steps:
       - uses: ropensci-review-tools/pkgcheck-action@main
-        with:
-          skip-cran-name-test: true
