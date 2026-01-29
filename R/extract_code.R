@@ -9,7 +9,7 @@
 #'   \item a full path to a package source directory,
 #'   \item a full path to a package archive file (tar.gz),
 #'   \item a package name not installed (which will then be downloaded from CRAN), or
-#'   \item a remote package specification (e.g., "user/repo", "user/repo@branch", "user/repo/subdir") which will be downloaded using the `pak` package. Note that the `pak` package must be installed for this feature.
+#'   \item a remote package specification (e.g., "user/repo", "user/repo@branch", "user/repo/subdir") which will be downloaded using the `pak` package. Note that the `pak` package is required for this feature.
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
 #' @param include_tests `logical`. If `TRUE`, for non-installed packages, the function will also include R source code from the `tests` directory. Defaults to `FALSE`.

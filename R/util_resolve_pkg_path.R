@@ -51,20 +51,36 @@ resolve_pkg_path <- function(
     contents <- list.files(
       extract_dir,
       full.names = TRUE,
-      all.files = FALSE,
+      all.files = FALSE, # Ignore hidden files when checking for single dir
       no.. = TRUE
     )
+
     if (length(contents) == 1L && dir.exists(contents)) {
       subdir <- contents
       items <- list.files(
         subdir,
         full.names = TRUE,
-        all.files = TRUE,
+        all.files = TRUE, # Move everything, including hidden files
         no.. = TRUE
       )
-      sapply(items, function(x) {
-        file.rename(x, file.path(extract_dir, basename(x)))
-      })
+
+      # Attempt to rename, fallback to copy
+      results <- vapply(items, function(x) {
+        dest <- file.path(extract_dir, basename(x))
+        res <- suppressWarnings(file.rename(x, dest))
+        if (!res) {
+          # Fallback to copy and delete
+          res <- file.copy(x, dest, recursive = TRUE, overwrite = TRUE)
+          if (res) unlink(x, recursive = TRUE)
+        }
+        res
+      }, logical(1))
+
+      if (!all(results)) {
+        warning("Failed to move some files during flattening: ",
+                paste(items[!results], collapse = ", "))
+      }
+
       unlink(subdir, recursive = TRUE)
     }
   }
@@ -121,6 +137,7 @@ resolve_pkg_path <- function(
     # pkg is not an existing file/directory: treat it as a package name or remote.
 
     # Check if pkg is a remote specification (contains /)
+    # This distinguishes standard CRAN packages (no slash) from GitHub/GitLab remotes (user/repo).
     if (grepl("/", pkg)) {
       if (!requireNamespace("pak", quietly = TRUE)) {
         stop(
@@ -137,10 +154,19 @@ resolve_pkg_path <- function(
 
       dl_info <- tryCatch(
         pak::pkg_download(pkg, dest_dir = dest_dir, dependencies = FALSE),
-        error = function(e) stop("Failed to download package from remote: ", e$message)
+        error = function(e) {
+          msg <- conditionMessage(e)
+          prefix <- "Failed to download package from remote:"
+          # Avoid repeating prefix if already present
+          if (grepl(prefix, msg, fixed = TRUE)) {
+            stop(msg)
+          } else {
+            stop(prefix, " ", msg)
+          }
+        }
       )
 
-      if (nrow(dl_info) < 1) {
+      if (is.null(dl_info) || nrow(dl_info) < 1) {
         stop("Failed to download package from remote (no file returned).")
       }
 
