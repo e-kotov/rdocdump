@@ -29,7 +29,9 @@ cleanup_files <- function(
   if (
     !keep_files %in% c("extracted", "both") && !is.null(pkg_info$extracted_path)
   ) {
-    dir_to_remove <- dirname(pkg_info$extracted_path)
+    # pkg_info$extracted_path is the directory where the package was extracted.
+    # We should remove this directory, not its parent.
+    dir_to_remove <- pkg_info$extracted_path
     res <- unlink(dir_to_remove, recursive = TRUE)
     if (res != 0L) {
       warning(

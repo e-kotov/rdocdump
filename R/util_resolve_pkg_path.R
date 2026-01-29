@@ -46,43 +46,28 @@ resolve_pkg_path <- function(
     }
   }
 
-  # Helper function to flatten extra top-level folder if necessary.
-  flatten_extract_dir <- function(extract_dir) {
-    contents <- list.files(
-      extract_dir,
-      full.names = TRUE,
-      all.files = FALSE, # Ignore hidden files when checking for single dir
-      no.. = TRUE
-    )
-
-    if (length(contents) == 1L && dir.exists(contents)) {
-      subdir <- contents
-      items <- list.files(
-        subdir,
-        full.names = TRUE,
-        all.files = TRUE, # Move everything, including hidden files
-        no.. = TRUE
-      )
-
-      # Attempt to rename, fallback to copy
-      results <- vapply(items, function(x) {
-        dest <- file.path(extract_dir, basename(x))
-        res <- suppressWarnings(file.rename(x, dest))
-        if (!res) {
-          # Fallback to copy and delete
-          res <- file.copy(x, dest, recursive = TRUE, overwrite = TRUE)
-          if (res) unlink(x, recursive = TRUE)
-        }
-        res
-      }, logical(1))
-
-      if (!all(results)) {
-        warning("Failed to move some files during flattening: ",
-                paste(items[!results], collapse = ", "))
-      }
-
-      unlink(subdir, recursive = TRUE)
+  # Helper function to find the package root (containing DESCRIPTION) within an extracted directory.
+  # This avoids the need to move/rename files and robustly handles wrapper directories.
+  find_pkg_root <- function(path) {
+    # Check if the path itself is the root
+    if (file.exists(file.path(path, "DESCRIPTION"))) {
+      return(path)
     }
+
+    # Check immediate subdirectories (to handle wrapper folders like pkgname/ or user-repo-sha/)
+    contents <- list.files(path, full.names = TRUE, all.files = TRUE, no.. = TRUE)
+    dirs <- contents[dir.exists(contents)]
+
+    # If there is exactly one subdirectory, check inside it
+    if (length(dirs) == 1L) {
+      subdir <- dirs[[1]]
+      if (file.exists(file.path(subdir, "DESCRIPTION"))) {
+        return(subdir)
+      }
+    }
+
+    # If not found, return the original path and let downstream functions fail/warn
+    return(path)
   }
 
   if (file.exists(pkg)) {
@@ -124,10 +109,11 @@ resolve_pkg_path <- function(
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(pkg, exdir = extract_dir)
-      flatten_extract_dir(extract_dir)
+
+      pkg_root <- find_pkg_root(extract_dir)
 
       return(list(
-        pkg_path = extract_dir,
+        pkg_path = pkg_root,
         extracted_path = extract_dir,
         tar_path = NULL,
         is_installed = FALSE
@@ -137,7 +123,6 @@ resolve_pkg_path <- function(
     # pkg is not an existing file/directory: treat it as a package name or remote.
 
     # Check if pkg is a remote specification (contains /)
-    # This distinguishes standard CRAN packages (no slash) from GitHub/GitLab remotes (user/repo).
     if (grepl("/", pkg)) {
       if (!requireNamespace("pak", quietly = TRUE)) {
         stop(
@@ -157,7 +142,6 @@ resolve_pkg_path <- function(
         error = function(e) {
           msg <- conditionMessage(e)
           prefix <- "Failed to download package from remote:"
-          # Avoid repeating prefix if already present
           if (grepl(prefix, msg, fixed = TRUE)) {
             stop(msg)
           } else {
@@ -181,10 +165,11 @@ resolve_pkg_path <- function(
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(archive, exdir = extract_dir)
-      flatten_extract_dir(extract_dir)
+
+      pkg_root <- find_pkg_root(extract_dir)
 
       return(list(
-        pkg_path = extract_dir,
+        pkg_path = pkg_root,
         extracted_path = extract_dir,
         tar_path = archive,
         is_installed = FALSE
@@ -293,10 +278,11 @@ resolve_pkg_path <- function(
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(archive, exdir = extract_dir)
-      flatten_extract_dir(extract_dir)
+
+      pkg_root <- find_pkg_root(extract_dir)
 
       return(list(
-        pkg_path = extract_dir,
+        pkg_path = pkg_root,
         extracted_path = extract_dir,
         tar_path = archive,
         is_installed = FALSE
