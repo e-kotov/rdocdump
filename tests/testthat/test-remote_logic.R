@@ -11,10 +11,6 @@ test_that("resolve_pkg_path identifies remote packages correctly", {
     writeLines("Package: testpkg\nVersion: 0.1", file.path(pkg_dir, "DESCRIPTION"))
 
     # Use withr::with_dir to change directory safely for tar
-    # Note: we should not rely on 'tar' from utils being mocked if we call it via namespace in the code,
-    # but here we are in the test setup.
-    # The actual code calls utils::untar, not utils::tar.
-
     old_wd <- getwd()
     on.exit(setwd(old_wd))
     setwd(dest_dir)
@@ -47,8 +43,6 @@ test_that("resolve_pkg_path does NOT treat non-existent local paths as remotes",
   # it should fall through to the CRAN check (and fail there),
   # NOT try to use pak.
 
-  # We mock find.package and download.packages to verify they ARE called (or that pak is NOT called)
-
   calls <- new.env()
   calls$pak_called <- FALSE
 
@@ -74,15 +68,25 @@ test_that("resolve_pkg_path does NOT treat non-existent local paths as remotes",
     .package = "utils"
   )
 
-  # "./nonexistent" should NOT trigger pak (starts with ./)
+  # 1. Explicit relative path "./nonexistent"
+  # Should NOT trigger pak (starts with ./)
   expect_error(
     resolve_pkg_path("./nonexistent"),
     "Package not found on CRAN"
   )
   expect_false(calls$pak_called)
 
-  # "nonexistent/path" (no leading ./) SHOULD trigger pak (looks like user/repo)
-  # But fails because our mock returns empty
+  # 2. Absolute path "/tmp/nonexistent" (Unix-style)
+  # Should NOT trigger pak (starts with /)
+  expect_error(
+    resolve_pkg_path("/tmp/nonexistent"),
+    "Package not found on CRAN"
+  )
+  expect_false(calls$pak_called)
+
+  # 3. Remote-like string "nonexistent/path" (no leading ./ or /)
+  # SHOULD trigger pak (looks like user/repo)
+  # But fails because our mock returns empty (or download.packages if it falls through? No, it enters the remote block)
   expect_error(
     resolve_pkg_path("nonexistent/path"),
     "Failed to download package from remote"
