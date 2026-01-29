@@ -6,9 +6,16 @@ test_that("resolve_pkg_path identifies remote packages correctly", {
     # Simulate a successful download
     tar_file <- file.path(dest_dir, "testpkg_0.1.tar.gz")
     # Create a dummy tarball
-    dir.create(file.path(dest_dir, "testpkg"), showWarnings = FALSE)
-    writeLines("Package: testpkg\nVersion: 0.1", file.path(dest_dir, "testpkg", "DESCRIPTION"))
-    utils::tar(tar_file, files = "testpkg", tar = "internal", extra_flags = "-C", root = dest_dir)
+    pkg_dir <- file.path(dest_dir, "testpkg")
+    dir.create(pkg_dir, showWarnings = FALSE)
+    writeLines("Package: testpkg\nVersion: 0.1", file.path(pkg_dir, "DESCRIPTION"))
+
+    # Use withr::with_dir to change directory safely for tar
+    old_wd <- getwd()
+    on.exit(setwd(old_wd))
+    setwd(dest_dir)
+    utils::tar("testpkg_0.1.tar.gz", files = "testpkg", tar = "internal")
+
     # Return data frame like pak::pkg_download
     data.frame(
       fulltarget = tar_file,
