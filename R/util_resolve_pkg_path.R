@@ -58,10 +58,11 @@ resolve_pkg_path <- function(
     contents <- list.files(path, full.names = TRUE, all.files = TRUE, no.. = TRUE)
     dirs <- contents[dir.exists(contents)]
 
-    # Ignore hidden directories like .git or .github
-    dirs <- dirs[!startsWith(basename(dirs), ".")]
-
     # If there is exactly one subdirectory, check inside it
+    dirs <- contents[
+      dir.exists(contents) & !startsWith(basename(contents), ".")
+    ]
+    # If there is exactly one non-hidden subdirectory, check inside it
     if (length(dirs) == 1L) {
       subdir <- dirs[[1]]
       if (file.exists(file.path(subdir, "DESCRIPTION"))) {
