@@ -46,6 +46,29 @@ resolve_pkg_path <- function(
     }
   }
 
+  # Helper function to flatten extra top-level folder if necessary.
+  flatten_extract_dir <- function(extract_dir) {
+    contents <- list.files(
+      extract_dir,
+      full.names = TRUE,
+      all.files = FALSE,
+      no.. = TRUE
+    )
+    if (length(contents) == 1L && dir.exists(contents)) {
+      subdir <- contents
+      items <- list.files(
+        subdir,
+        full.names = TRUE,
+        all.files = TRUE,
+        no.. = TRUE
+      )
+      sapply(items, function(x) {
+        file.rename(x, file.path(extract_dir, basename(x)))
+      })
+      unlink(subdir, recursive = TRUE)
+    }
+  }
+
   if (file.exists(pkg)) {
     if (dir.exists(pkg)) {
       # Check if directory is a source package by looking for Rd files in "man/"
@@ -85,18 +108,8 @@ resolve_pkg_path <- function(
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(pkg, exdir = extract_dir)
-      # Flatten extra top-level folder if necessary.
-      subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
-      if (length(subdirs) == 1L) {
-        files <- list.files(
-          subdirs[1],
-          full.names = TRUE,
-          all.files = TRUE,
-          no.. = TRUE
-        )
-        file.copy(files, extract_dir, recursive = TRUE)
-        unlink(subdirs[1], recursive = TRUE)
-      }
+      flatten_extract_dir(extract_dir)
+
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
@@ -105,7 +118,53 @@ resolve_pkg_path <- function(
       ))
     }
   } else {
-    # pkg is not an existing file/directory: treat it as a package name.
+    # pkg is not an existing file/directory: treat it as a package name or remote.
+
+    # Check if pkg is a remote specification (contains /)
+    if (grepl("/", pkg)) {
+      if (!requireNamespace("pak", quietly = TRUE)) {
+        stop(
+          "The 'pak' package is required to download packages from remote sources (e.g., GitHub, GitLab).\n",
+          "Please install it using install.packages('pak')."
+        )
+      }
+
+      message("Fetching package source from remote: ", pkg, " ...")
+      dest_dir <- if (!is.null(cache_path)) cache_path else tempdir()
+      if (!dir.exists(dest_dir)) {
+        dir.create(dest_dir, recursive = TRUE)
+      }
+
+      dl_info <- tryCatch(
+        pak::pkg_download(pkg, dest_dir = dest_dir, dependencies = FALSE),
+        error = function(e) stop("Failed to download package from remote: ", e$message)
+      )
+
+      if (nrow(dl_info) < 1) {
+        stop("Failed to download package from remote (no file returned).")
+      }
+
+      archive <- dl_info$fulltarget[1]
+
+      extract_dir <- tryCatch(
+        get_extract_dir(archive),
+        error = function(e) tempfile("pak_extract")
+      )
+
+      if (!dir.exists(extract_dir)) {
+        dir.create(extract_dir, recursive = TRUE)
+      }
+      utils::untar(archive, exdir = extract_dir)
+      flatten_extract_dir(extract_dir)
+
+      return(list(
+        pkg_path = extract_dir,
+        extracted_path = extract_dir,
+        tar_path = archive,
+        is_installed = FALSE
+      ))
+    }
+
     # If force_fetch is TRUE, ignore any locally installed package.
     pkg_found <- if (!force_fetch) {
       tryCatch(find.package(pkg), error = function(e) NULL)
@@ -208,17 +267,8 @@ resolve_pkg_path <- function(
         dir.create(extract_dir, recursive = TRUE)
       }
       utils::untar(archive, exdir = extract_dir)
-      subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
-      if (length(subdirs) == 1L) {
-        files <- list.files(
-          subdirs[1],
-          full.names = TRUE,
-          all.files = TRUE,
-          no.. = TRUE
-        )
-        file.copy(files, extract_dir, recursive = TRUE)
-        unlink(subdirs[1], recursive = TRUE)
-      }
+      flatten_extract_dir(extract_dir)
+
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
