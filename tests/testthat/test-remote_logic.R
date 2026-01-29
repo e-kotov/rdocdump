@@ -36,12 +36,17 @@ test_that("resolve_pkg_path identifies remote packages correctly", {
   # Test type::pkg format
   res2 <- resolve_pkg_path("gitlab::user/repo", cache_path = tempdir())
   expect_false(res2$is_installed)
+
+  # Test user/repo@version format
+  res3 <- resolve_pkg_path("user/repo", version = "v1.0", cache_path = tempdir())
+  expect_false(res3$is_installed)
+  # Mock doesn't validate the pkg string content, but we ensure it didn't crash
 })
 
-test_that("resolve_pkg_path does NOT treat non-existent local paths as remotes", {
+test_that("resolve_pkg_path fails informatively for missing local paths", {
   # If we pass a path starting with ./ or / that doesn't exist,
-  # it should fall through to the CRAN check (and fail there),
-  # NOT try to use pak.
+  # it should FAIL with a specific "path does not exist" error,
+  # NOT try to download it as a remote.
 
   calls <- new.env()
   calls$pak_called <- FALSE
@@ -69,24 +74,32 @@ test_that("resolve_pkg_path does NOT treat non-existent local paths as remotes",
   )
 
   # 1. Explicit relative path "./nonexistent"
-  # Should NOT trigger pak (starts with ./)
+  # Should FAIL immediately as path not found, NOT trigger pak logic
   expect_error(
     resolve_pkg_path("./nonexistent"),
-    "Package not found on CRAN"
+    "specified path does not exist"
   )
   expect_false(calls$pak_called)
 
-  # 2. Absolute path "/tmp/nonexistent" (Unix-style)
-  # Should NOT trigger pak (starts with /)
+  # 2. Absolute path "/tmp/nonexistent" (Unix-style) or Windows absolute
+  # Should FAIL immediately
   expect_error(
     resolve_pkg_path("/tmp/nonexistent"),
-    "Package not found on CRAN"
+    "specified path does not exist"
   )
   expect_false(calls$pak_called)
 
-  # 3. Remote-like string "nonexistent/path" (no leading ./ or /)
+  # 3. Path with extension "foo/bar.tar.gz"
+  # Should FAIL immediately if it looks like a file path
+  expect_error(
+    resolve_pkg_path("nonexistent/package.tar.gz"),
+    "specified path does not exist"
+  )
+  expect_false(calls$pak_called)
+
+  # 4. Remote-like string "nonexistent/path" (no leading ./ or /, no ext)
   # SHOULD trigger pak (looks like user/repo)
-  # But fails because our mock returns empty (or download.packages if it falls through? No, it enters the remote block)
+  # But fails because our mock returns empty (or enters pak block and mock doesn't return valid)
   expect_error(
     resolve_pkg_path("nonexistent/path"),
     "Failed to download package from remote"

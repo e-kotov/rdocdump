@@ -58,6 +58,9 @@ resolve_pkg_path <- function(
     contents <- list.files(path, full.names = TRUE, all.files = TRUE, no.. = TRUE)
     dirs <- contents[dir.exists(contents)]
 
+    # Ignore hidden directories like .git or .github
+    dirs <- dirs[!startsWith(basename(dirs), ".")]
+
     # If there is exactly one subdirectory, check inside it
     if (length(dirs) == 1L) {
       subdir <- dirs[[1]]
@@ -122,15 +125,21 @@ resolve_pkg_path <- function(
   } else {
     # pkg is not an existing file/directory: treat it as a package name or remote.
 
-    # Check if pkg is a remote specification (contains /).
-    # Note: Valid CRAN package names cannot contain slashes.
-    # We exclude strings that look like explicit file paths (start with /, ./, ../, ~)
-    # to avoid treating non-existent local files as remote packages.
-    is_likely_remote <- grepl("/", pkg) &&
-      !grepl("^(/|\\./|\\.\\./|~|\\\\|[a-zA-Z]:)", pkg)
+    # Heuristics to distinguish non-existent local paths from remote specifications.
+    # If it resembles a path (absolute, relative, home, Windows drive, or a path
+    # with separators plus a file extension), treat it as a missing local path
+    # rather than a remote package specification.
+    likely_path_prefix <- grepl("^(/|\\./|\\.\\./|~|\\\\|[A-Za-z]:[/\\\\])", pkg)
+    has_path_sep <- grepl("[/\\\\]", pkg)
+    has_extension <- grepl("\\.[A-Za-z0-9]+$", basename(pkg))
+    is_likely_local_path <- likely_path_prefix || (has_path_sep && has_extension)
+    if (is_likely_local_path) {
+      stop("The specified path does not exist: ", pkg)
+    }
 
-    # Also handle "type::pkg" which might not have slash but has :: (e.g. cran::pkg)
-    if (grepl("::", pkg)) is_likely_remote <- TRUE
+    # Check if pkg is a remote specification (contains /) or uses "type::pkg" syntax.
+    # Note: Valid CRAN package names cannot contain slashes.
+    is_likely_remote <- (grepl("/", pkg) && !likely_path_prefix) || grepl("::", pkg)
 
     if (is_likely_remote) {
       if (!requireNamespace("pak", quietly = TRUE)) {
@@ -140,21 +149,28 @@ resolve_pkg_path <- function(
         )
       }
 
-      message("Fetching package source from remote: ", pkg, " ...")
+      # Handle version parameter if provided
+      pkg_for_download <- pkg
+      if (!is.null(version) && nzchar(version) && !grepl("@", pkg, fixed = TRUE)) {
+        pkg_for_download <- paste0(pkg, "@", version)
+      }
+
+      message("Fetching package source from remote: ", pkg_for_download, " ...")
       dest_dir <- if (!is.null(cache_path)) cache_path else tempdir()
       if (!dir.exists(dest_dir)) {
         dir.create(dest_dir, recursive = TRUE)
       }
 
       dl_info <- tryCatch(
-        pak::pkg_download(pkg, dest_dir = dest_dir, dependencies = FALSE),
+        pak::pkg_download(pkg_for_download, dest_dir = dest_dir, dependencies = FALSE),
         error = function(e) {
           msg <- conditionMessage(e)
           prefix <- "Failed to download package from remote:"
+          # Avoid double prefixing if the message already has it (though pak errors usually don't)
           if (grepl(prefix, msg, fixed = TRUE)) {
             stop(msg)
           } else {
-            stop(prefix, " ", msg)
+            stop(paste(prefix, msg))
           }
         }
       )

@@ -26,19 +26,25 @@ cleanup_files <- function(
     }
   }
 
-  if (
-    !keep_files %in% c("extracted", "both") && !is.null(pkg_info$extracted_path)
-  ) {
-    # pkg_info$extracted_path is the directory where the package was extracted.
-    # We should remove this directory, not its parent.
-    dir_to_remove <- pkg_info$extracted_path
-    res <- unlink(dir_to_remove, recursive = TRUE)
-    if (res != 0L) {
-      warning(
-        "cleanup_files: failed to delete extracted directory: ",
-        dir_to_remove,
-        call. = FALSE
-      )
+  if (!keep_files %in% c("extracted", "both")) {
+    # If we have an extracted root, remove it (this includes the pkg_path inside it).
+    if (!is.null(pkg_info$extracted_path)) {
+      dir_to_remove <- pkg_info$extracted_path
+      res <- unlink(dir_to_remove, recursive = TRUE)
+      if (res != 0L) {
+        warning(
+          "cleanup_files: failed to delete extracted directory: ",
+          dir_to_remove,
+          call. = FALSE
+        )
+      }
+    } else if (!is.null(pkg_info$pkg_path) && !isTRUE(pkg_info$is_installed)) {
+      # Fallback: if there is no extracted_path (e.g. source dir), but we are supposed to clean up?
+      # Actually, if is_installed is FALSE and tar_path was NULL, it might be a local source dir provided by user.
+      # resolve_pkg_path sets extracted_path=NULL for existing source dirs.
+      # We generally should NOT delete user-provided source dirs unless we created them.
+      # But resolve_pkg_path sets extracted_path only if it extracted/downloaded something.
+      # So relying on extracted_path is correct.
     }
   }
 

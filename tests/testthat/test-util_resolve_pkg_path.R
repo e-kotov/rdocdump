@@ -99,8 +99,12 @@ test_that("resolve_pkg_path fetches package from CRAN", {
 
   expect_true(file.exists(pkg_info$tar_path))
   expect_true(dir.exists(pkg_info$pkg_path))
-  unlink(pkg_info$pkg_path, recursive = TRUE) # This might leave the wrapper dir if different
-  # Better clean up extracted_path if available
-  if (!is.null(pkg_info$extracted_path)) unlink(pkg_info$extracted_path, recursive = TRUE)
+
+  # Clean up using the logic in cleanup_files()
+  if (!is.null(pkg_info$extracted_path)) {
+    unlink(pkg_info$extracted_path, recursive = TRUE)
+  } else {
+    unlink(pkg_info$pkg_path, recursive = TRUE)
+  }
   unlink(pkg_info$tar_path)
 })
