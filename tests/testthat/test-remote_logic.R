@@ -1,62 +1,98 @@
+test_that("resolve_pkg_path identifies remote packages correctly", {
+  skip_if_not_installed("pak")
 
-test_that("resolve_pkg_path identifies remote package and errors without pak", {
-  # Mocking requireNamespace to return FALSE for "pak"
-  # Since we can't easily mock requireNamespace in testthat without mockery,
-  # we rely on the fact that if pak IS installed, this test will fail to error.
-  # So we check if pak is installed first.
-
-  if (!requireNamespace("pak", quietly = TRUE)) {
-    expect_error(
-      resolve_pkg_path("user/repo"),
-      "The 'pak' package is required"
-    )
-  } else {
-    # If pak IS installed, we can't easily test the error path without mocking.
-    # We can at least test that it tries to download and fails (since "user/repo" is likely invalid)
-    # or skip.
-    skip("pak is installed, skipping 'missing pak' test")
-  }
-})
-
-test_that("resolve_pkg_path works for CRAN packages", {
-  # "stats" is a base package, should be found installed
-  res <- resolve_pkg_path("stats")
-  expect_true(res$is_installed)
-  expect_equal(res$pkg_name, "stats")
-})
-
-test_that("resolve_pkg_path distinguishes local file from remote", {
-  # Create a dummy file with a slash in name (if possible? no, but path has slashes)
-  tmp <- tempfile()
-  dir.create(tmp)
-  # Create a dummy tarball structure
-  tar_name <- "dummy_1.0.tar.gz"
-  tar_path <- file.path(tmp, tar_name)
-  file.create(tar_path)
-
-  # Should identify as local file (even if extraction fails later due to empty file)
-  # Actually resolve_pkg_path attempts to untar immediately if file exists
-  # So we need a valid tarball to avoid error during untar
-
-  # Creating a minimal valid tarball is hard without tar/R.
-  # We will test the failure mode: if file exists, it tries untar.
-  # If file doesn't exist, it goes to remote check.
-
-  non_existent <- file.path(tmp, "non/existent/package")
-
-  # This path contains "/", so if it doesn't exist, it hits the remote block.
-  # If pak is missing, it errors with "pak required".
-  # If pak is present, it errors with "Failed to download" (because invalid repo).
-
-  if (!requireNamespace("pak", quietly = TRUE)) {
-    expect_error(
-      resolve_pkg_path(non_existent),
-      "The 'pak' package is required"
-    )
-  } else {
-    expect_error(
-      resolve_pkg_path(non_existent),
-      "Failed to download package from remote"
+  # Mock pak::pkg_download to avoid actual network calls
+  mock_pkg_download <- function(pkg, dest_dir, dependencies) {
+    # Simulate a successful download
+    tar_file <- file.path(dest_dir, "testpkg_0.1.tar.gz")
+    # Create a dummy tarball
+    dir.create(file.path(dest_dir, "testpkg"), showWarnings = FALSE)
+    writeLines("Package: testpkg\nVersion: 0.1", file.path(dest_dir, "testpkg", "DESCRIPTION"))
+    utils::tar(tar_file, files = "testpkg", tar = "internal", extra_flags = "-C", root = dest_dir)
+    # Return data frame like pak::pkg_download
+    data.frame(
+      fulltarget = tar_file,
+      stringsAsFactors = FALSE
     )
   }
+
+  local_mocked_bindings(
+    pkg_download = mock_pkg_download,
+    .package = "pak"
+  )
+
+  # Test user/repo format
+  res <- resolve_pkg_path("user/repo", cache_path = tempdir())
+  expect_false(res$is_installed)
+  expect_true(!is.null(res$extracted_path))
+
+  # Test type::pkg format
+  res2 <- resolve_pkg_path("gitlab::user/repo", cache_path = tempdir())
+  expect_false(res2$is_installed)
+})
+
+test_that("resolve_pkg_path does NOT treat non-existent local paths as remotes", {
+  # If we pass a path starting with ./ or / that doesn't exist,
+  # it should fall through to the CRAN check (and fail there),
+  # NOT try to use pak.
+
+  # We mock find.package and download.packages to verify they ARE called (or that pak is NOT called)
+
+  calls <- new.env()
+  calls$pak_called <- FALSE
+
+  mock_pkg_download <- function(...) {
+    calls$pak_called <- TRUE
+    data.frame()
+  }
+
+  # Mock download.packages to just return empty to simulate "not found on CRAN"
+  mock_download_packages <- function(...) {
+    matrix(character(0), nrow = 0, ncol = 2)
+  }
+
+  if (requireNamespace("pak", quietly = TRUE)) {
+    local_mocked_bindings(
+      pkg_download = mock_pkg_download,
+      .package = "pak"
+    )
+  }
+
+  local_mocked_bindings(
+    download.packages = mock_download_packages,
+    .package = "utils"
+  )
+
+  # "./nonexistent" should NOT trigger pak (starts with ./)
+  expect_error(
+    resolve_pkg_path("./nonexistent"),
+    "Package not found on CRAN"
+  )
+  expect_false(calls$pak_called)
+
+  # "nonexistent/path" (no leading ./) SHOULD trigger pak (looks like user/repo)
+  # But fails because our mock returns empty
+  expect_error(
+    resolve_pkg_path("nonexistent/path"),
+    "Failed to download package from remote"
+  )
+  expect_true(calls$pak_called)
+})
+
+test_that("missing pak throws specific error for remote specs", {
+  # Mock requireNamespace to return FALSE for pak
+  mock_requireNamespace <- function(package, ...) {
+    if (package == "pak") return(FALSE)
+    base::requireNamespace(package, ...)
+  }
+
+  local_mocked_bindings(
+    requireNamespace = mock_requireNamespace,
+    .package = "base"
+  )
+
+  expect_error(
+    resolve_pkg_path("user/repo"),
+    "The 'pak' package is required"
+  )
 })

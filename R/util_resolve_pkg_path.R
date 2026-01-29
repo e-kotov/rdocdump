@@ -122,8 +122,17 @@ resolve_pkg_path <- function(
   } else {
     # pkg is not an existing file/directory: treat it as a package name or remote.
 
-    # Check if pkg is a remote specification (contains /)
-    if (grepl("/", pkg)) {
+    # Check if pkg is a remote specification (contains /).
+    # Note: Valid CRAN package names cannot contain slashes.
+    # We exclude strings that look like explicit file paths (start with /, ./, ../, ~)
+    # to avoid treating non-existent local files as remote packages.
+    is_likely_remote <- grepl("/", pkg) &&
+      !grepl("^(/|\\./|\\.\\./|~|\\\\|[a-zA-Z]:)", pkg)
+
+    # Also handle "type::pkg" which might not have slash but has :: (e.g. cran::pkg)
+    if (grepl("::", pkg)) is_likely_remote <- TRUE
+
+    if (is_likely_remote) {
       if (!requireNamespace("pak", quietly = TRUE)) {
         stop(
           "The 'pak' package is required to download packages from remote sources (e.g., GitHub, GitLab).\n",
