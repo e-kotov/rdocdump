@@ -47,6 +47,7 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
   old_wd <- getwd()
   setwd(dirname(dummy_pkg))
   # Create the archive without extra arguments.
+  # tar will include the directory 'basename(dummy_pkg)' in the archive.
   utils::tar(tarfile = tar_path, files = basename(dummy_pkg), tar = "internal")
   setwd(old_wd)
 
@@ -59,12 +60,26 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
   # With cache_path specified, get_extract_dir() should return a directory path.
   expect_true(is.character(pkg_info$pkg_path))
   expect_true(is.character(pkg_info$extracted_path))
-  expect_equal(pkg_info$pkg_path, pkg_info$extracted_path)
+
+  # The extracted path is the root where tar extracted.
+  # The package path should be the subdirectory containing DESCRIPTION.
+  # Since we created the tarball from basename(dummy_pkg), it wraps content in that dir.
+  expect_true(dir.exists(pkg_info$extracted_path))
+
+  # Verify pkg_path is inside extracted_path
+  expect_true(grepl(pkg_info$extracted_path, pkg_info$pkg_path, fixed = TRUE))
+
+  # Specifically, it should be extracted_path/basename(dummy_pkg)
+  expected_pkg_path <- file.path(pkg_info$extracted_path, basename(dummy_pkg))
+  expect_equal(pkg_info$pkg_path, expected_pkg_path)
+
   expect_true(dir.exists(pkg_info$pkg_path))
+  expect_true(file.exists(file.path(pkg_info$pkg_path, "DESCRIPTION")))
 
   # Clean up.
-  unlink(pkg_info$pkg_path, recursive = TRUE)
+  unlink(pkg_info$extracted_path, recursive = TRUE)
   unlink(tar_path)
+  unlink(dummy_pkg, recursive = TRUE)
 })
 
 
@@ -84,6 +99,8 @@ test_that("resolve_pkg_path fetches package from CRAN", {
 
   expect_true(file.exists(pkg_info$tar_path))
   expect_true(dir.exists(pkg_info$pkg_path))
-  unlink(pkg_info$pkg_path, recursive = TRUE)
+  unlink(pkg_info$pkg_path, recursive = TRUE) # This might leave the wrapper dir if different
+  # Better clean up extracted_path if available
+  if (!is.null(pkg_info$extracted_path)) unlink(pkg_info$extracted_path, recursive = TRUE)
   unlink(pkg_info$tar_path)
 })
