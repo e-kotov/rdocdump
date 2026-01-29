@@ -11,6 +11,10 @@ test_that("resolve_pkg_path identifies remote packages correctly", {
     writeLines("Package: testpkg\nVersion: 0.1", file.path(pkg_dir, "DESCRIPTION"))
 
     # Use withr::with_dir to change directory safely for tar
+    # Note: we should not rely on 'tar' from utils being mocked if we call it via namespace in the code,
+    # but here we are in the test setup.
+    # The actual code calls utils::untar, not utils::tar.
+
     old_wd <- getwd()
     on.exit(setwd(old_wd))
     setwd(dest_dir)
