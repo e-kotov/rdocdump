@@ -1,9 +1,8 @@
-# Helper function to extract code from package source files. This function reads all `.R` files in the `R` directory and optionally includes files from the `tests` directory. It can also exclude roxygen2 documentation lines.
+# Helper function to extract code from package source files.
 
-Helper function to extract code from package source files. This function
-reads all `.R` files in the `R` directory and optionally includes files
-from the `tests` directory. It can also exclude roxygen2 documentation
-lines.
+This function reads all `.R` files in the `R` directory and optionally
+includes files from the `tests` directory. It can also exclude roxygen2
+documentation lines.
 
 ## Usage
 

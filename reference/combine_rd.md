@@ -1,8 +1,7 @@
-# Combine Rd files into a single character vector. This function reads the Rd files from a package source directory or an installed package and combines them into a single string.
+# Combine Rd files into a single character vector.
 
-Combine Rd files into a single character vector. This function reads the
-Rd files from a package source directory or an installed package and
-combines them into a single string.
+This function reads the Rd files from a package source directory or an
+installed package and combines them into a single string.
 
 ## Usage
 

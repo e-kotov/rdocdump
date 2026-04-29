@@ -2,6 +2,8 @@
 
 ## rdocdump 0.2.0 (2026-04-29)
 
+CRAN release: 2026-04-29
+
 - Added support for remote repository references (GitHub, GitLab,
   Bitbucket) in
   [`rdd_to_txt()`](https://www.ekotov.pro/rdocdump/reference/rdd_to_txt.md)

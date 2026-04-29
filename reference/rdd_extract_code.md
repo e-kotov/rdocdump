@@ -118,7 +118,8 @@ roxygen2 documentation) from the package.
 ## Examples
 
 ``` r
-# Extract only R source code (excluding roxygen2 documentation) from an installed package.
+# Extract only R source code (excluding roxygen2 documentation) from an
+# installed package.
 code <- rdd_extract_code("splines")
 cat(substr(code, 1, 1000))
 #> --------------------------------------------------------------------------------
@@ -154,11 +155,12 @@ cat(substr(code, 1, 1000))
 #> --------------------------------------------------------------------------------
 #> F
 
-# Extract R source code including roxygen2 documentation from a package source directory.
+# Extract R source code including roxygen2 documentation from a package
+# source directory.
 # \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpdaTOSG/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/RtmpVpwrjL/rdocdump_cache
 
 local({
 code_with_roxygen <- rdd_extract_code(

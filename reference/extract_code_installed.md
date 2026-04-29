@@ -1,8 +1,7 @@
-# Extract code from an installed package using its namespace. This function retrieves all functions from the package namespace and deparses them to get their source code.
+# Extract code from an installed package using its namespace.
 
-Extract code from an installed package using its namespace. This
-function retrieves all functions from the package namespace and deparses
-them to get their source code.
+This function retrieves all functions from the package namespace and
+deparses them to get their source code.
 
 ## Usage
 
