@@ -1,4 +1,4 @@
-#' Dump Package Source, Documentationm and Vignettes into Plain Text
+#' Dump Package Source, Documentation and Vignettes into Plain Text
 #'
 #' @description
 #' This function produces a single text output for an R package by processing its documentation (Rd files from the package source or the documentation from already installed packages), vignettes, and/or R source code.

@@ -1,6 +1,6 @@
-# rdocdump 0.2.0
+# rdocdump 0.2.0 (2026-04-29)
 
-* Added support for remote repository references (GitHub, GitLab, Bitbucket) in `rdd_to_txt()` and `rdd_extract_code()`. This includes support for specific branches/tags/commits and packages in subdirectories, as well as direct URLs (to branches and/or folders within repositories). Therefore the `remotes` package to `Suggests` to handle remote downloads.
+* Added support for remote repository references (GitHub, GitLab, Bitbucket) in `rdd_to_txt()` and `rdd_extract_code()`. This includes support for specific branches/tags/commits and packages in subdirectories, as well as direct URLs (to branches and/or folders within repositories). Therefore, added the `remotes` package to `Suggests` to handle remote downloads.
 
 # rdocdump 0.1.1 (2025-08-21)
 

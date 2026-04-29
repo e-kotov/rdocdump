@@ -2,7 +2,7 @@
 % Please edit documentation in R/to_txt.R
 \name{rdd_to_txt}
 \alias{rdd_to_txt}
-\title{Dump Package Source, Documentationm and Vignettes into Plain Text}
+\title{Dump Package Source, Documentation and Vignettes into Plain Text}
 \usage{
 rdd_to_txt(
   pkg,
