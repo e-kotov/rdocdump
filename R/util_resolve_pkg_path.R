@@ -21,6 +21,12 @@ resolve_pkg_path <- function(
     stop("Argument 'pkg' must be a single character string.")
   }
 
+  # Check if it's a remote reference (GitHub, GitLab, etc.)
+  if (is_remote_reference(pkg)) {
+    message("Fetching package source from remote repository...")
+    return(resolve_remote_pkg(pkg, cache_path))
+  }
+
   # Helper function to parse tarball filename into package name and version.
   parse_tarball_name <- function(tar_path) {
     base_name <- basename(tar_path) # e.g., "rJavaEnv_0.2.2.tar.gz"

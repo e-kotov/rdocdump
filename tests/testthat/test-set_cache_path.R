@@ -7,7 +7,13 @@ test_that("rdd_set_cache_path sets the cache path correctly", {
     rdocdump.cache_path = getOption("rdocdump.cache_path")
   ))
 
-  result <- rdd_set_cache_path(temp_cache)
+  expect_message(
+    {
+      result <- rdd_set_cache_path(temp_cache)
+    },
+    "rdocdump.cache_path set to:"
+  )
+
   normalized_path <- normalizePath(temp_cache, winslash = "/")
 
   expect_equal(getOption("rdocdump.cache_path"), normalized_path)

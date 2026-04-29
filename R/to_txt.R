@@ -5,10 +5,20 @@
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
-#'   \item an installed package name,
+#'   \item an installed package name (e.g., `"ggplot2"`),
 #'   \item a full path to a package source directory,
-#'   \item a full path to a package archive file (tar.gz), or
-#'   \item a package name not installed (which will then be downloaded from CRAN).
+#'   \item a full path to a package archive file (tar.gz),
+#'   \item a package name not installed (which will then be downloaded from CRAN),
+#'   \item a GitHub repository reference (e.g., `"tidyverse/ggplot2"` or
+#'         `"github::tidyverse/ggplot2"`),
+#'   \item a GitLab repository reference (e.g., `"gitlab::user/repo"`),
+#'   \item a repository reference with specific branch/tag/commit
+#'         (e.g., `"user/repo@v1.0.0"` or `"user/repo@main"`),
+#'   \item a repository reference with subdirectory
+#'         (e.g., `"user/repo/subdir"` for packages not at repo root),
+#'   \item a full GitHub or GitLab web URL
+#'         (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"` or
+#'         `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
 #' }
 #' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
 #' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
@@ -44,6 +54,17 @@
 #' # Extract documentation for built-in `stats` package (both docs and vignettes).
 #' docs <- rdd_to_txt("splines")
 #' cat(substr(docs, 1, 500))
+#'
+#' \dontrun{
+#' # Extract from GitHub repository
+#' docs <- rdd_to_txt("r-lib/rlang")
+#'
+#' # Extract specific version from GitHub
+#' docs <- rdd_to_txt("r-lib/rlang@v1.1.0")
+#'
+#' # Extract from GitLab
+#' docs <- rdd_to_txt("gitlab::user/repo")
+#' }
 #'
 #' \donttest{
 #' # set cache directory for `rdocdump`
