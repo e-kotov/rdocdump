@@ -18,10 +18,20 @@ rdd_to_txt(
 \arguments{
 \item{pkg}{A \code{character} string specifying the package. This can be:
 \itemize{
-\item an installed package name,
+\item an installed package name (e.g., \code{"ggplot2"}),
 \item a full path to a package source directory,
-\item a full path to a package archive file (tar.gz), or
-\item a package name not installed (which will then be downloaded from CRAN).
+\item a full path to a package archive file (tar.gz),
+\item a package name not installed (which will then be downloaded from CRAN),
+\item a GitHub repository reference (e.g., \code{"tidyverse/ggplot2"} or
+\code{"github::tidyverse/ggplot2"}),
+\item a GitLab repository reference (e.g., \code{"gitlab::user/repo"}),
+\item a repository reference with specific branch/tag/commit
+(e.g., \code{"user/repo@v1.0.0"} or \code{"user/repo@main"}),
+\item a repository reference with subdirectory
+(e.g., \code{"user/repo/subdir"} for packages not at repo root),
+\item a full GitHub or GitLab web URL
+(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"} or
+\code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
 }}
 
 \item{file}{Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to \code{NULL}.}
@@ -65,6 +75,17 @@ This function produces a single text output for an R package by processing its d
 # Extract documentation for built-in `stats` package (both docs and vignettes).
 docs <- rdd_to_txt("splines")
 cat(substr(docs, 1, 500))
+
+\dontrun{
+# Extract from GitHub repository
+docs <- rdd_to_txt("r-lib/rlang")
+
+# Extract specific version from GitHub
+docs <- rdd_to_txt("r-lib/rlang@v1.1.0")
+
+# Extract from GitLab
+docs <- rdd_to_txt("gitlab::user/repo")
+}
 
 \donttest{
 # set cache directory for `rdocdump`

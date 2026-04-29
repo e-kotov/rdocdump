@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/e-kotov/rdocdump",
   "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.1.1",
+  "version": "0.2.0.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -75,6 +75,19 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "remotes",
+      "name": "remotes",
+      "version": ">= 2.2.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=remotes"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
       "version": ">= 3.0.0",
@@ -102,7 +115,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "80.824KB",
+  "fileSize": "110.425KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -123,7 +136,7 @@
       "sameAs": "https://doi.org/10.32614/CRAN.package.rdocdump"
     }
   ],
-  "releaseNotes": "https://github.com/e-kotov/rdocdump/blob/master/NEWS.md",
+  "releaseNotes": "https://github.com/e-kotov/rdocdump/blob/main/NEWS.md",
   "readme": "https://github.com/e-kotov/rdocdump/blob/main/README.md",
   "contIntegration": ["https://github.com/e-kotov/rdocdump/actions/workflows/R-CMD-check.yaml", "https://github.com/e-kotov/rdocdump/actions?query=workflow%3Apkgcheck"],
   "developmentStatus": ["https://www.repostatus.org/#active", "https://lifecycle.r-lib.org/articles/stages.html#experimental"],

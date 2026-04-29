@@ -66,7 +66,12 @@ test_that("rdd_to_txt combines DESCRIPTION, Rd documentation and vignettes", {
     .package = "rdocdump"
   )
 
-  out <- rdd_to_txt(pkg_dir, keep_files = "none")
+  expect_warning(
+    {
+      out <- rdd_to_txt(pkg_dir, keep_files = "none")
+    },
+    "R directory not found"
+  )
 
   # Adjusted expectations:
   # Check that the output includes the DESCRIPTION content.

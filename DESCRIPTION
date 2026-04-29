@@ -1,6 +1,6 @@
 Package: rdocdump
 Title: Dump 'R' Package Source, Documentation, and Vignettes into One File
-Version: 0.1.1.9000
+Version: 0.2.0.9000
 Authors@R: 
     person("Egor", "Kotov", , "kotov.egor@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-6690-5345"))
@@ -19,6 +19,7 @@ BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests:
     curl,
     quarto,
+    remotes (>= 2.2.0),
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: 
@@ -27,4 +28,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
