@@ -2,8 +2,7 @@
 % Please edit documentation in R/extract_code.R
 \name{extract_code_installed}
 \alias{extract_code_installed}
-\title{Extract code from an installed package using its namespace.
-This function retrieves all functions from the package namespace and deparses them to get their source code.}
+\title{Extract code from an installed package using its namespace.}
 \usage{
 extract_code_installed(pkg_name)
 }
@@ -11,10 +10,11 @@ extract_code_installed(pkg_name)
 \item{pkg_name}{The name of the installed package.}
 }
 \value{
-A single string containing the source code of all functions in the package.
+A single string containing the source code of all functions in the
+package.
 }
 \description{
-Extract code from an installed package using its namespace.
-This function retrieves all functions from the package namespace and deparses them to get their source code.
+This function retrieves all functions from the package namespace and
+deparses them to get their source code.
 }
 \keyword{internal}

@@ -21,7 +21,8 @@ rdd_to_txt(
 \item an installed package name (e.g., \code{"ggplot2"}),
 \item a full path to a package source directory,
 \item a full path to a package archive file (tar.gz),
-\item a package name not installed (which will then be downloaded from CRAN),
+\item a package name not installed (which will then be downloaded from
+CRAN),
 \item a GitHub repository reference (e.g., \code{"tidyverse/ggplot2"} or
 \code{"github::tidyverse/ggplot2"}),
 \item a GitLab repository reference (e.g., \code{"gitlab::user/repo"}),
@@ -30,46 +31,70 @@ rdd_to_txt(
 \item a repository reference with subdirectory
 (e.g., \code{"user/repo/subdir"} for packages not at repo root),
 \item a full GitHub or GitLab web URL
-(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"} or
-\code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
+(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"}
+or \code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
 }}
 
-\item{file}{Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to \code{NULL}.}
+\item{file}{Optional. Save path for the output text file. If set, the
+function will return the path to the file instead of the combined text.
+Defaults to \code{NULL}.}
 
-\item{content}{A character vector specifying which components to include in the output.
-Possible values are:
+\item{content}{A character vector specifying which components to include in
+the output. Possible values are:
 \itemize{
-\item \code{"all"}: Include Rd documentation, vignettes, and R source code (default).
+\item \code{"all"}: Include Rd documentation, vignettes, and R source code
+(default).
 \item \code{"docs"}: Include only the Rd documentation.
 \item \code{"vignettes"}: Include only the vignettes.
-\item \code{"code"}: Include only the R source code. When extracting code for non-installed packages, the function will not include roxygen2 documentation, as the documentation can be imported from the Rd files. If you want to extract the R source code with the roxygen2 documentation, use \code{\link{rdd_extract_code}} and set \code{include_roxygen} to \code{TRUE}.
+\item \code{"code"}: Include only the R source code. When extracting code for
+non-installed packages, the function will not include roxygen2
+documentation, as the documentation can be imported from the Rd
+files. If you want to extract the R source code with the roxygen2
+documentation, use \code{\link{rdd_extract_code}} and set
+\code{include_roxygen} to \code{TRUE}.
 }
-You can specify multiple options (e.g., \code{c("docs", "code")} to include both documentation and source code).}
+You can specify multiple options (e.g., \code{c("docs", "code")} to include both
+documentation and source code).}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched
+from CRAN as a tar.gz archive even if the package is already installed
+locally. Default is \code{FALSE}, but when \code{version} is specified, it will be
+set to \code{TRUE}.}
 
-\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
+\item{version}{Optional. A \code{character} string specifying the package version
+to fetch from CRAN. If not provided, the latest version will be used.}
 
-\item{keep_files}{A \code{character} value controlling whether temporary files should be kept.
-Possible values are:
+\item{keep_files}{A \code{character} value controlling whether temporary files
+should be kept. Possible values are:
 \itemize{
-\item \code{"none"}: Delete both the tar.gz archive and the extracted files (default).
+\item \code{"none"}: Delete both the tar.gz archive and the extracted files
+(default).
 \item \code{"tgz"}: Keep only the tar.gz archive.
 \item \code{"extracted"}: Keep only the extracted files.
 \item \code{"both"}: Keep both the tar.gz archive and the extracted files.
 }}
 
-\item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
-By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
+\item{cache_path}{A \code{character} string specifying the directory where kept
+temporary files will be stored. By default, it uses the value of
+\code{getOption("rdocdump.cache_path")} which sets the cache directory to the
+temporary directory of the current R session.}
 
-\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the
+value of \code{getOption("rdocdump.repos")} which sets the repository URLs to
+the default R repositories and is itself set to
+\code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent
+accidental downloads of pre-built packages from Posit Package Manager and
+R Universe.}
 }
 \value{
-A single string containing the combined package documentation, vignettes, and/or code as specified by the \code{content} argument.
-If the \code{file} argument is set, returns the path to the file.
+A single string containing the combined package documentation,
+vignettes, and/or code as specified by the \code{content} argument. If the
+\code{file} argument is set, returns the path to the file.
 }
 \description{
-This function produces a single text output for an R package by processing its documentation (Rd files from the package source or the documentation from already installed packages), vignettes, and/or R source code.
+This function produces a single text output for an R package by processing
+its documentation (Rd files from the package source or the documentation from
+already installed packages), vignettes, and/or R source code.
 }
 \examples{
 # Extract documentation for built-in `stats` package (both docs and vignettes).

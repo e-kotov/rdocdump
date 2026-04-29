@@ -1,23 +1,38 @@
-# test_that(".onLoad sets rdocdump.cache_path if not already set", {
-#   # Backup any existing option
-#   old_opt <- getOption("rdocdump.cache_path")
-#   options(rdocdump.cache_path = NULL)
+test_that(".onLoad sets default options", {
+  # Backup any existing options
+  old_cache <- getOption("rdocdump.cache_path")
+  old_repos <- getOption("rdocdump.repos")
 
-#   # Expected default value based on tempdir()
-#   default_cache <- file.path(tempdir(), "rdocdump_cache")
+  options(rdocdump.cache_path = NULL)
+  options(rdocdump.repos = NULL)
 
-#   # Call .onLoad
-#   .onLoad(libname = NULL, pkgname = NULL)
-#   expect_equal(getOption("rdocdump.cache_path"), default_cache)
+  # Call .onLoad
+  rdocdump:::.onLoad(libname = NULL, pkgname = "rdocdump")
 
-#   # Restore previous option
-#   options(rdocdump.cache_path = old_opt)
-# })
+  expect_false(is.null(getOption("rdocdump.cache_path")))
+  expect_false(is.null(getOption("rdocdump.repos")))
 
-# test_that(".onLoad does not override existing rdocdump.cache_path", {
-#   old_value <- file.path(tempdir(), "existing_cache")
-#   options(rdocdump.cache_path = old_value)
+  # Restore previous options
+  options(rdocdump.cache_path = old_cache)
+  options(rdocdump.repos = old_repos)
+})
 
-#   .onLoad(libname = NULL, pkgname = NULL)
-#   expect_equal(getOption("rdocdump.cache_path"), old_value)
-# })
+test_that(".onLoad does not override existing options", {
+  old_cache <- getOption("rdocdump.cache_path")
+  old_repos <- getOption("rdocdump.repos")
+
+  custom_cache <- "/tmp/custom_cache"
+  custom_repos <- c(CRAN = "https://my.cran.org")
+
+  options(rdocdump.cache_path = custom_cache)
+  options(rdocdump.repos = custom_repos)
+
+  rdocdump:::.onLoad(libname = NULL, pkgname = "rdocdump")
+
+  expect_equal(getOption("rdocdump.cache_path"), custom_cache)
+  expect_equal(getOption("rdocdump.repos"), custom_repos)
+
+  # Restore
+  options(rdocdump.cache_path = old_cache)
+  options(rdocdump.repos = old_repos)
+})

@@ -1,14 +1,17 @@
 #' Dump Package Source, Documentation and Vignettes into Plain Text
 #'
 #' @description
-#' This function produces a single text output for an R package by processing its documentation (Rd files from the package source or the documentation from already installed packages), vignettes, and/or R source code.
+#' This function produces a single text output for an R package by processing
+#' its documentation (Rd files from the package source or the documentation from
+#' already installed packages), vignettes, and/or R source code.
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
 #'   \item an installed package name (e.g., `"ggplot2"`),
 #'   \item a full path to a package source directory,
 #'   \item a full path to a package archive file (tar.gz),
-#'   \item a package name not installed (which will then be downloaded from CRAN),
+#'   \item a package name not installed (which will then be downloaded from
+#'         CRAN),
 #'   \item a GitHub repository reference (e.g., `"tidyverse/ggplot2"` or
 #'         `"github::tidyverse/ggplot2"`),
 #'   \item a GitLab repository reference (e.g., `"gitlab::user/repo"`),
@@ -17,36 +20,58 @@
 #'   \item a repository reference with subdirectory
 #'         (e.g., `"user/repo/subdir"` for packages not at repo root),
 #'   \item a full GitHub or GitLab web URL
-#'         (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"` or
-#'         `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
+#'         (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"`
+#'         or `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
 #' }
-#' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
-#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
-#' @param version Optional. A `character` string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.
-#' @param content A character vector specifying which components to include in the output.
-#' Possible values are:
+#' @param file Optional. Save path for the output text file. If set, the
+#'   function will return the path to the file instead of the combined text.
+#'   Defaults to `NULL`.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched
+#'   from CRAN as a tar.gz archive even if the package is already installed
+#'   locally. Default is `FALSE`, but when `version` is specified, it will be
+#'   set to `TRUE`.
+#' @param version Optional. A `character` string specifying the package version
+#'   to fetch from CRAN. If not provided, the latest version will be used.
+#' @param content A character vector specifying which components to include in
+#'   the output. Possible values are:
 #' \itemize{
-#'   \item `"all"`: Include Rd documentation, vignettes, and R source code (default).
+#'   \item `"all"`: Include Rd documentation, vignettes, and R source code
+#'         (default).
 #'   \item `"docs"`: Include only the Rd documentation.
 #'   \item `"vignettes"`: Include only the vignettes.
-#'   \item `"code"`: Include only the R source code. When extracting code for non-installed packages, the function will not include roxygen2 documentation, as the documentation can be imported from the Rd files. If you want to extract the R source code with the roxygen2 documentation, use \code{\link{rdd_extract_code}} and set `include_roxygen` to `TRUE`.
+#'   \item `"code"`: Include only the R source code. When extracting code for
+#'         non-installed packages, the function will not include roxygen2
+#'         documentation, as the documentation can be imported from the Rd
+#'         files. If you want to extract the R source code with the roxygen2
+#'         documentation, use \code{\link{rdd_extract_code}} and set
+#'         `include_roxygen` to `TRUE`.
 #' }
-#' You can specify multiple options (e.g., `c("docs", "code")` to include both documentation and source code).
-#' @param keep_files A `character` value controlling whether temporary files should be kept.
-#' Possible values are:
+#' You can specify multiple options (e.g., `c("docs", "code")` to include both
+#' documentation and source code).
+#' @param keep_files A `character` value controlling whether temporary files
+#'   should be kept. Possible values are:
 #' \itemize{
-#'   \item `"none"`: Delete both the tar.gz archive and the extracted files (default).
+#'   \item `"none"`: Delete both the tar.gz archive and the extracted files
+#'         (default).
 #'   \item `"tgz"`: Keep only the tar.gz archive.
 #'   \item `"extracted"`: Keep only the extracted files.
 #'   \item `"both"`: Keep both the tar.gz archive and the extracted files.
 #' }
-#' @param cache_path A `character` string specifying the directory where kept temporary files will be stored.
-#' By default, it uses the value of `getOption("rdocdump.cache_path")` which sets the cache directory to the temporary directory of the current R session.
+#' @param cache_path A `character` string specifying the directory where kept
+#'   temporary files will be stored. By default, it uses the value of
+#'   `getOption("rdocdump.cache_path")` which sets the cache directory to the
+#'   temporary directory of the current R session.
 #'
-#' @param repos A `character` vector of repository URLs. By default, it uses the value of `getOption("rdocdump.repos")` which sets the repository URLs to the default R repositories and is itself set to `c("CRAN" = "https://cloud.r-project.org")` on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.
+#' @param repos A `character` vector of repository URLs. By default, it uses the
+#'   value of `getOption("rdocdump.repos")` which sets the repository URLs to
+#'   the default R repositories and is itself set to
+#'   `c("CRAN" = "https://cloud.r-project.org")` on package load to prevent
+#'   accidental downloads of pre-built packages from Posit Package Manager and
+#'   R Universe.
 #'
-#' @return A single string containing the combined package documentation, vignettes, and/or code as specified by the `content` argument.
-#' If the `file` argument is set, returns the path to the file.
+#' @return A single string containing the combined package documentation,
+#'   vignettes, and/or code as specified by the `content` argument. If the
+#'   `file` argument is set, returns the path to the file.
 #'
 #' @export
 #'

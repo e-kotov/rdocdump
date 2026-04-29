@@ -31,45 +31,69 @@ rdd_extract_code(
 \item a repository reference with subdirectory
 (e.g., \code{"user/repo/subdir"} for packages not at repo root),
 \item a full GitHub or GitLab web URL
-(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"} or
-\code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
+(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"}
+or \code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
 }}
 
-\item{file}{Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to \code{NULL}.}
+\item{file}{Optional. Save path for the output text file. If set, the
+function will return the path to the file instead of the combined text.
+Defaults to \code{NULL}.}
 
-\item{include_tests}{\code{logical}. If \code{TRUE}, for non-installed packages, the function will also include R source code from the \code{tests} directory. Defaults to \code{FALSE}.}
+\item{include_tests}{\code{logical}. If \code{TRUE}, for non-installed packages, the
+function will also include R source code from the \code{tests} directory.
+Defaults to \code{FALSE}.}
 
-\item{include_roxygen}{\code{logical}. If \code{TRUE}, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to \code{FALSE}.}
+\item{include_roxygen}{\code{logical}. If \code{TRUE}, roxygen2 documentation lines
+(lines starting with "#'") from R files will be included in the output.
+Defaults to \code{FALSE}.}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN even if the package is installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched
+from CRAN even if the package is installed locally. Default is \code{FALSE},
+but when \code{version} is specified, it will be set to \code{TRUE}.}
 
-\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
+\item{version}{Optional. A \code{character} string specifying the package version
+to fetch from CRAN. If not provided, the latest version will be used.}
 
-\item{cache_path}{A \code{character} string specifying the directory to use as a cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
+\item{cache_path}{A \code{character} string specifying the directory to use as a
+cache. Defaults to the value of \code{getOption("rdocdump.cache_path")}.}
 
-\item{keep_files}{A \code{character} value controlling whether temporary files should be kept.
-Possible values are:
+\item{keep_files}{A \code{character} value controlling whether temporary files
+should be kept. Possible values are:
 \itemize{
-\item \code{"none"}: Delete both the tar.gz archive and the extracted files (default).
+\item \code{"none"}: Delete both the tar.gz archive and the extracted files
+(default).
 \item \code{"tgz"}: Keep only the tar.gz archive.
 \item \code{"extracted"}: Keep only the extracted files.
 \item \code{"both"}: Keep both the tar.gz archive and the extracted files.
 }}
 
-\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the
+value of \code{getOption("rdocdump.repos")} which sets the repository URLs to
+the default R repositories and is itself set to
+\code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent
+accidental downloads of pre-built packages from Posit Package Manager and
+R Universe.}
 }
 \value{
-A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
+A single string containing the combined R source code (and,
+optionally, roxygen2 documentation) from the package.
 }
 \description{
-This function extracts the R source code from a package. For installed packages, it retrieves the package namespace and deparses all functions found in the package. For package source directories or archives (non-installed packages), it reads all \code{.R} files from the \code{R} directory and, optionally, from the \code{tests} directory. Optionally, it can include roxygen2 documentation from these files.
+This function extracts the R source code from a package. For installed
+packages, it retrieves the package namespace and deparses all functions found
+in the package. For package source directories or archives (non-installed
+packages), it reads all \code{.R} files from the \code{R} directory and, optionally,
+from the \code{tests} directory. Optionally, it can include roxygen2 documentation
+from these files.
 }
 \examples{
-# Extract only R source code (excluding roxygen2 documentation) from an installed package.
+# Extract only R source code (excluding roxygen2 documentation) from an
+# installed package.
 code <- rdd_extract_code("splines")
 cat(substr(code, 1, 1000))
 
-# Extract R source code including roxygen2 documentation from a package source directory.
+# Extract R source code including roxygen2 documentation from a package
+# source directory.
 \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))

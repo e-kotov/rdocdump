@@ -1,7 +1,12 @@
 #' Extract R Source Code from a Package
 #'
 #' @description
-#' This function extracts the R source code from a package. For installed packages, it retrieves the package namespace and deparses all functions found in the package. For package source directories or archives (non-installed packages), it reads all `.R` files from the `R` directory and, optionally, from the `tests` directory. Optionally, it can include roxygen2 documentation from these files.
+#' This function extracts the R source code from a package. For installed
+#' packages, it retrieves the package namespace and deparses all functions found
+#' in the package. For package source directories or archives (non-installed
+#' packages), it reads all `.R` files from the `R` directory and, optionally,
+#' from the `tests` directory. Optionally, it can include roxygen2 documentation
+#' from these files.
 #'
 #' @param pkg A `character` string specifying the package. This can be:
 #' \itemize{
@@ -17,28 +22,41 @@
 #' \item a repository reference with subdirectory
 #'       (e.g., `"user/repo/subdir"` for packages not at repo root),
 #' \item a full GitHub or GitLab web URL
-#'       (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"` or
-#'       `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
+#'       (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"`
+#'       or `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
 #' }
-#' @param file Optional. Save path for the output text file. If set, the function will return the path to the file instead of the combined text. Defaults to `NULL`.
-#' @param include_tests `logical`. If `TRUE`, for non-installed packages, the function will also include R source code from the `tests` directory. Defaults to `FALSE`.
-#' @param include_roxygen `logical`. If `TRUE`, roxygen2 documentation lines (lines starting with "#'") from R files will be included in the output. Defaults to `FALSE`.
-#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched from CRAN even if the package is installed locally. Default is `FALSE`, but when `version` is specified, it will be set to `TRUE`.
-#' @param version Optional. A `character` string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.
-#' @param cache_path A `character` string specifying the directory to use as a cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
+#' @param file Optional. Save path for the output text file. If set, the
+#'   function will return the path to the file instead of the combined text.
+#'   Defaults to `NULL`.
+#' @param include_tests `logical`. If `TRUE`, for non-installed packages, the
+#'   function will also include R source code from the `tests` directory.
+#'   Defaults to `FALSE`.
+#' @param include_roxygen `logical`. If `TRUE`, roxygen2 documentation lines
+#'   (lines starting with "#'") from R files will be included in the output.
+#'   Defaults to `FALSE`.
+#' @param force_fetch `logical`. If `TRUE`, the package source will be fetched
+#'   from CRAN even if the package is installed locally. Default is `FALSE`,
+#'   but when `version` is specified, it will be set to `TRUE`.
+#' @param version Optional. A `character` string specifying the package version
+#'   to fetch from CRAN. If not provided, the latest version will be used.
+#' @param cache_path A `character` string specifying the directory to use as a
+#'   cache. Defaults to the value of `getOption("rdocdump.cache_path")`.
 #'
 #' @inheritParams rdd_to_txt
 #'
-#' @return A single string containing the combined R source code (and, optionally, roxygen2 documentation) from the package.
+#' @return A single string containing the combined R source code (and,
+#'   optionally, roxygen2 documentation) from the package.
 #'
 #' @export
 #'
 #' @examples
-#' # Extract only R source code (excluding roxygen2 documentation) from an installed package.
+#' # Extract only R source code (excluding roxygen2 documentation) from an
+#' # installed package.
 #' code <- rdd_extract_code("splines")
 #' cat(substr(code, 1, 1000))
 #'
-#' # Extract R source code including roxygen2 documentation from a package source directory.
+#' # Extract R source code including roxygen2 documentation from a package
+#' # source directory.
 #' \donttest{
 #' # set cache directory for `rdocdump`
 #' rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
@@ -80,7 +98,8 @@ rdd_extract_code <- function(
   keep_files = "none",
   repos = getOption("rdocdump.repos", getOption("repos"))
 ) {
-  # Pass version to resolve_pkg_path and force fetching if a version is specified.
+  # Pass version to resolve_pkg_path and force fetching if a version is
+  # specified.
   pkg_info <- resolve_pkg_path(
     pkg,
     cache_path,
@@ -116,9 +135,12 @@ rdd_extract_code <- function(
 }
 
 #' Extract code from an installed package using its namespace.
-#' This function retrieves all functions from the package namespace and deparses them to get their source code.
+#'
+#' This function retrieves all functions from the package namespace and
+#' deparses them to get their source code.
 #' @param pkg_name The name of the installed package.
-#' @return A single string containing the source code of all functions in the package.
+#' @return A single string containing the source code of all functions in the
+#'   package.
 #' @keywords internal
 extract_code_installed <- function(pkg_name) {
   # Load the namespace of the installed package.
@@ -145,11 +167,14 @@ extract_code_installed <- function(pkg_name) {
 }
 
 #' Helper function to extract code from package source files.
-#' This function reads all `.R` files in the `R` directory and optionally includes files from the `tests` directory.
-#' It can also exclude roxygen2 documentation lines.
+#'
+#' This function reads all `.R` files in the `R` directory and optionally
+#' includes files from the `tests` directory. It can also exclude roxygen2
+#' documentation lines.
 #' @param pkg_path Path to the package source directory.
 #' @inheritParams rdd_extract_code
-#' @return A single string containing the source code from the package's R files.
+#' @return A single string containing the source code from the package's R
+#'   files.
 #' @keywords internal
 extract_code_source <- function(
   pkg_path,

@@ -18,4 +18,11 @@ test_that("rdd_set_cache_path sets the cache path correctly", {
 
   expect_equal(getOption("rdocdump.cache_path"), normalized_path)
   expect_equal(result, normalized_path)
+
+  # Test with existing directory
+  expect_message(rdd_set_cache_path(temp_cache), "rdocdump.cache_path set to:")
+
+  # Test validation
+  expect_error(rdd_set_cache_path(123), "must be a single character string")
+  expect_error(rdd_set_cache_path(c("a", "b")), "must be a single character string")
 })
