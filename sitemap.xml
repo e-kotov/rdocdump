@@ -9,6 +9,7 @@
 <url><loc>https://www.ekotov.pro/rdocdump/authors.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/index.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/news/index.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/check_if_binary.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/cleanup_files.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/combine_rd.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/combine_vignettes.html</loc></url>
@@ -18,6 +19,7 @@
 <url><loc>https://www.ekotov.pro/rdocdump/reference/find_pkg_dir.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/get_remote_cache_dir.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/index.html</loc></url>
+<url><loc>https://www.ekotov.pro/rdocdump/reference/is_binary_pkg.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/is_remote_reference.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/parse_remote_ref.html</loc></url>
 <url><loc>https://www.ekotov.pro/rdocdump/reference/parse_remote_url.html</loc></url>
