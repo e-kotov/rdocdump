@@ -158,7 +158,7 @@ cat(substr(code, 1, 1000))
 # \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/Rtmp9FJYmQ/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/Rtmpd8kIHd/rdocdump_cache
 
 local({
 code_with_roxygen <- rdd_extract_code(
