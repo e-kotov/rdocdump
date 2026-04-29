@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/e-kotov/rdocdump",
   "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.2.0.9000",
+  "version": "0.2.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -115,7 +115,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "110.425KB",
+  "fileSize": "112.448KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
