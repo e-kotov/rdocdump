@@ -1,5 +1,7 @@
 # Changelog
 
+## rdocdump (development version)
+
 ## rdocdump 0.2.0 (2026-04-29)
 
 CRAN release: 2026-04-29
