@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/e-kotov/rdocdump/blob/v0.2.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/e-kotov/rdocdump/blob/main/inst/CITATION)
 
 Kotov E (2025). *rdocdump: Dump R Package Source, Documentation, and
 Vignettes into One File*.
