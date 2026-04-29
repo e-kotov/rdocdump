@@ -11,7 +11,7 @@
 ^.github$
 ^CITATION\.cff$
 ^codemeta\.json$
-^man/figures/logo\.png$
-^man/figures/card\.png$
 ^CRAN-SUBMISSION$
 ^.gemini$
+^tools$
+^visual-network\.zip$
