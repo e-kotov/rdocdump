@@ -16,7 +16,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rdocdump</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,10 +62,20 @@
 
 
 <dl><dt id="arg-pkg">pkg<a class="anchor" aria-label="anchor" href="#arg-pkg"></a></dt>
-<dd><p>A <code>character</code> string specifying the package. This can be:</p><ul><li><p>an installed package name,</p></li>
+<dd><p>A <code>character</code> string specifying the package. This can be:</p><ul><li><p>an installed package name (e.g., <code>"ggplot2"</code>),</p></li>
 <li><p>a full path to a package source directory,</p></li>
-<li><p>a full path to a package archive file (tar.gz), or</p></li>
-<li><p>a package name not installed (which will then be downloaded from CRAN).</p></li>
+<li><p>a full path to a package archive file (tar.gz),</p></li>
+<li><p>a package name not installed (which will then be downloaded from CRAN),</p></li>
+<li><p>a GitHub repository reference (e.g., <code>"tidyverse/ggplot2"</code> or
+<code>"github::tidyverse/ggplot2"</code>),</p></li>
+<li><p>a GitLab repository reference (e.g., <code>"gitlab::user/repo"</code>),</p></li>
+<li><p>a repository reference with specific branch/tag/commit
+(e.g., <code>"user/repo@v1.0.0"</code> or <code>"user/repo@main"</code>),</p></li>
+<li><p>a repository reference with subdirectory
+(e.g., <code>"user/repo/subdir"</code> for packages not at repo root),</p></li>
+<li><p>a full GitHub or GitLab web URL
+(e.g., <code>"https://github.com/apache/sedona-db/tree/main/r/sedonadb"</code> or
+<code>"https://github.com/ipeaGIT/r5r/tree/master/r-package"</code>).</p></li>
 </ul></dd>
 
 
@@ -103,7 +113,7 @@ By default, it uses the value of <code>getOption("rdocdump.cache_path")</code> w
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

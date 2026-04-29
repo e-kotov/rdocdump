@@ -1,0 +1,207 @@
+# Quick Start: dump R docs and vignettes to text files for LLMs
+
+## Introduction
+
+[rdocdump](https://github.com/e-kotov/rdocdump) is an R package designed
+to combine an R package’s documentation and vignettes into a single
+plain text file. This is particularly useful when you want to ingest
+complete package documentation into large language models (LLMs) or for
+archival purposes. [rdocdump](https://github.com/e-kotov/rdocdump) works
+with installed packages, source directories, tar.gz archives, or package
+sources available on CRAN.
+
+## Installation
+
+Install the latest stable release of `rdocdump` from CRAN with:
+
+``` r
+install.packages("rdocdump")
+```
+
+You can install the development version of `rdocdump` from R Universe
+with:
+
+``` r
+install.packages('rdocdump',
+ repos = c('https://e-kotov.r-universe.dev', 'https://cloud.r-project.org')
+)
+```
+
+or from GitHub with:
+
+``` r
+# install.packages("pak")
+pak::pak("e-kotov/rdocdump")
+```
+
+## Setting the Cache Path
+
+By default, [rdocdump](https://github.com/e-kotov/rdocdump) stores
+temporary files in a directory within R’s temporary directory. You can
+override this by setting a custom cache path using the helper function
+[`rdd_set_cache_path()`](https://www.ekotov.pro/rdocdump/reference/rdd_set_cache_path.md).
+For example:
+
+``` r
+# Set a custom cache directory
+cache_dir <- file.path(tempdir(), "my_rdocdump_cache")
+rdd_set_cache_path(cache_dir)
+```
+
+    rdocdump.cache_path set to: /private/var/folders/gb/t5zr5rn15sldqybrmqbyh6y80000gn/T/Rtmpp5wRxV/my_rdocdump_cache
+
+This ensures that temporary tar.gz archives and extracted files are
+stored in your specified directory.
+
+## Extracting Documentation
+
+The main function in rdocdump is
+[`rdd_to_txt()`](https://www.ekotov.pro/rdocdump/reference/rdd_to_txt.md),
+which accepts several types of inputs for the `pkg` argument:
+
+- An installed package name (e.g., `"stats"`).
+
+- A full path to a package source directory.
+
+- A full path to a package archive (tar.gz).
+
+- A package name available on CRAN (downloaded automatically if not
+  installed).
+
+Here is an example that downloads the source for the package
+[rJavaEnv](https://github.com/e-kotov/rJavaEnv) from CRAN, extracts its
+documentation, and saves it to a file:
+
+``` r
+# Extract documentation for 'rJavaEnv' and save to a text file.
+rdd_to_txt(
+  pkg = "rJavaEnv",
+  file = tempfile("rJavaEnv_docs_", fileext = ".txt"),
+  force_fetch = TRUE,    # Force download even if the package is installed.
+  keep_files = "none"      # Delete temporary files after extraction.
+)
+```
+
+    Fetching package source from CRAN...
+    trying URL 'https://cloud.r-project.org/src/contrib/rJavaEnv_0.3.0.tar.gz'
+    Content type 'application/x-gzip' length 104016 bytes (101 KB)
+    ==================================================
+    downloaded 101 KB
+
+    [1] "/private/var/folders/gb/t5zr5rn15sldqybrmqbyh6y80000gn/T/Rtmpp5wRxV/rJavaEnv_docs_c0736421bbc2.txt"
+
+If you prefer to simply get the combined documentation as a character
+string, call the function without the `file` argument:
+
+``` r
+# Extract and capture the combined documentation in a variable.
+docs <- rdd_to_txt(pkg = "splines")
+cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
+```
+
+    DESCRIPTION:
+    Package: splines
+    Version: 4.5.1
+    Priority: base
+    Imports: graphics, stats
+    Title: Regression Spline Functions and Classes
+    Author: Douglas M. Bates <bates@stat.wisc.edu> and
+     William N. Venables <Bill.Venables@csiro.au>
+    Maintainer: R Core Team <do-use-Contact-address@r-project.org>
+    Contact: R-help mailing list <r-help@r-project.org>
+    Description: Regression spline functions and classes.
+    License: Part of R 4.5.1
+    Suggests: Matrix, methods
+    NeedsCompilation: yes
+    Built: R 4.5.1; aarch64-apple-darwin20; 2025-06-14 01:29:30 UTC; unix
+
+    --------------------------------------------------------------------------------
+    Function: asVector()
+    Coerce an Object to a Vector
+
+    Description:
+
+         This is a generic function.  Methods for this function coerce
+         objects of given classes to vectors.
+
+    Usage:
+
+         asVector(object)
+
+    Arguments:
+
+      object: An object.
+
+    Details:
+
+         Methods for vector coercion in new classes must be created for the
+         ‘asVector’ generic instead of ‘as.vector’.
+
+## Choosing what to dump to text
+
+You can also choose if you want just the package documentaiton, just the
+vignettes, or both to be combined with the `content` argument:
+
+``` r
+docs <- rdd_to_txt(
+  pkg = "utils",
+  content = "vignettes"
+)
+cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
+```
+
+As you can see below, only the vignettes were combined:
+
+    --------------------------------------------------------------------------------
+    Vignette: Sweave.Rnw
+
+    % File src/library/utils/vignettes/Sweave.Rnw
+    % Part of the R package, https://www.R-project.org
+    % Copyright 2002-2022 Friedrich Leisch and the R Core Team
+    % Distributed under GPL 2 or later
+
+    \documentclass[a4paper]{article}
+
+    %\VignetteIndexEntry{Sweave User Manual}
+    %\VignettePackage{utils}
+    %\VignetteDepends{tools, datasets, stats, graphics}
+
+    \title{Sweave User Manual}
+    \author{Friedrich Leisch and R Core Team}
+
+    \usepackage[round]{natbib}
+    \usepackage{graphicx, Rd}
+    \usepackage{listings}
+
+    \lstset{frame=trbl,basicstyle=\small\tt}
+    \usepackage{hyperref}
+    \usepackage{color}
+    \definecolor{Blue}{rgb}{0,0,0.8}
+    \hypersetup{%
+    colorlinks,%
+    plainpages=true,%
+    linkcolor=black,%
+    citecolor=black,%
+    urlcolor=Blue,%
+    %pdfstartview=FitH,% or Fit
+    pdfstartview={XYZ null null 1},%
+    pdfview={XYZ null null null},%
+    pdfpagemode=UseNone,% for no outline
+    pdfauthor={Friedrich Leisch and R Core Team},%
+    pdftitle={Sweave 
+
+## Handling Temporary Files
+
+The argument `keep_files` controls whether temporary files (the
+downloaded archive and/or extracted directory) are retained:
+
+- `"none"` (default): Delete both the tar.gz archive and the extracted
+  files.
+
+- `"tgz"`: Keep only the tar.gz archive.
+
+- `"extracted"`: Keep only the extracted files.
+
+- `"both"`: Keep both the tar.gz archive and the extracted files.
+
+Choose the option that best fits your workflow.
