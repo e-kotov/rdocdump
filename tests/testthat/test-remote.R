@@ -294,3 +294,27 @@ test_that("resolve_remote_pkg caches correctly", {
 
   unlink(cache, recursive = TRUE)
 })
+
+test_that("resolve_remote_pkg fails on binary repositories", {
+  skip_if_offline()
+  skip_on_cran()
+
+  # We mock a remote download by creating a directory that looks like a 
+  # downloaded repo but contains binary files.
+  # Since resolve_remote_pkg uses remotes::remote_download, we can't easily 
+  # mock the download without mocking the whole remotes package,
+  # but we can test check_if_binary directly to ensure it works for remotes too.
+  
+  # Create a dummy binary package directory
+  bin_pkg <- tempfile("bin_remote_pkg")
+  dir.create(bin_pkg)
+  writeLines("Package: binpkg\nVersion: 1.0", file.path(bin_pkg, "DESCRIPTION"))
+  dir.create(file.path(bin_pkg, "Meta"))
+  
+  expect_error(
+    check_if_binary(bin_pkg),
+    "appears to be a pre-built binary"
+  )
+  
+  unlink(bin_pkg, recursive = TRUE)
+})

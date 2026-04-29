@@ -116,6 +116,8 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     ))
   }
 
+  check_if_binary(pkg_path)
+
   list(
     pkg_path = pkg_path,
     extracted_path = extract_dir,

@@ -100,6 +100,7 @@ resolve_pkg_path <- function(
         file.copy(files, extract_dir, recursive = TRUE)
         unlink(subdirs[1], recursive = TRUE)
       }
+      check_if_binary(extract_dir)
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
@@ -223,6 +224,7 @@ resolve_pkg_path <- function(
         file.copy(files, extract_dir, recursive = TRUE)
         unlink(subdirs[1], recursive = TRUE)
       }
+      check_if_binary(extract_dir)
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
@@ -230,5 +232,46 @@ resolve_pkg_path <- function(
         is_installed = FALSE
       ))
     }
+  }
+}
+
+#' Check if a directory contains a pre-built binary package
+#' @param pkg_dir Path to the package directory.
+#' @return Logical indicating if it is a binary package.
+#' @keywords internal
+is_binary_pkg <- function(pkg_dir) {
+  r_dir <- file.path(pkg_dir, "R")
+  help_dir <- file.path(pkg_dir, "help")
+
+  # Binary packages usually have .rdx and .rdb files in R/ and help/
+  has_r_binaries <- if (dir.exists(r_dir)) {
+    length(list.files(r_dir, pattern = "\\.(rdx|rdb)$", ignore.case = TRUE)) > 0
+  } else {
+    FALSE
+  }
+
+  has_help_binaries <- if (dir.exists(help_dir)) {
+    length(list.files(help_dir, pattern = "\\.(rdx|rdb)$", ignore.case = TRUE)) > 0
+  } else {
+    FALSE
+  }
+
+  # Binary packages always have a Meta directory
+  has_meta <- dir.exists(file.path(pkg_dir, "Meta"))
+
+  has_r_binaries || has_help_binaries || has_meta
+}
+
+#' Throw an error if the package is a pre-built binary
+#' @param pkg_dir Path to the package directory.
+#' @keywords internal
+check_if_binary <- function(pkg_dir) {
+  if (is_binary_pkg(pkg_dir)) {
+    stop(
+      "The downloaded package appears to be a pre-built binary rather than a ",
+      "source package. This can happen when downloading from Posit Package ",
+      "Manager (PPM) on Linux. Please ensure you are downloading a source ",
+      "package (e.g., by checking your 'repos' option)."
+    )
   }
 }

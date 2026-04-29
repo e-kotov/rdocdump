@@ -118,3 +118,56 @@ test_that("resolve_pkg_path fetches package from CRAN", {
   unlink(pkg_info$pkg_path, recursive = TRUE)
   unlink(pkg_info$tar_path)
 })
+
+test_that("is_binary_pkg correctly identifies binary packages", {
+  # Create a dummy source package
+  src_pkg <- tempfile("src_pkg")
+  dir.create(src_pkg)
+  dir.create(file.path(src_pkg, "R"))
+  writeLines("f <- function() {}", file.path(src_pkg, "R", "f.R"))
+  expect_false(is_binary_pkg(src_pkg))
+
+  # Create a dummy binary package (with Meta directory)
+  bin_pkg_meta <- tempfile("bin_pkg_meta")
+  dir.create(bin_pkg_meta)
+  dir.create(file.path(bin_pkg_meta, "Meta"))
+  expect_true(is_binary_pkg(bin_pkg_meta))
+
+  # Create a dummy binary package (with .rdx/.rdb in R/)
+  bin_pkg_r <- tempfile("bin_pkg_r")
+  dir.create(bin_pkg_r)
+  dir.create(file.path(bin_pkg_r, "R"))
+  writeLines("", file.path(bin_pkg_r, "R", "pkg.rdx"))
+  expect_true(is_binary_pkg(bin_pkg_r))
+
+  # Create a dummy binary package (with .rdx/.rdb in help/)
+  bin_pkg_help <- tempfile("bin_pkg_help")
+  dir.create(bin_pkg_help)
+  dir.create(file.path(bin_pkg_help, "help"))
+  writeLines("", file.path(bin_pkg_help, "help", "pkg.rdb"))
+  expect_true(is_binary_pkg(bin_pkg_help))
+
+  unlink(c(src_pkg, bin_pkg_meta, bin_pkg_r, bin_pkg_help), recursive = TRUE)
+})
+
+test_that("resolve_pkg_path fails on binary tarballs", {
+  # Create a dummy binary package directory
+  bin_pkg <- tempfile("bin_pkg_1.0")
+  dir.create(bin_pkg)
+  writeLines("Package: binpkg\nVersion: 1.0", file.path(bin_pkg, "DESCRIPTION"))
+  dir.create(file.path(bin_pkg, "Meta"))
+
+  # Create a tar.gz archive
+  tar_path <- tempfile("binpkg_1.0", fileext = ".tar.gz")
+  withr::with_dir(dirname(bin_pkg), {
+    utils::tar(tarfile = tar_path, files = basename(bin_pkg), tar = "internal")
+  })
+
+  expect_error(
+    resolve_pkg_path(tar_path),
+    "appears to be a pre-built binary rather than a source package"
+  )
+
+  unlink(bin_pkg, recursive = TRUE)
+  unlink(tar_path)
+})
