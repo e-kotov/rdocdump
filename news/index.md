@@ -1,6 +1,6 @@
 # Changelog
 
-## rdocdump (development version)
+## rdocdump 0.2.0 (2026-04-29)
 
 - Added support for remote repository references (GitHub, GitLab,
   Bitbucket) in
@@ -9,8 +9,8 @@
   [`rdd_extract_code()`](https://www.ekotov.pro/rdocdump/reference/rdd_extract_code.md).
   This includes support for specific branches/tags/commits and packages
   in subdirectories, as well as direct URLs (to branches and/or folders
-  within repositories). Therefore the `remotes` package to `Suggests` to
-  handle remote downloads.
+  within repositories). Therefore, added the `remotes` package to
+  `Suggests` to handle remote downloads.
 
 ## rdocdump 0.1.1 (2025-08-21)
 

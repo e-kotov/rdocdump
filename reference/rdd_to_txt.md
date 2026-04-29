@@ -1,4 +1,4 @@
-# Dump Package Source, Documentationm and Vignettes into Plain Text
+# Dump Package Source, Documentation and Vignettes into Plain Text
 
 This function produces a single text output for an R package by
 processing its documentation (Rd files from the package source or the
@@ -165,7 +165,7 @@ docs <- rdd_to_txt("gitlab::user/repo")
 # \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpZJF4Uk/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/RtmpmhHgKL/rdocdump_cache
 
 # Extract only documentation for rJavaEnv by downloading its source from CRAN
 docs <- rdd_to_txt(

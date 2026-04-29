@@ -78,7 +78,7 @@ BibTeX:
 ## Main functions
 
 - [`rdd_to_txt()`](https://www.ekotov.pro/rdocdump/reference/rdd_to_txt.md)
-  : Dump Package Source, Documentationm and Vignettes into Plain Text
+  : Dump Package Source, Documentation and Vignettes into Plain Text
 - [`rdd_extract_code()`](https://www.ekotov.pro/rdocdump/reference/rdd_extract_code.md)
   : Extract R Source Code from a Package
 
