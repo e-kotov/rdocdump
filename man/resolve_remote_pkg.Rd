@@ -18,7 +18,8 @@ Supports formats like:
 \item \code{"user/repo/subdir"} - Package in subdirectory
 }}
 
-\item{cache_path}{Optional path to cache directory. If NULL, uses temp directory.}
+\item{cache_path}{Optional path to cache directory. If NULL, uses temp
+directory.}
 }
 \value{
 A list containing:

@@ -12,7 +12,8 @@
 #'   - `"bitbucket::user/repo"` - Bitbucket
 #'   - `"user/repo@ref"` - Specific commit, branch, or tag
 #'   - `"user/repo/subdir"` - Package in subdirectory
-#' @param cache_path Optional path to cache directory. If NULL, uses temp directory.
+#' @param cache_path Optional path to cache directory. If NULL, uses temp
+#'   directory.
 #'
 #' @return A list containing:
 #'   - `pkg_path`: Path to the package directory
@@ -88,7 +89,8 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
 
   utils::untar(bundle_path, exdir = extract_dir)
 
-  # Flatten extra top-level folder if necessary (common in GitHub/GitLab bundles)
+  # Flatten extra top-level folder if necessary (common in GitHub/GitLab
+  # bundles)
   subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
   if (length(subdirs) == 1L) {
     files <- list.files(
@@ -107,7 +109,10 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
   # Validate it's a package
   if (!file.exists(file.path(pkg_path, "DESCRIPTION"))) {
     stop(sprintf(
-      "Downloaded package does not contain a valid R package (no DESCRIPTION found). "
+      paste0(
+        "Downloaded package does not contain a valid R package ",
+        "(no DESCRIPTION found). "
+      )
     ))
   }
 
@@ -170,7 +175,10 @@ parse_remote_ref <- function(ref) {
 
   if (length(parts) < 2) {
     stop(sprintf(
-      "Invalid remote reference '%s'. Expected format: 'user/repo' or 'user/repo/subdir'",
+      paste0(
+        "Invalid remote reference '%s'. Expected format: 'user/repo' ",
+        "or 'user/repo/subdir'"
+      ),
       ref
     ))
   }

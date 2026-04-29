@@ -1,7 +1,10 @@
 #' Set `rdocdump` Repository Options
 #'
 #' @description
-#' This function sets the package repository URLs used by `rdocdump` when fetching package sources. May be useful for setting custom repositories or mirrors. This does not affect the repositories used by `install.packages()` in your current R session and/or project.
+#' This function sets the package repository URLs used by `rdocdump` when
+#' fetching package sources. May be useful for setting custom repositories or
+#' mirrors. This does not affect the repositories used by `install.packages()`
+#' in your current R session and/or project.
 #'
 #' @param repos A character vector of repository URLs.
 #'
@@ -24,7 +27,11 @@ rdd_set_repos <- function(repos) {
 #' Get Current `rdocdump` Repository Options
 #'
 #' @description
-#' This function returns the current repository URLs used by `rdocdump`. The default is set to the CRAN repository at "https://cloud.r-project.org". This does not affect the repositories used by `install.packages()` in your current R session and/or project. To set repository options, use \code{\link{rdd_set_repos}}.
+#' This function returns the current repository URLs used by `rdocdump`. The
+#' default is set to the CRAN repository at "https://cloud.r-project.org". This
+#' does not affect the repositories used by `install.packages()` in your current
+#' R session and/or project. To set repository options, use
+#' \code{\link{rdd_set_repos}}.
 #'
 #' @return A character vector of repository URLs.
 #'

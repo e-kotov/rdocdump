@@ -2,15 +2,16 @@
 % Please edit documentation in R/util_combine_rd.R
 \name{combine_rd}
 \alias{combine_rd}
-\title{Combine Rd files into a single character vector.
-This function reads the Rd files from a package source directory or an installed package and combines them into a single string.}
+\title{Combine Rd files into a single character vector.}
 \usage{
 combine_rd(pkg_path, is_installed = FALSE, pkg_name = NULL)
 }
 \arguments{
-\item{pkg_path}{Path to the package source directory or the installed package.}
+\item{pkg_path}{Path to the package source directory or the installed
+package.}
 
-\item{is_installed}{Logical indicating whether the package is installed (\code{TRUE}) or a source package (\code{FALSE}).}
+\item{is_installed}{Logical indicating whether the package is installed
+(\code{TRUE}) or a source package (\code{FALSE}).}
 
 \item{pkg_name}{Optional package name if the package is installed.}
 }
@@ -18,7 +19,7 @@ combine_rd(pkg_path, is_installed = FALSE, pkg_name = NULL)
 A single string containing the combined Rd documentation.
 }
 \description{
-Combine Rd files into a single character vector.
-This function reads the Rd files from a package source directory or an installed package and combines them into a single string.
+This function reads the Rd files from a package source directory or an
+installed package and combines them into a single string.
 }
 \keyword{internal}

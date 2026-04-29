@@ -1,13 +1,16 @@
 #' Cleanup Temporary Files
 #'
 #' @description
-#' Clean up temporary package archive and extracted files according to a keep_files policy.
+#' Clean up temporary package archive and extracted files according to a
+#' keep_files policy.
 #'
-#' @param pkg_info A list returned by `resolve_pkg_path()`, containing `tar_path` and `extracted_path`.
+#' @param pkg_info A list returned by `resolve_pkg_path()`, containing
+#'   `tar_path` and `extracted_path`.
 #'
 #' @inheritParams rdd_to_txt
 #'
-#' @return Invisibly returns `NULL`. If there are any issues with file deletion, warnings are issued.
+#' @return Invisibly returns `NULL`. If there are any issues with file deletion,
+#'   warnings are issued.
 #'
 #' @keywords internal
 #'

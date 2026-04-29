@@ -1,9 +1,14 @@
 #' Set `rdocdump` Cache Path in the Current R Session
 #'
 #' @description
-#' This function sets the cache path used by `rdocdump` to store temporary files (downloaded tar.gz archives and/or extracted directories) for the current R session. The cache path is stored in the option `"rdocdump.cache_path"`, which can be checked with `getOption("rdocdump.cache_path")`. The path is created if it does not exist.
+#' This function sets the cache path used by `rdocdump` to store temporary files
+#' (downloaded tar.gz archives and/or extracted directories) for the current R
+#' session. The cache path is stored in the option `"rdocdump.cache_path"`, which
+#' can be checked with `getOption("rdocdump.cache_path")`. The path is created if
+#' it does not exist.
 #'
-#' @param path A `character` string specifying the directory to be used as the cache path.
+#' @param path A `character` string specifying the directory to be used as the
+#'   cache path.
 #'
 #' @return Invisibly returns the new cache path.
 #' @export
@@ -18,7 +23,8 @@ rdd_set_cache_path <- function(
   # Validate the input path
   if (!is.character(path) || length(path) != 1) {
     stop(
-      "`path` argument must be a single character string specifying the cache directory."
+      "`path` argument must be a single character string specifying the ",
+      "cache directory."
     )
   }
 

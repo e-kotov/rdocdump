@@ -7,13 +7,18 @@
 rdd_set_cache_path(path)
 }
 \arguments{
-\item{path}{A \code{character} string specifying the directory to be used as the cache path.}
+\item{path}{A \code{character} string specifying the directory to be used as the
+cache path.}
 }
 \value{
 Invisibly returns the new cache path.
 }
 \description{
-This function sets the cache path used by \code{rdocdump} to store temporary files (downloaded tar.gz archives and/or extracted directories) for the current R session. The cache path is stored in the option \code{"rdocdump.cache_path"}, which can be checked with \code{getOption("rdocdump.cache_path")}. The path is created if it does not exist.
+This function sets the cache path used by \code{rdocdump} to store temporary files
+(downloaded tar.gz archives and/or extracted directories) for the current R
+session. The cache path is stored in the option \code{"rdocdump.cache_path"}, which
+can be checked with \code{getOption("rdocdump.cache_path")}. The path is created if
+it does not exist.
 }
 \examples{
 # set cache directory for `rdocdump`

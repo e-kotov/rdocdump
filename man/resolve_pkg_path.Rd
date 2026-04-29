@@ -18,7 +18,8 @@ resolve_pkg_path(
 \item an installed package name (e.g., \code{"ggplot2"}),
 \item a full path to a package source directory,
 \item a full path to a package archive file (tar.gz),
-\item a package name not installed (which will then be downloaded from CRAN),
+\item a package name not installed (which will then be downloaded from
+CRAN),
 \item a GitHub repository reference (e.g., \code{"tidyverse/ggplot2"} or
 \code{"github::tidyverse/ggplot2"}),
 \item a GitLab repository reference (e.g., \code{"gitlab::user/repo"}),
@@ -27,18 +28,29 @@ resolve_pkg_path(
 \item a repository reference with subdirectory
 (e.g., \code{"user/repo/subdir"} for packages not at repo root),
 \item a full GitHub or GitLab web URL
-(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"} or
-\code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
+(e.g., \code{"https://github.com/apache/sedona-db/tree/main/r/sedonadb"}
+or \code{"https://github.com/ipeaGIT/r5r/tree/master/r-package"}).
 }}
 
-\item{cache_path}{A \code{character} string specifying the directory where kept temporary files will be stored.
-By default, it uses the value of \code{getOption("rdocdump.cache_path")} which sets the cache directory to the temporary directory of the current R session.}
+\item{cache_path}{A \code{character} string specifying the directory where kept
+temporary files will be stored. By default, it uses the value of
+\code{getOption("rdocdump.cache_path")} which sets the cache directory to the
+temporary directory of the current R session.}
 
-\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched from CRAN as a tar.gz archive even if the package is already installed locally. Default is \code{FALSE}, but when \code{version} is specified, it will be set to \code{TRUE}.}
+\item{force_fetch}{\code{logical}. If \code{TRUE}, the package source will be fetched
+from CRAN as a tar.gz archive even if the package is already installed
+locally. Default is \code{FALSE}, but when \code{version} is specified, it will be
+set to \code{TRUE}.}
 
-\item{version}{Optional. A \code{character} string specifying the package version to fetch from CRAN. If not provided, the latest version will be used.}
+\item{version}{Optional. A \code{character} string specifying the package version
+to fetch from CRAN. If not provided, the latest version will be used.}
 
-\item{repos}{A \code{character} vector of repository URLs. By default, it uses the value of \code{getOption("rdocdump.repos")} which sets the repository URLs to the default R repositories and is itself set to \code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent accidental downloads of pre-built packages from Posit Package Manager and R Universe.}
+\item{repos}{A \code{character} vector of repository URLs. By default, it uses the
+value of \code{getOption("rdocdump.repos")} which sets the repository URLs to
+the default R repositories and is itself set to
+\code{c("CRAN" = "https://cloud.r-project.org")} on package load to prevent
+accidental downloads of pre-built packages from Posit Package Manager and
+R Universe.}
 }
 \value{
 A list containing:
@@ -50,6 +62,7 @@ A list containing:
 }
 }
 \description{
-This function resolves the path to a package directory or tarball, handling both installed packages and source packages from CRAN.
+This function resolves the path to a package directory or tarball, handling
+both installed packages and source packages from CRAN.
 }
 \keyword{internal}

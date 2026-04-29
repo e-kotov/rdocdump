@@ -44,11 +44,10 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
 
   # Create a tar.gz archive of the dummy package.
   tar_path <- tempfile("dummy_pkg", fileext = ".tar.gz")
-  old_wd <- getwd()
-  setwd(dirname(dummy_pkg))
-  # Create the archive without extra arguments.
-  utils::tar(tarfile = tar_path, files = basename(dummy_pkg), tar = "internal")
-  setwd(old_wd)
+  withr::with_dir(dirname(dummy_pkg), {
+    # Create the archive without extra arguments.
+    utils::tar(tarfile = tar_path, files = basename(dummy_pkg), tar = "internal")
+  })
 
   expect_true(file.exists(tar_path)) # Ensure archive exists
 
@@ -65,6 +64,38 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
   # Clean up.
   unlink(pkg_info$pkg_path, recursive = TRUE)
   unlink(tar_path)
+})
+
+test_that("resolve_pkg_path handles invalid archive file", {
+  tmp_file <- tempfile(fileext = ".txt")
+  writeLines("not a tarball", tmp_file)
+
+  expect_error(
+    resolve_pkg_path(tmp_file),
+    "not a recognized package archive"
+  )
+  unlink(tmp_file)
+})
+
+test_that("resolve_pkg_path handles malformed tarball name", {
+  # Create a tar.gz with a name that doesn't follow pkg_version.tar.gz
+  tmp_dir <- tempdir()
+  dummy_pkg <- file.path(tmp_dir, "dummy")
+  dir.create(dummy_pkg)
+  writeLines("Package: dummy", file.path(dummy_pkg, "DESCRIPTION"))
+
+  tar_path <- file.path(tmp_dir, "badname.tar.gz")
+  withr::with_dir(tmp_dir, {
+    utils::tar(tarfile = tar_path, files = "dummy", tar = "internal")
+  })
+
+  expect_error(
+    resolve_pkg_path(tar_path),
+    "Tarball filename does not conform to the expected pattern"
+  )
+
+  unlink(tar_path)
+  unlink(dummy_pkg, recursive = TRUE)
 })
 
 

@@ -1,6 +1,7 @@
 #' Resolve the path to a package directory or tarball
 #' @description
-#' This function resolves the path to a package directory or tarball, handling both installed packages and source packages from CRAN.
+#' This function resolves the path to a package directory or tarball, handling
+#' both installed packages and source packages from CRAN.
 #' @inheritParams rdd_to_txt
 #' @return A list containing:
 #' - `pkg_path`: Path to the package directory or tarball.
@@ -34,7 +35,8 @@ resolve_pkg_path <- function(
     parts <- strsplit(folder_name, "_")[[1]]
     if (length(parts) < 2) {
       stop(
-        "Tarball filename does not conform to the expected pattern 'pkgname_version.tar.gz'."
+        "Tarball filename does not conform to the expected pattern ",
+        "'pkgname_version.tar.gz'."
       )
     }
     version <- parts[length(parts)]
@@ -54,14 +56,8 @@ resolve_pkg_path <- function(
 
   if (file.exists(pkg)) {
     if (dir.exists(pkg)) {
-      # Check if directory is a source package by looking for Rd files in "man/"
-      man_dir <- file.path(pkg, "man")
-      rd_files <- if (dir.exists(man_dir)) {
-        list.files(man_dir, pattern = "\\.Rd$", full.names = TRUE)
-      } else {
-        character(0)
-      }
-      if (length(rd_files) > 0) {
+      # Check if directory is a source package by looking for DESCRIPTION file
+      if (file.exists(file.path(pkg, "DESCRIPTION"))) {
         # It is a source package
         return(list(
           pkg_path = pkg,
@@ -70,7 +66,7 @@ resolve_pkg_path <- function(
           is_installed = FALSE
         ))
       } else {
-        # No .Rd files found in "man/" -> assume it's an installed package.
+        # No DESCRIPTION found -> assume it's an installed package name.
         return(list(
           pkg_path = pkg,
           extracted_path = NULL,
@@ -83,7 +79,8 @@ resolve_pkg_path <- function(
       # pkg is a file; assume it is a tar.gz archive.
       if (!grepl("\\.tar\\.gz$", pkg)) {
         stop(
-          "The specified file is not a recognized package archive (expected extension .tar.gz)."
+          "The specified file is not a recognized package archive (expected ",
+          "extension .tar.gz)."
         )
       }
       extract_dir <- get_extract_dir(pkg)
@@ -138,7 +135,8 @@ resolve_pkg_path <- function(
         any(grepl("posit\\.co|r-universe\\.dev", repos, ignore.case = TRUE))
       ) {
         warning(
-          "Using a repository URL from posit.co or r-universe.dev may result in pre-built binaries being downloaded instead of the package source."
+          "Using a repository URL from posit.co or r-universe.dev may result ",
+          "in pre-built binaries being downloaded instead of the package source."
         )
       }
 
