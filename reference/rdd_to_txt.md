@@ -152,30 +152,20 @@ cat(substr(docs, 1, 500))
 #> Encoding: UTF-8
 #> Built: R 4.6.
 
-# \donttest{
+if (FALSE) { # \dontrun{
 # Extract from GitHub repository
 docs <- rdd_to_txt("r-lib/rlang")
-#> Fetching package source from remote repository...
-#> Downloading package from github (r-lib/rlang)...
-#> Warning: Neither 'vignettes' nor 'doc' directory found in the package source.
 
 # Extract specific version from GitHub
 docs <- rdd_to_txt("r-lib/rlang@v1.1.0")
-#> Fetching package source from remote repository...
-#> Downloading package from github (r-lib/rlang)...
-#> Warning: Neither 'vignettes' nor 'doc' directory found in the package source.
 
 # Extract from GitLab
 docs <- rdd_to_txt("gitlab::user/repo")
-#> Fetching package source from remote repository...
-#> Downloading package from gitlab (user/repo)...
-#> Error in value[[3L]](cond): Failed to download remote package 'gitlab::user/repo': cannot open URL 'https://gitlab.com/api/v4/projects/user%2Frepo/repository/commits/HEAD'
-# }
+} # }
 
-# \donttest{
+if (FALSE) { # \dontrun{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpyunqXB/rdocdump_cache
 
 # Extract only documentation for rJavaEnv by downloading its source from CRAN
 docs <- rdd_to_txt(
@@ -184,20 +174,13 @@ docs <- rdd_to_txt(
   content = "docs",
   repos = c("CRAN" = "https://cran.r-project.org")
 )
-#> Fetching package source from CRAN...
 lines <- unlist(strsplit(docs, "\n"))
 # Print the first 3 lines
 cat(head(lines, 3), sep = "\n")
-#> DESCRIPTION:
-#> Package: rJavaEnv
-#> Title: 'Java' Environments for R Projects
 # Print the last 3 lines
 cat(tail(lines, 3), sep = "\n")
-#>      "17" == java_check_version_rjava(quiet = TRUE)
-#>      ## End(Not run)
-#>      
 
 # clean cache directory
 unlink(getOption("rdocdump.cache_path"), recursive = TRUE, force = TRUE)
-# }
+} # }
 ```
