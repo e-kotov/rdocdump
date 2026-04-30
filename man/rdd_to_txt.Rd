@@ -102,7 +102,7 @@ already installed packages), vignettes, and/or R source code.
 docs <- rdd_to_txt("splines")
 cat(substr(docs, 1, 500))
 
-\donttest{
+\dontrun{
 # Extract from GitHub repository
 docs <- rdd_to_txt("r-lib/rlang")
 
@@ -113,7 +113,7 @@ docs <- rdd_to_txt("r-lib/rlang@v1.1.0")
 docs <- rdd_to_txt("gitlab::user/repo")
 }
 
-\donttest{
+\dontrun{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
 

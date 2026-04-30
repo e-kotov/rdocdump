@@ -55,7 +55,49 @@ test_that("rdd_extract_code includes tests and roxygen", {
 
   expect_true(is.character(code))
   expect_true(any(grepl("^#'", strsplit(code, "\n")[[1]])))
-  expect_true(any(grepl("Test File: test-f.R", strsplit(code, "\n")[[1]])))
+  expect_true(
+    any(grepl("Test File: test-f.R", strsplit(code, "\n")[[1]]))
+  )
+
+  unlink(tmp_pkg, recursive = TRUE)
+})
+
+test_that("rdd_extract_code includes tests but excludes roxygen", {
+  # Create a dummy source package directory.
+  tmp_pkg <- tempfile("dummy_pkg_no_roxy")
+  dir.create(tmp_pkg)
+  writeLines("Package: dummy\nVersion: 1.0", file.path(tmp_pkg, "DESCRIPTION"))
+
+  # Create an R directory with a file containing roxygen.
+  r_dir <- file.path(tmp_pkg, "R")
+  dir.create(r_dir)
+  writeLines(
+    c("#' My function", "f <- function() { 1 }"),
+    file.path(r_dir, "f.R")
+  )
+
+  # Create a tests directory with an R file containing roxygen.
+  tests_dir <- file.path(tmp_pkg, "tests")
+  dir.create(tests_dir)
+  writeLines(
+    c("#' Test header", "test_that('f works', { expect_equal(f(), 1) })"),
+    file.path(tests_dir, "test-f.R")
+  )
+
+  code <- rdd_extract_code(
+    tmp_pkg,
+    include_tests = TRUE,
+    include_roxygen = FALSE
+  )
+
+  expect_true(is.character(code))
+  # Should NOT contain roxygen
+  expect_false(any(grepl("^#'", strsplit(code, "\n")[[1]])))
+  # Should contain test file content
+  expect_true(
+    any(grepl("Test File: test-f.R", strsplit(code, "\n")[[1]]))
+  )
+  expect_true(any(grepl("test_that", strsplit(code, "\n")[[1]])))
 
   unlink(tmp_pkg, recursive = TRUE)
 })
@@ -64,7 +106,10 @@ test_that("rdd_extract_code handles missing R directory", {
   tmp_pkg <- tempdir()
   pkg_dir <- file.path(tmp_pkg, "no_r_pkg")
   dir.create(pkg_dir)
-  writeLines("Package: noRPkg\nVersion: 0.1.0", file.path(pkg_dir, "DESCRIPTION"))
+  writeLines(
+    "Package: noRPkg\nVersion: 0.1.0",
+    file.path(pkg_dir, "DESCRIPTION")
+  )
 
   expect_warning(
     rdd_extract_code(pkg_dir),

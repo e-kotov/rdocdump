@@ -8,13 +8,15 @@ concurrency:
 on:
   # Manually trigger the Action under Actions/pkgcheck
   workflow_dispatch:
-  # Run on every push to main
-  push:
-    branches:
-      - main
+  # Run after other checks
+  workflow_run:
+    workflows: ["R-CMD-check", "R-CMD-check-HTML5"]
+    types:
+      - completed
 
 jobs:
   pkgcheck:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write

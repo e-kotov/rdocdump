@@ -74,3 +74,23 @@ test_that("cleanup_files respects keep_files policy", {
   unlink(tar_path)
   unlink(extract_parent, recursive = TRUE)
 })
+
+test_that("cleanup_files issues warnings when unlink fails", {
+  pkg_info <- list(
+    tar_path = "dummy.tar.gz",
+    extracted_path = "dummy_extracted/pkg"
+  )
+
+  local_mocked_bindings(
+    unlink = function(...) 1L,
+    .package = "base"
+  )
+
+  expect_warning(
+    expect_warning(
+      cleanup_files(pkg_info, "none"),
+      "cleanup_files: failed to delete archive"
+    ),
+    "cleanup_files: failed to delete extracted directory"
+  )
+})

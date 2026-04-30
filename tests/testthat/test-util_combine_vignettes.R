@@ -21,8 +21,10 @@ test_that("combine_vignettes works with a 'vignettes' directory", {
   )
 })
 
-test_that("combine_vignettes falls back to 'doc' directory if 'vignettes' is absent", {
-  pkg_dir <- tempfile("pkg_")
+test_that(
+  "combine_vignettes falls back to 'doc' directory if 'vignettes' is absent",
+  {
+    pkg_dir <- tempfile("pkg_")
   dir.create(pkg_dir)
   doc_dir <- file.path(pkg_dir, "doc")
   dir.create(doc_dir)
@@ -44,14 +46,20 @@ test_that("combine_vignettes falls back to 'doc' directory if 'vignettes' is abs
   )
 })
 
-test_that("combine_vignettes returns empty string if neither 'vignettes' nor 'doc' exists", {
-  pkg_dir <- tempfile("pkg_")
-  dir.create(pkg_dir)
+test_that(
+  paste(
+    "combine_vignettes returns empty string if neither",
+    "'vignettes' nor 'doc' exists"
+  ),
+  {
+    pkg_dir <- tempfile("pkg_")
+    dir.create(pkg_dir)
 
-  out <- suppressWarnings(combine_vignettes(pkg_dir))
-  expect_equal(
-    out,
-    "",
-    info = "Should return an empty string when no relevant directory is found"
-  )
-})
+    out <- suppressWarnings(combine_vignettes(pkg_dir))
+    expect_equal(
+      out,
+      "",
+      info = "Should return an empty string when no relevant directory is found"
+    )
+  }
+)

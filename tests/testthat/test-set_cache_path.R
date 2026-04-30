@@ -24,5 +24,8 @@ test_that("rdd_set_cache_path sets the cache path correctly", {
 
   # Test validation
   expect_error(rdd_set_cache_path(123), "must be a single character string")
-  expect_error(rdd_set_cache_path(c("a", "b")), "must be a single character string")
+  expect_error(
+    rdd_set_cache_path(c("a", "b")),
+    "must be a single character string"
+  )
 })

@@ -18,7 +18,13 @@ test_that("combine_rd works for source packages", {
 
   man_dir <- file.path(temp_pkg, "man")
   dir.create(man_dir)
-  dummy_rd <- "\\name{dummy}\n\\alias{dummy}\n\\title{Dummy Function}\n\\description{A dummy function.}\n"
+  dummy_rd <- paste(
+    "\\name{dummy}",
+    "\\alias{dummy}",
+    "\\title{Dummy Function}",
+    "\\description{A dummy function.}",
+    sep = "\n"
+  )
   writeLines(dummy_rd, file.path(man_dir, "dummy.Rd"))
 
   rd_text <- combine_rd(temp_pkg, is_installed = FALSE)

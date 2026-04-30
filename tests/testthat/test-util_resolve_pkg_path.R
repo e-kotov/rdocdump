@@ -16,7 +16,13 @@ test_that("resolve_pkg_path identifies a source package directory", {
   # Create a 'man' directory with a dummy Rd file.
   man_dir <- file.path(temp_pkg, "man")
   dir.create(man_dir)
-  dummy_rd <- "\\name{dummy}\n\\alias{dummy}\n\\title{Dummy Function}\n\\description{A dummy function.}\n"
+  dummy_rd <- paste(
+    "\\name{dummy}",
+    "\\alias{dummy}",
+    "\\title{Dummy Function}",
+    "\\description{A dummy function.}",
+    sep = "\n"
+  )
   writeLines(dummy_rd, file.path(man_dir, "dummy.Rd"))
 
   pkg_info <- resolve_pkg_path(temp_pkg)
@@ -46,10 +52,14 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
   tar_path <- tempfile("dummy_pkg", fileext = ".tar.gz")
   withr::with_dir(dirname(dummy_pkg), {
     # Create the archive without extra arguments.
-    utils::tar(tarfile = tar_path, files = basename(dummy_pkg), tar = "internal")
+    utils::tar(
+      tarfile = tar_path,
+      files = basename(dummy_pkg),
+      tar = "internal"
+    )
   })
 
-  expect_true(file.exists(tar_path)) # Ensure archive exists
+  expect_true(file.exists(tar_path)) # Ensure it exists
 
   # Call the actual function with an explicit cache_path to force extraction.
   pkg_info <- resolve_pkg_path(tar_path, cache_path = tempdir())

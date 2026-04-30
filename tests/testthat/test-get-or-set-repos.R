@@ -1,7 +1,10 @@
 test_that("rdd_set_repos and rdd_get_repos work", {
   old_repos <- getOption("rdocdump.repos")
 
-  new_repos <- c(CRAN = "https://cloud.r-project.org", CUSTOM = "https://my.repo.org")
+  new_repos <- c(
+    CRAN = "https://cloud.r-project.org",
+    CUSTOM = "https://my.repo.org"
+  )
   rdd_set_repos(new_repos)
 
   expect_equal(getOption("rdocdump.repos"), new_repos)

@@ -95,9 +95,9 @@ test_that("parse_remote_ref errors on invalid references", {
   expect_error(parse_remote_ref("invalid"), "Invalid remote reference")
   expect_error(parse_remote_ref("user"), "Invalid remote reference")
   # Note: "/user/repo" is not detected as remote by is_remote_reference
-  # but parse_remote_ref will error because it only has one part after removing type
+  # but parse_remote_ref will error because it only has one part after
+  # removing type
 })
-
 test_that("get_remote_cache_dir creates correct paths", {
   p <- list(
     type = "github",
@@ -151,7 +151,9 @@ test_that("is_remote_reference detects web URLs correctly", {
   expect_true(is_remote_reference("https://github.com/user/repo"))
   expect_true(is_remote_reference("http://github.com/user/repo"))
   expect_true(is_remote_reference("https://gitlab.com/user/repo"))
-  expect_true(is_remote_reference("https://github.com/user/repo/tree/main/subdir"))
+  expect_true(
+    is_remote_reference("https://github.com/user/repo/tree/main/subdir")
+  )
 })
 
 test_that("parse_remote_url parses GitHub URLs correctly", {
@@ -169,18 +171,21 @@ test_that("parse_remote_url parses GitHub URLs correctly", {
   expect_null(p$subdir)
 
   # With branch and subdir
-  p <- parse_remote_url("https://github.com/apache/sedona-db/tree/main/r/sedonadb")
+  p <- parse_remote_url(
+    "https://github.com/apache/sedona-db/tree/main/r/sedonadb"
+  )
   expect_equal(p$user, "apache")
   expect_equal(p$repo, "sedona-db")
   expect_equal(p$ref, "main")
   expect_equal(p$subdir, "r/sedonadb")
 
   # With complex branch
-  p <- parse_remote_url("https://github.com/user/repo/tree/feature/cool-stuff/pkg")
+  p <- parse_remote_url(
+    "https://github.com/user/repo/tree/feature/cool-stuff/pkg"
+  )
   expect_equal(p$ref, "feature/cool-stuff")
   expect_equal(p$subdir, "pkg")
 })
-
 test_that("parse_remote_url parses GitLab URLs correctly", {
   p <- parse_remote_url("https://gitlab.com/user/repo/-/tree/main/subdir")
   expect_equal(p$type, "gitlab")
