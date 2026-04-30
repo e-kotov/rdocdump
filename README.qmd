@@ -11,7 +11,7 @@ default-image-extension: ""
 
 <!-- badges: start -->
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.org/package=rdocdump)
 [![CRAN/METACRAN Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/rdocdump?color=blue)](https://CRAN.R-project.org/package=rdocdump){target="_blank"}
 [![CRAN/METACRAN Downloads per month](https://cranlogs.r-pkg.org/badges/rdocdump?color=blue)](https://CRAN.R-project.org/package=rdocdump){target="_blank"}

@@ -9,7 +9,7 @@
 [![Project Status:
 Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rdocdump)](https://CRAN.R-project.org/package=rdocdump)
 <a href="https://CRAN.R-project.org/package=rdocdump"
@@ -82,7 +82,7 @@ To cite package ‘rdocdump’ in publications use:
 
 Kotov E (2025). *rdocdump: Dump R Package Source, Documentation, and
 Vignettes into One File*. doi:10.32614/CRAN.package.rdocdump
-<https://doi.org/10.32614/CRAN.package.rdocdump>,
+<https://doi.org/10.32614/CRAN.package.rdocdump>.
 <https://github.com/e-kotov/rdocdump>.
 
 BibTeX:
