@@ -137,7 +137,8 @@ resolve_pkg_path <- function(
       ) {
         warning(
           "Using a repository URL from posit.co or r-universe.dev may result ",
-          "in pre-built binaries being downloaded instead of the package source."
+          "in pre-built binaries being downloaded instead of the package ",
+          "source."
         )
       }
 
@@ -251,7 +252,9 @@ is_binary_pkg <- function(pkg_dir) {
   }
 
   has_help_binaries <- if (dir.exists(help_dir)) {
-    length(list.files(help_dir, pattern = "\\.(rdx|rdb)$", ignore.case = TRUE)) > 0
+    length(
+      list.files(help_dir, pattern = "\\.(rdx|rdb)$", ignore.case = TRUE)
+    ) > 0
   } else {
     FALSE
   }

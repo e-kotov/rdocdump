@@ -76,11 +76,12 @@
 #' @export
 #'
 #' @examples
-#' # Extract documentation for built-in `stats` package (both docs and vignettes).
+#' # Extract documentation for built-in `stats` package (both docs and
+#' # vignettes).
 #' docs <- rdd_to_txt("splines")
 #' cat(substr(docs, 1, 500))
 #'
-#' \dontrun{
+#' \donttest{
 #' # Extract from GitHub repository
 #' docs <- rdd_to_txt("r-lib/rlang")
 #'
@@ -125,7 +126,10 @@ rdd_to_txt <- function(
   # Validate keep_files argument.
   if (!keep_files %in% c("none", "tgz", "extracted", "both")) {
     stop(
-      'Invalid value for keep_files. Choose one of "none", "tgz", "extracted", "both".'
+      paste(
+        'Invalid value for keep_files.',
+        'Choose one of "none", "tgz", "extracted", "both".'
+      )
     )
   }
 
@@ -179,7 +183,8 @@ rdd_to_txt <- function(
       force_fetch = force_fetch || !is.null(version),
       version = version,
       cache_path = cache_path,
-      keep_files = "both" # make sure the files are not deleted prematurely, as rdd_to_txt will take care of that later
+      keep_files = "both" # make sure files are not deleted prematurely,
+                          # as rdd_to_txt will take care of that later
     )
   }
 

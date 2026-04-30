@@ -9,7 +9,7 @@ type: software
 license: MIT
 title: 'rdocdump: Dump ''R'' Package Source, Documentation, and Vignettes into One
   File'
-version: 0.2.0
+version: 0.2.0.9000
 doi: 10.32614/CRAN.package.rdocdump
 identifiers:
 - type: doi

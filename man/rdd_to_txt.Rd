@@ -97,11 +97,12 @@ its documentation (Rd files from the package source or the documentation from
 already installed packages), vignettes, and/or R source code.
 }
 \examples{
-# Extract documentation for built-in `stats` package (both docs and vignettes).
+# Extract documentation for built-in `stats` package (both docs and
+# vignettes).
 docs <- rdd_to_txt("splines")
 cat(substr(docs, 1, 500))
 
-\dontrun{
+\donttest{
 # Extract from GitHub repository
 docs <- rdd_to_txt("r-lib/rlang")
 

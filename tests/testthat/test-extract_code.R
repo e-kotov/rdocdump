@@ -1,3 +1,16 @@
+test_that("rdd_extract_code handles missing pkg_name for installed package", {
+  local_mocked_bindings(
+    resolve_pkg_path = function(...) {
+      list(is_installed = TRUE, pkg_name = NULL)
+    },
+    .package = "rdocdump"
+  )
+  expect_error(
+    rdd_extract_code("anypkg"),
+    "Installed package does not provide pkg_name information"
+  )
+})
+
 test_that("rdd_extract_code works with file argument", {
   tmp_file <- tempfile(fileext = ".txt")
   # Use a small package for testing

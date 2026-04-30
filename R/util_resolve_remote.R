@@ -32,7 +32,8 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
   # Check if remotes package is installed
   if (!requireNamespace("remotes", quietly = TRUE)) {
     stop(
-      "The 'remotes' package is required to download from remote repositories. ",
+      "The 'remotes' package is required to download from remote ",
+      "repositories. ",
       "Please install it with: install.packages('remotes')"
     )
   }

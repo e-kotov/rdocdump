@@ -16,6 +16,13 @@ fake_resolve_pkg_path <- function(
   )
 }
 
+test_that("rdd_to_txt with invalid content value errors", {
+  expect_error(
+    rdd_to_txt("stats", content = "invalid"),
+    "Invalid value for content"
+  )
+})
+
 test_that("rdd_to_txt works for installed packages", {
   # Use an installed package such as "stats".
   txt <- rdd_to_txt("stats", keep_files = "none")
