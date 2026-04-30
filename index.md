@@ -18,6 +18,7 @@ Retrieval-Augmented Generation (RAG) workflow.
 Install the latest stable release of `rdocdump` from CRAN with:
 
 ``` r
+
 install.packages("rdocdump")
 ```
 
@@ -25,6 +26,7 @@ You can install the development version of `rdocdump` from R Universe
 with:
 
 ``` r
+
 install.packages('rdocdump',
  repos = c('https://e-kotov.r-universe.dev', 'https://cloud.r-project.org')
 )
@@ -33,6 +35,7 @@ install.packages('rdocdump',
 or from GitHub with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("e-kotov/rdocdump")
 ```
@@ -44,6 +47,7 @@ Extract documenation and source code of
 source from CRAN and save it to file `rJavaEnv_docs.txt`
 
 ``` r
+
 rdd_to_txt(
   pkg = "rJavaEnv",
   file = tempfile("rJavaEnv_docs_", fileext = ".txt"),
@@ -58,7 +62,7 @@ To cite package ‘rdocdump’ in publications use:
 
 Kotov E (2025). *rdocdump: Dump R Package Source, Documentation, and
 Vignettes into One File*. <doi:10.32614/CRAN.package.rdocdump>
-<https://doi.org/10.32614/CRAN.package.rdocdump>,
+<https://doi.org/10.32614/CRAN.package.rdocdump>.
 <https://github.com/e-kotov/rdocdump>.
 
 BibTeX:

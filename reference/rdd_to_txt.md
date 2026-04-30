@@ -165,7 +165,7 @@ docs <- rdd_to_txt("gitlab::user/repo")
 # \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpGSKGr2/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/RtmpRiVG4q/rdocdump_cache
 
 # Extract only documentation for rJavaEnv by downloading its source from CRAN
 docs <- rdd_to_txt(

@@ -15,6 +15,7 @@ sources available on CRAN.
 Install the latest stable release of `rdocdump` from CRAN with:
 
 ``` r
+
 install.packages("rdocdump")
 ```
 
@@ -22,6 +23,7 @@ You can install the development version of `rdocdump` from R Universe
 with:
 
 ``` r
+
 install.packages('rdocdump',
  repos = c('https://e-kotov.r-universe.dev', 'https://cloud.r-project.org')
 )
@@ -30,6 +32,7 @@ install.packages('rdocdump',
 or from GitHub with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("e-kotov/rdocdump")
 ```
@@ -43,6 +46,7 @@ override this by setting a custom cache path using the helper function
 For example:
 
 ``` r
+
 # Set a custom cache directory
 cache_dir <- file.path(tempdir(), "my_rdocdump_cache")
 rdd_set_cache_path(cache_dir)
@@ -73,6 +77,7 @@ Here is an example that downloads the source for the package
 documentation, and saves it to a file:
 
 ``` r
+
 # Extract documentation for 'rJavaEnv' and save to a text file.
 rdd_to_txt(
   pkg = "rJavaEnv",
@@ -94,6 +99,7 @@ If you prefer to simply get the combined documentation as a character
 string, call the function without the `file` argument:
 
 ``` r
+
 # Extract and capture the combined documentation in a variable.
 docs <- rdd_to_txt(pkg = "splines")
 cat(substr(docs, 1, 1000))  # Print the first 1000 characters for a preview.
@@ -143,6 +149,7 @@ You can also choose if you want just the package documentaiton, just the
 vignettes, or both to be combined with the `content` argument:
 
 ``` r
+
 docs <- rdd_to_txt(
   pkg = "utils",
   content = "vignettes"
