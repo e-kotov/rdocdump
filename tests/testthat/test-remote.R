@@ -280,6 +280,9 @@ test_that("parse_remote_url parses GitHub URLs correctly", {
   p <- parse_remote_url("https://github.com/user/repo/tree/v1.2.3/pkg")
   expect_equal(p$ref, "v1.2.3")
   expect_equal(p$subdir, "pkg")
+
+  p <- parse_remote_url("https://github.com/user/repo/tree/v1.2.3.4/pkg")
+  expect_equal(p$ref, "v1.2.3.4")
 })
 
 test_that("parse_remote_url parses GitLab URLs correctly", {
@@ -442,6 +445,18 @@ test_that("parse_remote_url handles generic URLs as git::", {
   p <- parse_remote_url("https://example.com/repo.git")
   expect_equal(p$type, "git")
   expect_equal(p$original, "https://example.com/repo.git")
+})
+
+test_that("parse_remote_ref preserves original reference with prefix and ref", {
+  p <- parse_remote_ref("bioc::Biobase@RELEASE_3_18")
+  expect_equal(p$original, "bioc::Biobase@RELEASE_3_18")
+  expect_equal(remote_display_name(p), "bioc::Biobase@RELEASE_3_18")
+
+  p2 <- parse_remote_ref("github::user/repo@main")
+  expect_equal(p2$original, "github::user/repo@main")
+
+  p3 <- parse_remote_ref("user/repo/subdir@v1.0.0")
+  expect_equal(p3$original, "user/repo/subdir@v1.0.0")
 })
 
 test_that("remote_display_name handles NA users and original refs", {

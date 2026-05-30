@@ -174,6 +174,8 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
 #' @return List with components: type, user, repo, ref, subdir
 #' @keywords internal
 parse_remote_ref <- function(ref) {
+  original_ref <- ref
+
   # Handle web URLs
   if (grepl("^https?://", ref)) {
     return(parse_remote_url(ref))
@@ -200,7 +202,7 @@ parse_remote_ref <- function(ref) {
       repo = NA_character_,
       ref = NULL,
       subdir = NULL,
-      original = ref
+      original = original_ref
     ))
   }
 
@@ -226,7 +228,7 @@ parse_remote_ref <- function(ref) {
       repo = ref,
       ref = commit_ref,
       subdir = NULL,
-      original = ref
+      original = original_ref
     ))
   }
 
@@ -262,7 +264,7 @@ parse_remote_ref <- function(ref) {
       repo = ref,
       ref = commit_ref,
       subdir = NULL,
-      original = ref
+      original = original_ref
     ))
   }
 
@@ -281,7 +283,7 @@ parse_remote_ref <- function(ref) {
     repo = repo,
     ref = commit_ref,
     subdir = subdir,
-    original = ref
+    original = original_ref
   )
 }
 
@@ -299,6 +301,9 @@ build_pak_remote_ref <- function(parsed) {
       if (!is.null(parsed$subdir)) {
         ref <- paste0(ref, "/", parsed$subdir)
       }
+      if (!is.null(parsed$ref)) {
+        ref <- paste0(ref, "@", parsed$ref)
+      }
       ref
     },
     gitlab = {
@@ -306,25 +311,54 @@ build_pak_remote_ref <- function(parsed) {
       if (!is.null(parsed$subdir)) {
         ref <- paste0(ref, "/-/", parsed$subdir)
       }
+      if (!is.null(parsed$ref)) {
+        ref <- paste0(ref, "@", parsed$ref)
+      }
       ref
     },
-    bioc = sprintf("bioc::%s", parsed$repo),
-    git = sprintf("git::%s", parsed$original),
+    bioc = {
+      # bioc:: refs are built from repo and ref to ensure correctness
+      # even if original was missing the prefix.
+      ref <- sprintf("bioc::%s", parsed$repo)
+      if (!is.null(parsed$ref)) {
+        ref <- paste0(ref, "@", parsed$ref)
+      }
+      ref
+    },
+    git = {
+      # For git:: we just use the original untouched string if it has the prefix
+      if (grepl("^git::", parsed$original)) {
+        parsed$original
+      } else {
+        ref <- sprintf("git::%s", parsed$original)
+        if (!is.null(parsed$ref)) {
+          ref <- paste0(ref, "@", parsed$ref)
+        }
+        ref
+      }
+    },
     bitbucket = {
       # Backward compatibility: translate bitbucket:: to git:: URL
       ref <- sprintf("git::https://bitbucket.org/%s/%s.git", parsed$user, parsed$repo)
       if (!is.null(parsed$subdir)) {
         warning("Subdirectories are not supported for Bitbucket legacy references. Using repository root.")
       }
+      if (!is.null(parsed$ref)) {
+        ref <- paste0(ref, "@", parsed$ref)
+      }
       ref
     },
     # Transparent pass-through for other pak types
-    sprintf("%s::%s", parsed$type, parsed$original)
+    if (grepl(paste0("^", parsed$type, "::"), parsed$original)) {
+      parsed$original
+    } else {
+      ref <- sprintf("%s::%s", parsed$type, parsed$original)
+      if (!is.null(parsed$ref)) {
+        ref <- paste0(ref, "@", parsed$ref)
+      }
+      ref
+    }
   )
-
-  if (!is.null(parsed$ref)) {
-    pak_ref <- paste0(pak_ref, "@", parsed$ref)
-  }
 
   pak_ref
 }
@@ -413,7 +447,7 @@ parse_remote_url <- function(url) {
     "ci", "build", "perf", "style", "revert",
     "renovate", "dependabot"
   )
-  is_version_tag <- grepl("^v?\\d+(\\Dots+)*([._-][A-Za-z0-9.+-]+)?$", ref_parts[1])
+  is_version_tag <- grepl("^v?\\d+(\\.\\d+)*([._-][A-Za-z0-9.+-]+)?$", ref_parts[1])
 
   if (ref_parts[1] %in% common_branches || is_version_tag) {
     ref <- ref_parts[1]
