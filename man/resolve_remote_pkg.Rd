@@ -2,18 +2,21 @@
 % Please edit documentation in R/util_resolve_remote.R
 \name{resolve_remote_pkg}
 \alias{resolve_remote_pkg}
-\title{Resolve Remote Package References (GitHub, GitLab, Bitbucket)}
+\title{Resolve Remote Package References (GitHub, GitLab, Bioconductor, etc.)}
 \usage{
 resolve_remote_pkg(pkg_ref, cache_path = NULL)
 }
 \arguments{
 \item{pkg_ref}{A character string specifying the remote package reference.
-Supports formats like:
+Supports any format supported by \code{pak}. See \code{?pak::pak_package_sources}
+for a full list of supported formats. Examples:
 \itemize{
 \item \code{"user/repo"} - GitHub shorthand (default)
 \item \code{"github::user/repo"} - Explicit GitHub
 \item \code{"gitlab::user/repo"} - GitLab
-\item \code{"bitbucket::user/repo"} - Bitbucket
+\item \code{"bioc::pkgname"} - Bioconductor
+\item \code{"git::https://..."} - Arbitrary Git URL
+\item \code{"bitbucket::user/repo"} - Bitbucket (translated to \verb{git::})
 \item \code{"user/repo@ref"} - Specific commit, branch, or tag
 \item \code{"user/repo/subdir"} - Package in subdirectory
 }}
@@ -28,11 +31,31 @@ A list containing:
 \item \code{extracted_path}: Path to the extracted bundle
 \item \code{tar_path}: Path to the downloaded tarball
 \item \code{is_installed}: FALSE (always FALSE for remote packages)
+\item \code{pkg_name}: Package name reported by pak (or repo slug fallback)
+\item \code{pkg_version}: Package version reported by pak, if available
 \item \code{remote_info}: Parsed remote reference information
 }
 }
 \description{
-Downloads package source from remote repositories (GitHub, GitLab, Bitbucket)
-without installing the package. Uses the \code{remotes} package for downloading.
+Downloads package source from remote repositories without installing the
+package. Uses the \code{pak} package for downloading.
+
+If \code{pak} fails to resolve the reference (e.g., because the R package is in a
+subdirectory and no \code{subdir} was provided), the function automatically
+falls back to downloading the full repository and scanning for the
+shallowest directory containing a \code{DESCRIPTION} file.
+}
+\details{
+The auto-discovery mechanism uses two fallback tiers if \code{pak} resolution
+fails:
+\enumerate{
+\item \strong{Archive Download:} Attempts to download a \code{.tar.gz} archive of the
+repository for known hosts (GitHub, GitLab, Bitbucket).
+\item \strong{Git Clone:} Uses \verb{git clone --depth 1} for arbitrary Git URLs or if
+the archive download fails (requires system \code{git}).
+}
+
+Once downloaded, it recursively searches for \code{DESCRIPTION} files and selects
+the one closest to the repository root.
 }
 \keyword{internal}

@@ -25,6 +25,13 @@
 #'       (e.g., `"https://github.com/apache/sedona-db/tree/main/r/sedonadb"`
 #'       or `"https://github.com/ipeaGIT/r5r/tree/master/r-package"`).
 #' }
+#'
+#' @details
+#' For remote repositories, `rdocdump` uses `pak` for resolution. If `pak`
+#' cannot find an R package at the root or the specified subdirectory, the
+#' function will automatically fall back to downloading the full repository
+#' and searching for the shallowest directory containing a `DESCRIPTION` file.
+#'
 #' @param file Optional. Save path for the output text file. If set, the
 #'   function will return the path to the file instead of the combined text.
 #'   Defaults to `NULL`.
@@ -137,7 +144,10 @@ rdd_extract_code <- function(
 #' Extract code from an installed package using its namespace.
 #'
 #' This function retrieves all functions from the package namespace and
-#' deparses them to get their source code.
+#' deparses them to get their source code. Note that extracting from an
+#' installed package silently skips S4 classes, R6 classes, environment
+#' objects, and datasets since it filters for `is.function()`. For more
+#' complete code extraction, prefer extracting from source packages.
 #' @param pkg_name The name of the installed package.
 #' @return A single string containing the source code of all functions in the
 #'   package.

@@ -28,19 +28,11 @@ combine_vignettes <- function(pkg_path) {
     return("")
   }
 
-  combined_text <- ""
-
-  for (vf in vignette_files) {
+  vignette_texts <- lapply(vignette_files, function(vf) {
     header_line <- paste0(strrep("-", 80), "\nVignette: ", basename(vf), "\n")
     text <- readLines(vf, warn = FALSE)
-    combined_text <- paste(
-      combined_text,
-      header_line,
-      paste(text, collapse = "\n"),
-      "\n\n",
-      sep = "\n"
-    )
-  }
+    paste(header_line, paste(text, collapse = "\n"), "\n", sep = "\n")
+  })
 
-  return(combined_text)
+  return(paste(unlist(vignette_texts), collapse = "\n"))
 }

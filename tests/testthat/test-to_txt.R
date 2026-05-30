@@ -361,13 +361,14 @@ test_that(
 
     fake_rdd_extract_code_spy <- function(
       pkg,
-      file,
-      include_tests,
-      include_roxygen,
-      force_fetch,
-      version,
-      cache_path,
-      keep_files
+      file = NULL,
+      include_tests = FALSE,
+      include_roxygen = FALSE,
+      force_fetch = FALSE,
+      version = NULL,
+      cache_path = getOption("rdocdump.cache_path"),
+      keep_files = "none",
+      ...
     ) {
       calls$rdd_force_fetch <- force_fetch
       "CODE"
@@ -428,13 +429,14 @@ test_that(
 
     fake_rdd_extract_code_spy <- function(
       pkg,
-      file,
-      include_tests,
-      include_roxygen,
-      force_fetch,
-      cache_path,
-      version,
-      keep_files
+      file = NULL,
+      include_tests = FALSE,
+      include_roxygen = FALSE,
+      force_fetch = FALSE,
+      version = NULL,
+      cache_path = getOption("rdocdump.cache_path"),
+      keep_files = "none",
+      ...
     ) {
       calls$rdd_force_fetch <- force_fetch
       "CODE"

@@ -13,16 +13,12 @@ parse_remote_ref(ref)
 List with components: type, user, repo, ref, subdir
 }
 \description{
-Supports formats:
-\itemize{
-\item "user/repo" -> GitHub shorthand
-\item "github::user/repo" -> Explicit GitHub
-\item "gitlab::user/repo" -> GitLab
-\item "bitbucket::user/repo" -> Bitbucket
-\item "user/repo@ref" -> With commit/branch/tag
-\item "user/repo/subdir" -> With subdirectory
-\item "user/repo/subdir@ref" -> Combined
-\item "https://github.com/user/repo/tree/ref/subdir" -> Web URL
+Supports any format supported by \code{pak}. See \code{?pak::pak_package_sources}
+for details.
 }
+\details{
+Ambiguous web URLs (e.g. branch names like \code{feat/foo/pkg}) are best
+supplied as \code{user/repo@ref/subdir}; the URL heuristic is intentionally
+limited.
 }
 \keyword{internal}

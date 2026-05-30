@@ -86,6 +86,12 @@ packages), it reads all \code{.R} files from the \code{R} directory and, optiona
 from the \code{tests} directory. Optionally, it can include roxygen2 documentation
 from these files.
 }
+\details{
+For remote repositories, \code{rdocdump} uses \code{pak} for resolution. If \code{pak}
+cannot find an R package at the root or the specified subdirectory, the
+function will automatically fall back to downloading the full repository
+and searching for the shallowest directory containing a \code{DESCRIPTION} file.
+}
 \examples{
 # Extract only R source code (excluding roxygen2 documentation) from an
 # installed package.

@@ -8,6 +8,8 @@
 #' - `extracted_path`: Path to the extracted package directory (if applicable).
 #' - `tar_path`: Path to the tarball if it was downloaded.
 #' - `is_installed`: Logical indicating if the package is installed.
+#' - `pkg_name`: Package name (always populated when known).
+#' - `pkg_version`: Package version (NULL if not known).
 #'
 #' @keywords internal
 #'
@@ -39,18 +41,17 @@ resolve_pkg_path <- function(
         "'pkgname_version.tar.gz'."
       )
     }
-    version <- parts[length(parts)]
+    version_part <- parts[length(parts)]
     pkgname <- paste(parts[-length(parts)], collapse = "_")
-    list(pkgname = pkgname, version = version)
+    list(pkgname = pkgname, version = version_part)
   }
 
   # Helper function to determine extraction directory.
-  get_extract_dir <- function(tar_path) {
-    info <- parse_tarball_name(tar_path)
+  get_extract_dir <- function(pkgname, pkgversion) {
     if (!is.null(cache_path)) {
-      file.path(cache_path, info$pkgname, info$version)
+      file.path(cache_path, pkgname, pkgversion)
     } else {
-      tempfile(paste0(info$pkgname, "_", info$version))
+      tempfile(paste0(pkgname, "_", pkgversion))
     }
   }
 
@@ -59,11 +60,14 @@ resolve_pkg_path <- function(
       # Check if directory is a source package by looking for DESCRIPTION file
       if (file.exists(file.path(pkg, "DESCRIPTION"))) {
         # It is a source package
+        desc <- read_pkg_meta(pkg)
         return(list(
           pkg_path = pkg,
           extracted_path = NULL,
           tar_path = NULL,
-          is_installed = FALSE
+          is_installed = FALSE,
+          pkg_name = if (is.na(desc$pkg_name)) NULL else desc$pkg_name,
+          pkg_version = if (is.na(desc$pkg_version)) NULL else desc$pkg_version
         ))
       } else {
         # No DESCRIPTION found -> assume it's an installed package name.
@@ -72,7 +76,8 @@ resolve_pkg_path <- function(
           extracted_path = NULL,
           tar_path = NULL,
           is_installed = TRUE,
-          pkg_name = pkg
+          pkg_name = pkg,
+          pkg_version = NULL
         ))
       }
     } else {
@@ -83,29 +88,31 @@ resolve_pkg_path <- function(
           "extension .tar.gz)."
         )
       }
-      extract_dir <- get_extract_dir(pkg)
+      info <- parse_tarball_name(pkg)
+      extract_dir <- get_extract_dir(info$pkgname, info$version)
       if (!dir.exists(extract_dir)) {
         dir.create(extract_dir, recursive = TRUE)
       }
-      utils::untar(pkg, exdir = extract_dir)
-      # Flatten extra top-level folder if necessary.
-      subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
-      if (length(subdirs) == 1L) {
-        files <- list.files(
-          subdirs[1],
-          full.names = TRUE,
-          all.files = TRUE,
-          no.. = TRUE
-        )
-        file.copy(files, extract_dir, recursive = TRUE)
-        unlink(subdirs[1], recursive = TRUE)
+      res <- utils::untar(pkg, exdir = extract_dir, tar = "internal")
+      if (!identical(as.integer(res), 0L)) {
+        stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
       }
+      flatten_extracted_dir(extract_dir)
       check_if_binary(extract_dir)
+      desc <- read_pkg_meta(extract_dir)
+      pkg_name <- if (!is.na(desc$pkg_name)) desc$pkg_name else info$pkgname
+      pkg_version <- if (!is.na(desc$pkg_version)) {
+        desc$pkg_version
+      } else {
+        info$version
+      }
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
         tar_path = NULL,
-        is_installed = FALSE
+        is_installed = FALSE,
+        pkg_name = pkg_name,
+        pkg_version = pkg_version
       ))
     }
   } else {
@@ -118,119 +125,114 @@ resolve_pkg_path <- function(
     }
     if (!is.null(pkg_found) && is.null(version)) {
       # Installed package found.
+      desc <- read_pkg_meta(pkg_found)
       return(list(
         pkg_path = pkg_found,
         extracted_path = NULL,
         tar_path = NULL,
         is_installed = TRUE,
-        pkg_name = pkg
+        pkg_name = pkg,
+        pkg_version = if (is.na(desc$pkg_version)) NULL else desc$pkg_version
       ))
     } else {
+      # Check if pak package is installed
+      if (!requireNamespace("pak", quietly = TRUE)) {
+        stop(
+          "The 'pak' package is required to download package sources. ",
+          "Please install it with: install.packages('pak')"
+        )
+      }
+
       message("Fetching package source from CRAN...")
       dest_dir <- if (!is.null(cache_path)) cache_path else tempdir()
       if (!dir.exists(dest_dir)) {
         dir.create(dest_dir, recursive = TRUE)
       }
-      # Warn if repos contains known problematic URLs.
+
+      # Pre-emptive hint for Linux users who point at binary-serving repos.
       if (
         any(grepl("posit\\.co|r-universe\\.dev", repos, ignore.case = TRUE))
       ) {
-        warning(
-          "Using a repository URL from posit.co or r-universe.dev may result ",
-          "in pre-built binaries being downloaded instead of the package ",
-          "source."
+        message(
+          "Note: 'repos' includes posit.co or r-universe.dev, which may ",
+          "serve pre-built binaries on Linux. If extraction fails with a ",
+          "binary-package error, switch to a source-serving repository."
         )
       }
 
-      if (!is.null(version)) {
-        # Construct URL for a specific version.
-        repo_url <- repos[1] # Use the first repo.
-        tar_filename <- paste0(pkg, "_", version, ".tar.gz")
-        # Try archive first.
-        url <- file.path(repo_url, "src/contrib/Archive", pkg, tar_filename)
-        # Try downloading.
-        res <- try(
-          suppressWarnings(
-            utils::download.file(
-              url,
-              destfile = file.path(dest_dir, tar_filename),
-              mode = "wb",
-              quiet = TRUE
-            )
-          ),
-          silent = TRUE
+      pkg_ref <- if (!is.null(version)) paste0(pkg, "@", version) else pkg
+
+      if (!requireNamespace("withr", quietly = TRUE)) {
+        stop(
+          "The 'withr' package is required to scope the 'repos' option for ",
+          "pak. Please install it with: install.packages('withr')"
         )
-        # If archive fails, try main contrib.
-        if (inherits(res, "try-error") || res != 0) {
-          url <- file.path(repo_url, "src/contrib", tar_filename)
-          res <- try(
-            suppressWarnings(
-              utils::download.file(
-                url,
-                destfile = file.path(dest_dir, tar_filename),
-                mode = "wb",
-                quiet = TRUE
-              )
-            ),
-            silent = TRUE
-          )
-        }
-        if (inherits(res, "try-error") || res != 0) {
-          stop(paste(
-            "Could not download package",
-            pkg,
-            "version",
-            version,
-            "from",
-            url
+      }
+      withr::local_options(list(repos = repos))
+      if (Sys.getenv("R_USER_CACHE_DIR") == "") {
+        withr::local_envvar(c(R_USER_CACHE_DIR = tempfile("pak-cache-")))
+      }
+
+      dl_info <- tryCatch(
+        pak::pkg_download(
+          pkg_ref,
+          dest_dir = dest_dir,
+          platforms = "source",
+          dependencies = FALSE
+        ),
+        error = function(e) {
+          stop(sprintf(
+            "Could not download package '%s' from CRAN: %s",
+            pkg_ref,
+            conditionMessage(e)
           ))
         }
-        dp <- matrix(
-          c(tar_filename, file.path(dest_dir, tar_filename)),
-          nrow = 1
-        )
+      )
+
+      archive <- select_pak_download_archive(dl_info, dest_dir, pkg_ref)
+
+      pkg_row <- find_pak_target_row(dl_info, pkg_ref)
+      pkg_name_from_pak <- pak_row_value(pkg_row, "package")
+      version_from_pak <- if (!is.null(version)) {
+        version
       } else {
-        dp <- utils::download.packages(
-          pkg,
-          destdir = dest_dir,
-          type = "source",
-          repos = repos
-        )
+        pak_row_value(pkg_row, "version")
       }
 
-      if (nrow(dp) < 1L) {
-        stop("Package not found on CRAN.")
+      if (is.na(pkg_name_from_pak) || !nzchar(pkg_name_from_pak)) {
+        stop(sprintf("pak did not return a package name for '%s'.", pkg_ref))
       }
-      archive <- dp[, 2]
-      base_name <- basename(archive)
-      # If cache_path is provided, move the archive there.
-      if (!is.null(cache_path)) {
-        dest_archive <- file.path(cache_path, base_name)
-        file.rename(archive, dest_archive)
-        archive <- dest_archive
+      if (is.na(version_from_pak) || !nzchar(version_from_pak)) {
+        stop(sprintf("pak did not return a package version for '%s'.", pkg_ref))
       }
-      extract_dir <- get_extract_dir(archive)
+
+      extract_dir <- get_extract_dir(pkg_name_from_pak, version_from_pak)
       if (!dir.exists(extract_dir)) {
         dir.create(extract_dir, recursive = TRUE)
       }
-      utils::untar(archive, exdir = extract_dir)
-      subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
-      if (length(subdirs) == 1L) {
-        files <- list.files(
-          subdirs[1],
-          full.names = TRUE,
-          all.files = TRUE,
-          no.. = TRUE
-        )
-        file.copy(files, extract_dir, recursive = TRUE)
-        unlink(subdirs[1], recursive = TRUE)
+
+      success <- FALSE
+      on.exit({
+        if (!success && dir.exists(extract_dir)) {
+          unlink(extract_dir, recursive = TRUE)
+        }
+      }, add = TRUE)
+
+      res <- utils::untar(archive, exdir = extract_dir, tar = "internal")
+      if (!identical(as.integer(res), 0L)) {
+        stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
       }
+      flatten_extracted_dir(extract_dir)
       check_if_binary(extract_dir)
+      
+      success <- TRUE
       return(list(
         pkg_path = extract_dir,
         extracted_path = extract_dir,
         tar_path = archive,
-        is_installed = FALSE
+        is_installed = FALSE,
+        pkg_name = pkg_name_from_pak,
+        pkg_version = version_from_pak
       ))
     }
   }

@@ -19,7 +19,7 @@ BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests:
     curl,
     quarto,
-    remotes (>= 2.2.0),
+    pak,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: 
