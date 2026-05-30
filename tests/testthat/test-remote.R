@@ -207,7 +207,7 @@ test_that("find_pkg_dir finds package directory correctly", {
 
   # Should find the subdirectory
   found <- find_pkg_dir(temp_dir, NULL)
-  expect_equal(found, pkg_dir)
+  expect_equal(normalizePath(found), normalizePath(pkg_dir))
 
   # Cleanup
   unlink(temp_dir, recursive = TRUE)
@@ -221,7 +221,7 @@ test_that("find_pkg_dir handles specified subdirectory", {
   writeLines("Package: pkg", file.path(sub_dir, "DESCRIPTION"))
 
   found <- find_pkg_dir(temp_dir, "nested/pkg")
-  expect_equal(found, sub_dir)
+  expect_equal(normalizePath(found), normalizePath(sub_dir))
 
   unlink(temp_dir, recursive = TRUE)
 })
