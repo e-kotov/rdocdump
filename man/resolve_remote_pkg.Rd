@@ -39,5 +39,23 @@ A list containing:
 \description{
 Downloads package source from remote repositories without installing the
 package. Uses the \code{pak} package for downloading.
+
+If \code{pak} fails to resolve the reference (e.g., because the R package is in a
+subdirectory and no \code{subdir} was provided), the function automatically
+falls back to downloading the full repository and scanning for the
+shallowest directory containing a \code{DESCRIPTION} file.
+}
+\details{
+The auto-discovery mechanism uses two fallback tiers if \code{pak} resolution
+fails:
+\enumerate{
+\item \strong{Archive Download:} Attempts to download a \code{.tar.gz} archive of the
+repository for known hosts (GitHub, GitLab, Bitbucket).
+\item \strong{Git Clone:} Uses \verb{git clone --depth 1} for arbitrary Git URLs or if
+the archive download fails (requires system \code{git}).
+}
+
+Once downloaded, it recursively searches for \code{DESCRIPTION} files and selects
+the one closest to the repository root.
 }
 \keyword{internal}

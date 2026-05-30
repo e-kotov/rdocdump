@@ -90,6 +90,12 @@
 #'
 #' # Extract from GitLab
 #' docs <- rdd_to_txt("gitlab::user/repo")
+#'
+#' # Auto-discovery of packages in subdirectories (e.g., if repo root is not the pkg)
+#' docs <- rdd_to_txt("ipeaGIT/r5r")
+#'
+#' # Manual subdirectory specification (useful for disambiguation)
+#' docs <- rdd_to_txt("ipeaGIT/r5r/r-package")
 #' }
 #'
 #' \dontrun{

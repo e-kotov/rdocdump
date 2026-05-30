@@ -4,6 +4,11 @@
 #' Downloads package source from remote repositories without installing the
 #' package. Uses the `pak` package for downloading.
 #'
+#' If `pak` fails to resolve the reference (e.g., because the R package is in a
+#' subdirectory and no `subdir` was provided), the function automatically
+#' falls back to downloading the full repository and scanning for the
+#' shallowest directory containing a `DESCRIPTION` file.
+#'
 #' @param pkg_ref A character string specifying the remote package reference.
 #'   Supports any format supported by `pak`. See `?pak::pak_package_sources`
 #'   for a full list of supported formats. Examples:
@@ -15,6 +20,18 @@
 #'   - `"bitbucket::user/repo"` - Bitbucket (translated to `git::`)
 #'   - `"user/repo@ref"` - Specific commit, branch, or tag
 #'   - `"user/repo/subdir"` - Package in subdirectory
+#'
+#' @details
+#' The auto-discovery mechanism uses two fallback tiers if `pak` resolution
+#' fails:
+#' 1. **Archive Download:** Attempts to download a `.tar.gz` archive of the
+#'    repository for known hosts (GitHub, GitLab, Bitbucket).
+#' 2. **Git Clone:** Uses `git clone --depth 1` for arbitrary Git URLs or if
+#'    the archive download fails (requires system `git`).
+#'
+#' Once downloaded, it recursively searches for `DESCRIPTION` files and selects
+#' the one closest to the repository root.
+#'
 #' @param cache_path Optional path to cache directory. If NULL, uses temp
 #'   directory.
 #'
@@ -81,19 +98,32 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
       dependencies = FALSE
     ),
     error = function(e) {
+      msg <- conditionMessage(e)
+      # If pak fails to resolve (likely because it expects a DESCRIPTION at
+      # the root or specific subdir), we fall back to downloading the entire
+      # repository and scanning for packages.
+      if (grepl("Resolution has errors|Cannot start downloading", msg, ignore.case = TRUE)) {
+        return(NULL)
+      }
       stop(sprintf(
         "Failed to download remote package '%s': %s",
         pkg_ref,
-        conditionMessage(e)
+        msg
       ))
     }
   )
 
-  bundle_path <- select_pak_download_archive(dl_info, dest_dir, pak_ref)
-
-  direct_row <- find_pak_target_row(dl_info, pak_ref)
-  pkg_name_from_pak <- pak_row_value(direct_row, "package")
-  pkg_version_from_pak <- pak_row_value(direct_row, "version")
+  if (is.null(dl_info)) {
+    message("pak resolution failed. Attempting full repository download for auto-discovery...")
+    bundle_path <- fallback_download_repo(parsed, dest_dir)
+    pkg_name_from_pak <- NA_character_
+    pkg_version_from_pak <- NA_character_
+  } else {
+    bundle_path <- select_pak_download_archive(dl_info, dest_dir, pak_ref)
+    direct_row <- find_pak_target_row(dl_info, pak_ref)
+    pkg_name_from_pak <- pak_row_value(direct_row, "package")
+    pkg_version_from_pak <- pak_row_value(direct_row, "version")
+  }
 
   # Extract
   extract_dir <- file.path(dest_dir, "extracted")
@@ -109,17 +139,24 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     }
   }, add = TRUE)
 
-  first_bytes <- readBin(bundle_path, raw(), n = 2L)
-  if (length(first_bytes) == 2L &&
-      identical(first_bytes, as.raw(c(0x50, 0x4b)))) {
-    utils::unzip(bundle_path, exdir = extract_dir)
+  # Handle both tarball and git-clone directory cases
+  if (dir.exists(bundle_path)) {
+    # It's a directory from git clone
+    files_to_copy <- list.files(bundle_path, full.names = TRUE, all.files = TRUE, no.. = TRUE)
+    file.copy(files_to_copy, extract_dir, recursive = TRUE)
   } else {
-    res <- utils::untar(bundle_path, exdir = extract_dir, tar = "internal")
-    if (!identical(as.integer(res), 0L)) {
-      stop(sprintf(
-        "Extraction failed: utils::untar() returned non-zero status code %s.",
-        res
-      ))
+    first_bytes <- readBin(bundle_path, raw(), n = 2L)
+    if (length(first_bytes) == 2L &&
+        identical(first_bytes, as.raw(c(0x50, 0x4b)))) {
+      utils::unzip(bundle_path, exdir = extract_dir)
+    } else {
+      res <- utils::untar(bundle_path, exdir = extract_dir, tar = "internal")
+      if (!identical(as.integer(res), 0L)) {
+        stop(sprintf(
+          "Extraction failed: utils::untar() returned non-zero status code %s.",
+          res
+        ))
+      }
     }
   }
 
@@ -309,7 +346,10 @@ build_pak_remote_ref <- function(parsed) {
     gitlab = {
       ref <- sprintf("gitlab::%s/%s", parsed$user, parsed$repo)
       if (!is.null(parsed$subdir)) {
-        ref <- paste0(ref, "/-/", parsed$subdir)
+        # pak requires /-/ for GitLab subdirectories.
+        # Ensure we don't double up if it's already present.
+        clean_subdir <- sub("^-/", "", parsed$subdir)
+        ref <- paste0(ref, "/-/", clean_subdir)
       }
       if (!is.null(parsed$ref)) {
         ref <- paste0(ref, "@", parsed$ref)
@@ -529,23 +569,25 @@ find_pkg_dir <- function(extract_dir, subdir = NULL) {
   }
 
   # Auto-detect: look for DESCRIPTION file
-  # Usually the bundle extracts to a single directory
-  subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
+  # Recursively search for all DESCRIPTION files to find the primary package
+  desc_files <- list.files(
+    extract_dir,
+    pattern = "^DESCRIPTION$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
 
-  if (length(subdirs) == 1) {
-    # Single subdirectory - likely the package
-    return(subdirs[1])
+  if (length(desc_files) == 0) {
+    return(extract_dir)
   }
 
-  # Multiple items - check if any is a package
-  for (dir in subdirs) {
-    if (file.exists(file.path(dir, "DESCRIPTION"))) {
-      return(dir)
-    }
-  }
+  # Pick the one with the shallowest depth to avoid tests/testthat/DESCRIPTION
+  # or deep sub-packages unless it's the only one.
+  # Count depth by number of path separators
+  depths <- vapply(strsplit(dirname(desc_files), "[/\\\\]"), length, integer(1))
+  best_idx <- which.min(depths)
 
-  # Return extract_dir if nothing else found
-  extract_dir
+  dirname(desc_files[best_idx])
 }
 
 #' Check if String is a Remote Package Reference
@@ -582,4 +624,122 @@ is_remote_reference <- function(pkg) {
   }
 
   FALSE
+}
+
+#' Fallback Download for Auto-Discovery
+#' @keywords internal
+#' @noRd
+fallback_download_repo <- function(parsed, dest_dir) {
+  # Tier 1: Try tarball for known hosts
+  tarball <- download_tarball(parsed, dest_dir)
+  if (!is.null(tarball) && file.exists(tarball)) {
+    return(tarball)
+  }
+
+  # Tier 2: Try git clone
+  cloned <- git_clone_repo(parsed, dest_dir)
+  if (!is.null(cloned) && dir.exists(cloned)) {
+    return(cloned)
+  }
+
+  stop(sprintf(
+    "Failed to download repository for auto-discovery: %s",
+    remote_display_name(parsed)
+  ))
+}
+
+#' Download Repository Tarball
+#' @keywords internal
+#' @noRd
+download_tarball <- function(parsed, dest_dir) {
+  ref <- parsed$ref %||% "HEAD"
+  url <- switch(
+    parsed$type,
+    github = sprintf(
+      "https://github.com/%s/%s/archive/%s.tar.gz",
+      parsed$user, parsed$repo, ref
+    ),
+    gitlab = sprintf(
+      "https://gitlab.com/%s/%s/-/archive/%s/%s-%s.tar.gz",
+      parsed$user, parsed$repo, ref, parsed$repo, ref
+    ),
+    bitbucket = sprintf(
+      "https://bitbucket.org/%s/%s/get/%s.tar.gz",
+      parsed$user, parsed$repo, ref
+    ),
+    NULL
+  )
+
+  if (is.null(url)) return(NULL)
+
+  # Support authentication for private GitHub repositories
+  headers <- NULL
+  if (parsed$type == "github") {
+    token <- Sys.getenv("GITHUB_PAT", Sys.getenv("GITHUB_TOKEN", ""))
+    if (nzchar(token)) {
+      headers <- c(Authorization = paste("token", token))
+    }
+  }
+
+  destfile <- file.path(dest_dir, sprintf("fallback_repo_%s.tar.gz", parsed$repo))
+  res <- try(
+    utils::download.file(
+      url,
+      destfile = destfile,
+      mode = "wb",
+      quiet = TRUE,
+      headers = headers
+    ),
+    silent = TRUE
+  )
+
+  if (inherits(res, "try-error") || res != 0) {
+    if (file.exists(destfile)) unlink(destfile)
+    return(NULL)
+  }
+
+  destfile
+}
+
+#' Clone Repository via Git
+#' @keywords internal
+#' @noRd
+git_clone_repo <- function(parsed, dest_dir) {
+  git_bin <- Sys.which("git")
+  if (git_bin == "") {
+    return(NULL)
+  }
+
+  url <- if (parsed$type == "git") {
+    parsed$original
+  } else if (!is.na(parsed$user %||% NA)) {
+    host <- switch(
+      parsed$type,
+      github = "github.com",
+      gitlab = "gitlab.com",
+      bitbucket = "bitbucket.org",
+      NULL
+    )
+    if (is.null(host)) return(NULL)
+    sprintf("https://%s/%s/%s.git", host, parsed$user, parsed$repo)
+  } else {
+    return(NULL)
+  }
+
+  clone_dir <- file.path(dest_dir, "fallback_clone")
+  if (dir.exists(clone_dir)) unlink(clone_dir, recursive = TRUE)
+
+  args <- c("clone", "--depth", "1")
+  if (!is.null(parsed$ref)) {
+    args <- c(args, "--branch", parsed$ref)
+  }
+  args <- c(args, url, clone_dir)
+
+  res <- system2(git_bin, args, stdout = FALSE, stderr = FALSE)
+  if (res != 0) {
+    if (dir.exists(clone_dir)) unlink(clone_dir, recursive = TRUE)
+    return(NULL)
+  }
+
+  clone_dir
 }

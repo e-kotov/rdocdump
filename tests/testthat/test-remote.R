@@ -467,3 +467,166 @@ test_that("remote_display_name handles NA users and original refs", {
   expect_equal(remote_display_name(p_bioc), "Biobase")
 })
 
+test_that("find_pkg_dir finds shallowest DESCRIPTION file", {
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE))
+  
+  # Deep DESCRIPTION
+  deep_dir <- file.path(tmp, "tests", "testthat")
+  dir.create(deep_dir, recursive = TRUE)
+  writeLines("Package: test", file.path(deep_dir, "DESCRIPTION"))
+  
+  # Shallow DESCRIPTION (the real package)
+  pkg_dir <- file.path(tmp, "r-package")
+  dir.create(pkg_dir)
+  writeLines("Package: real", file.path(pkg_dir, "DESCRIPTION"))
+  
+  found <- find_pkg_dir(tmp)
+  expect_equal(normalizePath(found), normalizePath(pkg_dir))
+})
+
+test_that("resolve_remote_pkg falls back to full download on pak failure", {
+  skip_if_not_installed("pak")
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  
+  # Mock pak failure
+  local_mocked_bindings(
+    pkg_download = function(...) stop("Resolution has errors"),
+    .package = "pak"
+  )
+  
+  # Mock download_tarball
+  local_mocked_bindings(
+    download_tarball = function(parsed, dest_dir) {
+      tar_path <- file.path(dest_dir, "repo.tar.gz")
+      pkg_dir <- file.path(tempdir(), "repo_root")
+      dir.create(file.path(pkg_dir, "pkg"), recursive = TRUE)
+      writeLines("Package: subpkg", file.path(pkg_dir, "pkg", "DESCRIPTION"))
+      withr::with_dir(tempdir(), utils::tar(tar_path, "repo_root", tar = "internal"))
+      unlink(pkg_dir, recursive = TRUE)
+      tar_path
+    },
+    .package = "rdocdump"
+  )
+  
+  info <- resolve_remote_pkg("user/repo", cache_path = cache)
+  expect_equal(info$pkg_name, "subpkg")
+  expect_match(info$pkg_path, "pkg$")
+  expect_true(file.exists(file.path(info$pkg_path, "DESCRIPTION")))
+})
+
+test_that("resolve_remote_pkg falls back to git clone if tarball fails", {
+  skip_if_not_installed("pak")
+  if (Sys.which("git") == "") skip("git not available")
+  
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+  
+  # Mock pak failure
+  local_mocked_bindings(
+    pkg_download = function(...) stop("Resolution has errors"),
+    .package = "pak"
+  )
+  
+  # Mock download_tarball to fail
+  local_mocked_bindings(
+    download_tarball = function(...) NULL,
+    .package = "rdocdump"
+  )
+  
+  # Mock git_clone_repo
+  local_mocked_bindings(
+    git_clone_repo = function(parsed, dest_dir) {
+      clone_dir <- file.path(dest_dir, "fallback_clone")
+      # Create a wrapper and a subdirectory to avoid simple flattening 
+      # that would move everything to the root of 'extracted'.
+      pkg_dir <- file.path(clone_dir, "repo-root", "r-pkg")
+      dir.create(pkg_dir, recursive = TRUE)
+      writeLines("Package: clonedpkg", file.path(pkg_dir, "DESCRIPTION"))
+      clone_dir
+    }
+,
+    .package = "rdocdump"
+  )
+  
+  info <- resolve_remote_pkg("user/repo", cache_path = cache)
+  expect_equal(info$pkg_name, "clonedpkg")
+  expect_match(info$pkg_path, "r-pkg$")
+})
+
+test_that("resolve_remote_pkg auto-discovers r5r in subdirectory (LIVE)", {
+  skip_if_offline()
+  skip_on_cran()
+  if (!requireNamespace("pak", quietly = TRUE)) skip("pak not installed")
+
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  # ipeaGIT/r5r has the R package in 'r-package/'
+  info <- resolve_remote_pkg("ipeaGIT/r5r", cache_path = cache)
+
+  expect_equal(info$pkg_name, "r5r")
+  expect_match(info$pkg_path, "r-package$")
+  expect_true(file.exists(file.path(info$pkg_path, "DESCRIPTION")))
+})
+
+test_that("build_pak_remote_ref handles GitLab subdirectories correctly", {
+  # Standard format
+  expect_equal(
+    build_pak_remote_ref(parse_remote_ref("gitlab::user/repo/sub")),
+    "gitlab::user/repo/-/sub"
+  )
+  # pak format (already contains /-/)
+  expect_equal(
+    build_pak_remote_ref(parse_remote_ref("gitlab::user/repo/-/sub")),
+    "gitlab::user/repo/-/sub"
+  )
+})
+
+test_that("download_tarball constructs correct headers for GitHub", {
+  skip_if_not_installed("withr")
+  parsed <- list(type = "github", user = "user", repo = "repo", ref = NULL)
+  
+  withr::with_envvar(c(GITHUB_PAT = "secret"), {
+    # We test the internal logic by mocking download.file
+    local_mocked_bindings(
+      download.file = function(url, destfile, headers, ...) {
+        expect_equal(headers[["Authorization"]], "token secret")
+        writeLines("dummy", destfile)
+        0 # success
+      },
+      .package = "utils"
+    )
+    res <- download_tarball(parsed, tempdir())
+    expect_true(file.exists(res))
+    unlink(res)
+  })
+})
+
+test_that("find_pkg_dir correctly handles long shallow names vs short deep names", {
+  tmp <- tempfile()
+  dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE))
+  
+  # Deep DESCRIPTION with short names
+  deep_dir <- file.path(tmp, "a", "b", "c")
+  dir.create(deep_dir, recursive = TRUE)
+  writeLines("Package: deep", file.path(deep_dir, "DESCRIPTION"))
+  
+  # Shallow DESCRIPTION with a very long name
+  pkg_dir <- file.path(tmp, "this-is-a-very-long-package-directory-name")
+  dir.create(pkg_dir)
+  writeLines("Package: shallow", file.path(pkg_dir, "DESCRIPTION"))
+  
+  # Ensure the test is actually testing the edge case
+  expect_true(nchar(pkg_dir) > nchar(deep_dir))
+  
+  found <- find_pkg_dir(tmp)
+  expect_equal(normalizePath(found), normalizePath(pkg_dir))
+})
+
