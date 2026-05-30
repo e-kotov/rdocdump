@@ -1,6 +1,6 @@
 # Changelog
 
-## rdocdump 0.3.0
+## rdocdump (development version)
 
 #### New Features
 
