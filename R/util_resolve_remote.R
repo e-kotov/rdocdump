@@ -63,6 +63,16 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
 
   # Download the bundle (NO INSTALLATION - just download)
   # pak::pkg_download creates a src/contrib structure
+  if (!requireNamespace("withr", quietly = TRUE)) {
+    stop(
+      "The 'withr' package is required to handle pak downloads safely. ",
+      "Please install it with: install.packages('withr')"
+    )
+  }
+  if (Sys.getenv("R_USER_CACHE_DIR") == "") {
+    withr::local_envvar(c(R_USER_CACHE_DIR = tempfile("pak-cache-")))
+  }
+
   dl_info <- tryCatch(
     pak::pkg_download(
       pak_ref,

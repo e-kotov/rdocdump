@@ -169,6 +169,9 @@ resolve_pkg_path <- function(
         )
       }
       withr::local_options(list(repos = repos))
+      if (Sys.getenv("R_USER_CACHE_DIR") == "") {
+        withr::local_envvar(c(R_USER_CACHE_DIR = tempfile("pak-cache-")))
+      }
 
       dl_info <- tryCatch(
         pak::pkg_download(
