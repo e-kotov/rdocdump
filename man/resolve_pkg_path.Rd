@@ -59,6 +59,8 @@ A list containing:
 \item \code{extracted_path}: Path to the extracted package directory (if applicable).
 \item \code{tar_path}: Path to the tarball if it was downloaded.
 \item \code{is_installed}: Logical indicating if the package is installed.
+\item \code{pkg_name}: Package name (always populated when known).
+\item \code{pkg_version}: Package version (NULL if not known).
 }
 }
 \description{

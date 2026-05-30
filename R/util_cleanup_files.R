@@ -32,7 +32,7 @@ cleanup_files <- function(
   if (
     !keep_files %in% c("extracted", "both") && !is.null(pkg_info$extracted_path)
   ) {
-    dir_to_remove <- dirname(pkg_info$extracted_path)
+    dir_to_remove <- pkg_info$extracted_path
     res <- unlink(dir_to_remove, recursive = TRUE)
     if (res != 0L) {
       warning(

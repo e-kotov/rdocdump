@@ -5,6 +5,8 @@ test_that("resolve_pkg_path identifies installed packages correctly", {
   expect_true(pkg_info$is_installed)
   expect_equal(pkg_info$pkg_name, "stats")
   expect_equal(pkg_info$pkg_path, find.package("stats"))
+  # pkg_version is populated from DESCRIPTION when available
+  expect_true(is.null(pkg_info$pkg_version) || nzchar(pkg_info$pkg_version))
 })
 
 test_that("resolve_pkg_path identifies a source package directory", {
@@ -28,6 +30,8 @@ test_that("resolve_pkg_path identifies a source package directory", {
   pkg_info <- resolve_pkg_path(temp_pkg)
   expect_false(pkg_info$is_installed)
   expect_equal(pkg_info$pkg_path, temp_pkg)
+  expect_equal(pkg_info$pkg_name, "dummy")
+  expect_equal(pkg_info$pkg_version, "1.0")
 
   unlink(temp_pkg, recursive = TRUE)
 })
@@ -70,6 +74,8 @@ test_that("resolve_pkg_path handles tar.gz archive file correctly", {
   expect_true(is.character(pkg_info$extracted_path))
   expect_equal(pkg_info$pkg_path, pkg_info$extracted_path)
   expect_true(dir.exists(pkg_info$pkg_path))
+  expect_equal(pkg_info$pkg_name, "dummy")
+  expect_equal(pkg_info$pkg_version, "1.0")
 
   # Clean up.
   unlink(pkg_info$pkg_path, recursive = TRUE)
@@ -89,7 +95,8 @@ test_that("resolve_pkg_path handles invalid archive file", {
 
 test_that("resolve_pkg_path handles malformed tarball name", {
   # Create a tar.gz with a name that doesn't follow pkg_version.tar.gz
-  tmp_dir <- tempdir()
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
   dummy_pkg <- file.path(tmp_dir, "dummy")
   dir.create(dummy_pkg)
   writeLines("Package: dummy", file.path(dummy_pkg, "DESCRIPTION"))
@@ -104,29 +111,173 @@ test_that("resolve_pkg_path handles malformed tarball name", {
     "Tarball filename does not conform to the expected pattern"
   )
 
-  unlink(tar_path)
-  unlink(dummy_pkg, recursive = TRUE)
+  unlink(tmp_dir, recursive = TRUE)
 })
 
 
-test_that("resolve_pkg_path fetches package from CRAN", {
+test_that("resolve_pkg_path passes repos to pak downloads", {
+  skip_if_not_installed("pak")
+
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  seen_repos <- NULL
+  local_mocked_bindings(
+    pkg_download = function(pkg, dest_dir, dependencies, platforms) {
+      seen_repos <<- getOption("repos")
+
+      pkg_dir <- file.path(cache, "ini")
+      dir.create(pkg_dir)
+      writeLines("Package: ini\nVersion: 1.0.0", file.path(pkg_dir, "DESCRIPTION"))
+
+      tar_path <- file.path(dest_dir, "src", "contrib", "ini_1.0.0.tar.gz")
+      dir.create(dirname(tar_path), recursive = TRUE)
+      withr::with_dir(cache, {
+        utils::tar(tar_path, "ini", tar = "internal")
+      })
+
+      data.frame(
+        ref = pkg,
+        direct = TRUE,
+        package = "ini",
+        version = "1.0.0",
+        target = "src/contrib/ini_1.0.0.tar.gz",
+        fulltarget = tar_path,
+        stringsAsFactors = FALSE
+      )
+    },
+    .package = "pak"
+  )
+
+  requested_repos <- c(CRAN = "https://example.test/cran")
+  old_repos <- getOption("repos")
+  options(repos = c(CRAN = "https://wrong.example/cran"))
+  on.exit(options(repos = old_repos), add = TRUE)
+
+  pkg_info <- resolve_pkg_path(
+    "ini",
+    cache_path = cache,
+    force_fetch = TRUE,
+    repos = requested_repos
+  )
+
+  expect_equal(seen_repos, requested_repos)
+  expect_true(file.exists(file.path(pkg_info$pkg_path, "DESCRIPTION")))
+})
+
+
+test_that("resolve_pkg_path errors clearly when pak omits package column", {
+  skip_if_not_installed("pak")
+
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    pkg_download = function(pkg, dest_dir, dependencies, platforms) {
+      pkg_dir <- file.path(cache, "ini")
+      dir.create(pkg_dir)
+      writeLines("Package: ini\nVersion: 1.0.0", file.path(pkg_dir, "DESCRIPTION"))
+
+      tar_path <- file.path(dest_dir, "src", "contrib", "ini_1.0.0.tar.gz")
+      dir.create(dirname(tar_path), recursive = TRUE)
+      withr::with_dir(cache, {
+        utils::tar(tar_path, "ini", tar = "internal")
+      })
+
+      # No 'package' column on purpose.
+      data.frame(
+        ref = pkg,
+        direct = TRUE,
+        version = "1.0.0",
+        target = "src/contrib/ini_1.0.0.tar.gz",
+        fulltarget = tar_path,
+        stringsAsFactors = FALSE
+      )
+    },
+    .package = "pak"
+  )
+
+  expect_error(
+    resolve_pkg_path("ini", cache_path = cache, force_fetch = TRUE),
+    "pak did not return a package name"
+  )
+})
+
+
+test_that("resolve_pkg_path errors when pak omits package version", {
+  skip_if_not_installed("pak")
+
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    pkg_download = function(pkg, dest_dir, dependencies, platforms) {
+      pkg_dir <- file.path(cache, "ini")
+      dir.create(pkg_dir)
+      writeLines("Package: ini\nVersion: 1.0.0", file.path(pkg_dir, "DESCRIPTION"))
+
+      tar_path <- file.path(dest_dir, "src", "contrib", "ini_1.0.0.tar.gz")
+      dir.create(dirname(tar_path), recursive = TRUE)
+      withr::with_dir(cache, {
+        utils::tar(tar_path, "ini", tar = "internal")
+      })
+
+      data.frame(
+        ref = pkg,
+        direct = TRUE,
+        package = "ini",
+        version = NA_character_,
+        target = "src/contrib/ini_1.0.0.tar.gz",
+        fulltarget = tar_path,
+        stringsAsFactors = FALSE
+      )
+    },
+    .package = "pak"
+  )
+
+  expect_error(
+    resolve_pkg_path("ini", cache_path = cache, force_fetch = TRUE),
+    "pak did not return a package version"
+  )
+})
+
+
+test_that("resolve_pkg_path fetches requested CRAN package with stale cache", {
   skip_on_cran()
   skip_if_offline()
 
   package <- "ini" # choosing a minimal size stable package
+  cache <- tempfile()
+  dir.create(cache)
+  stale_pkg <- file.path(cache, "stale")
+  dir.create(stale_pkg)
+  writeLines("Package: stale\nVersion: 1.0.0", file.path(stale_pkg, "DESCRIPTION"))
+  stale_archive <- file.path(cache, "stale_1.0.0.tar.gz")
+  withr::with_dir(cache, {
+    utils::tar(stale_archive, "stale", tar = "internal")
+  })
+
   old_repos <- getOption("repos")
   options(repos = c(CRAN = "https://cloud.r-project.org"))
   pkg_info <- resolve_pkg_path(
     package,
-    cache_path = tempdir(),
+    cache_path = cache,
     force_fetch = TRUE
   )
   options(repos = old_repos)
 
   expect_true(file.exists(pkg_info$tar_path))
   expect_true(dir.exists(pkg_info$pkg_path))
-  unlink(pkg_info$pkg_path, recursive = TRUE)
-  unlink(pkg_info$tar_path)
+  expect_false(identical(basename(pkg_info$tar_path), basename(stale_archive)))
+  expect_match(
+    readLines(file.path(pkg_info$pkg_path, "DESCRIPTION"), n = 1),
+    "Package: ini"
+  )
+
+  unlink(cache, recursive = TRUE)
 })
 
 test_that("is_binary_pkg correctly identifies binary packages", {

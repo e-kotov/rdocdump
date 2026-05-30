@@ -1,15 +1,18 @@
-#' Resolve Remote Package References (GitHub, GitLab, Bitbucket)
+#' Resolve Remote Package References (GitHub, GitLab, Bioconductor, etc.)
 #'
 #' @description
-#' Downloads package source from remote repositories (GitHub, GitLab, Bitbucket)
-#' without installing the package. Uses the `remotes` package for downloading.
+#' Downloads package source from remote repositories without installing the
+#' package. Uses the `pak` package for downloading.
 #'
 #' @param pkg_ref A character string specifying the remote package reference.
-#'   Supports formats like:
+#'   Supports any format supported by `pak`. See `?pak::pak_package_sources`
+#'   for a full list of supported formats. Examples:
 #'   - `"user/repo"` - GitHub shorthand (default)
 #'   - `"github::user/repo"` - Explicit GitHub
 #'   - `"gitlab::user/repo"` - GitLab
-#'   - `"bitbucket::user/repo"` - Bitbucket
+#'   - `"bioc::pkgname"` - Bioconductor
+#'   - `"git::https://..."` - Arbitrary Git URL
+#'   - `"bitbucket::user/repo"` - Bitbucket (translated to `git::`)
 #'   - `"user/repo@ref"` - Specific commit, branch, or tag
 #'   - `"user/repo/subdir"` - Package in subdirectory
 #' @param cache_path Optional path to cache directory. If NULL, uses temp
@@ -20,6 +23,8 @@
 #'   - `extracted_path`: Path to the extracted bundle
 #'   - `tar_path`: Path to the downloaded tarball
 #'   - `is_installed`: FALSE (always FALSE for remote packages)
+#'   - `pkg_name`: Package name reported by pak (or repo slug fallback)
+#'   - `pkg_version`: Package version reported by pak, if available
 #'   - `remote_info`: Parsed remote reference information
 #'
 #' @keywords internal
@@ -29,12 +34,11 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     stop("Argument 'pkg_ref' must be a single character string.")
   }
 
-  # Check if remotes package is installed
-  if (!requireNamespace("remotes", quietly = TRUE)) {
+  # Check if pak package is installed
+  if (!requireNamespace("pak", quietly = TRUE)) {
     stop(
-      "The 'remotes' package is required to download from remote ",
-      "repositories. ",
-      "Please install it with: install.packages('remotes')"
+      "The 'pak' package is required to download from remote repositories. ",
+      "Please install it with: install.packages('pak')"
     )
   }
 
@@ -42,14 +46,12 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
   parsed <- parse_remote_ref(pkg_ref)
 
   message(sprintf(
-    "Downloading package from %s (%s/%s)...",
+    "Downloading package from %s (%s)...",
     parsed$type,
-    parsed$user,
-    parsed$repo
+    remote_display_name(parsed)
   ))
 
-  # Create appropriate remote object
-  remote <- create_remote(parsed)
+  pak_ref <- build_pak_remote_ref(parsed)
 
   # Setup cache directory
   dest_dir <- get_remote_cache_dir(parsed, cache_path)
@@ -60,9 +62,14 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
   }
 
   # Download the bundle (NO INSTALLATION - just download)
-  # remotes downloads to a temp file, so we need to move it to our cache
-  temp_bundle <- tryCatch(
-    remotes::remote_download(remote, quiet = TRUE),
+  # pak::pkg_download creates a src/contrib structure
+  dl_info <- tryCatch(
+    pak::pkg_download(
+      pak_ref,
+      dest_dir = dest_dir,
+      platforms = "source",
+      dependencies = FALSE
+    ),
     error = function(e) {
       stop(sprintf(
         "Failed to download remote package '%s': %s",
@@ -72,14 +79,11 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     }
   )
 
-  # Move to our cache location
-  bundle_path <- file.path(dest_dir, basename(temp_bundle))
-  if (file.exists(bundle_path)) {
-    file.remove(bundle_path)
-  }
-  file.copy(temp_bundle, bundle_path, overwrite = TRUE)
-  # Clean up original temp file
-  file.remove(temp_bundle)
+  bundle_path <- select_pak_download_archive(dl_info, dest_dir, pak_ref)
+
+  direct_row <- find_pak_target_row(dl_info, pak_ref)
+  pkg_name_from_pak <- pak_row_value(direct_row, "package")
+  pkg_version_from_pak <- pak_row_value(direct_row, "version")
 
   # Extract
   extract_dir <- file.path(dest_dir, "extracted")
@@ -88,58 +92,64 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
   }
   dir.create(extract_dir, recursive = TRUE, showWarnings = FALSE)
 
-  utils::untar(bundle_path, exdir = extract_dir)
+  success <- FALSE
+  on.exit({
+    if (!success && dir.exists(extract_dir)) {
+      unlink(extract_dir, recursive = TRUE)
+    }
+  }, add = TRUE)
+
+  res <- utils::untar(bundle_path, exdir = extract_dir)
+  if (!identical(as.integer(res), 0L)) {
+    stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
+  }
 
   # Flatten extra top-level folder if necessary (common in GitHub/GitLab
   # bundles)
-  subdirs <- list.dirs(extract_dir, recursive = FALSE, full.names = TRUE)
-  if (length(subdirs) == 1L) {
-    files <- list.files(
-      subdirs[1],
-      full.names = TRUE,
-      all.files = TRUE,
-      no.. = TRUE
-    )
-    file.copy(files, extract_dir, recursive = TRUE)
-    unlink(subdirs[1], recursive = TRUE)
-  }
+  flatten_extracted_dir(extract_dir)
 
   # Find package directory (handle subdirectories)
   pkg_path <- find_pkg_dir(extract_dir, parsed$subdir)
 
   # Validate it's a package
   if (!file.exists(file.path(pkg_path, "DESCRIPTION"))) {
-    stop(sprintf(
-      paste0(
-        "Downloaded package does not contain a valid R package ",
-        "(no DESCRIPTION found). "
-      )
-    ))
+    stop(
+      "Downloaded package does not contain a valid R package ",
+      "(no DESCRIPTION found)."
+    )
   }
 
   check_if_binary(pkg_path)
 
+  # Prefer the DESCRIPTION on disk for definitive pkg_name/pkg_version,
+  # falling back to whatever pak reported and finally to the repo slug.
+  desc <- read_pkg_meta(pkg_path)
+  pkg_name <- desc$pkg_name
+  if (is.na(pkg_name)) pkg_name <- pkg_name_from_pak
+  if (is.na(pkg_name)) pkg_name <- parsed$repo
+  pkg_version <- desc$pkg_version
+  if (is.na(pkg_version)) pkg_version <- pkg_version_from_pak
+
+  success <- TRUE
   list(
     pkg_path = pkg_path,
     extracted_path = extract_dir,
     tar_path = bundle_path,
     is_installed = FALSE,
-    pkg_name = parsed$repo,
+    pkg_name = pkg_name,
+    pkg_version = if (is.na(pkg_version)) NULL else pkg_version,
     remote_info = parsed
   )
 }
 
 #' Parse Remote Reference String
 #'
-#' Supports formats:
-#' - "user/repo" -> GitHub shorthand
-#' - "github::user/repo" -> Explicit GitHub
-#' - "gitlab::user/repo" -> GitLab
-#' - "bitbucket::user/repo" -> Bitbucket
-#' - "user/repo@ref" -> With commit/branch/tag
-#' - "user/repo/subdir" -> With subdirectory
-#' - "user/repo/subdir@ref" -> Combined
-#' - "https://github.com/user/repo/tree/ref/subdir" -> Web URL
+#' Supports any format supported by `pak`. See `?pak::pak_package_sources`
+#' for details.
+#'
+#' Ambiguous web URLs (e.g. branch names like `feat/foo/pkg`) are best
+#' supplied as `user/repo@ref/subdir`; the URL heuristic is intentionally
+#' limited.
 #'
 #' @param ref Character string reference
 #' @return List with components: type, user, repo, ref, subdir
@@ -150,8 +160,8 @@ parse_remote_ref <- function(ref) {
     return(parse_remote_url(ref))
   }
 
-  # Check for explicit type prefix
-  type_pattern <- "^(github|gitlab|bitbucket|git|bioc)::"
+  # Check for explicit type prefix (type::)
+  type_pattern <- "^([a-zA-Z0-9]+)::"
   type_match <- regexpr(type_pattern, ref, perl = TRUE)
 
   if (type_match[1] != -1) {
@@ -161,6 +171,44 @@ parse_remote_ref <- function(ref) {
   } else {
     # Default to GitHub for "user/repo" format
     type <- "github"
+  }
+
+  # `git::` refs come in URL form and are passed through verbatim.
+  if (type == "git") {
+    return(list(
+      type = "git",
+      user = NA_character_,
+      repo = NA_character_,
+      ref = NULL,
+      subdir = NULL,
+      original = ref
+    ))
+  }
+
+  # `bioc::` refs are single-segment package names with an optional @ref.
+  if (type == "bioc") {
+    ref_pattern <- "@([^/@]+)$"
+    ref_match <- regexpr(ref_pattern, ref, perl = TRUE)
+    commit_ref <- NULL
+    if (ref_match[1] != -1) {
+      commit_ref <- regmatches(ref, ref_match)
+      commit_ref <- sub("^@", "", commit_ref)
+      ref <- sub(ref_pattern, "", ref)
+    }
+    if (!nzchar(ref) || grepl("/", ref)) {
+      stop(sprintf(
+        "Invalid Bioconductor reference '%s'. Expected: 'bioc::pkgname'",
+        ref
+      ))
+    }
+    return(list(
+      type = "bioc",
+      user = NA_character_,
+      repo = ref,
+      ref = commit_ref,
+      subdir = NULL,
+      original = ref
+    ))
   }
 
   # Extract ref (commit/branch/tag) if present
@@ -176,13 +224,26 @@ parse_remote_ref <- function(ref) {
   # Split remaining path
   parts <- strsplit(ref, "/")[[1]]
 
+  # For transparent pass-through of unknown types (like url::),
+  # we don't strictly require user/repo parts.
   if (length(parts) < 2) {
-    stop(sprintf(
-      paste0(
-        "Invalid remote reference '%s'. Expected format: 'user/repo' ",
-        "or 'user/repo/subdir'"
-      ),
-      ref
+    if (type %in% c("github", "gitlab", "bitbucket")) {
+      stop(sprintf(
+        paste0(
+          "Invalid remote reference '%s'. Expected format: 'user/repo' ",
+          "or 'user/repo/subdir'"
+        ),
+        ref
+      ))
+    }
+    # Pass through others (like url::) with original ref
+    return(list(
+      type = type,
+      user = NA_character_,
+      repo = ref,
+      ref = commit_ref,
+      subdir = NULL,
+      original = ref
     ))
   }
 
@@ -205,6 +266,60 @@ parse_remote_ref <- function(ref) {
   )
 }
 
+#' Build a pak Remote Reference
+#'
+#' @param parsed Parsed reference from `parse_remote_ref()`.
+#' @return A package reference suitable for `pak::pkg_download()`.
+#' @keywords internal
+#' @noRd
+build_pak_remote_ref <- function(parsed) {
+  pak_ref <- switch(
+    parsed$type,
+    github = {
+      ref <- sprintf("github::%s/%s", parsed$user, parsed$repo)
+      if (!is.null(parsed$subdir)) {
+        ref <- paste0(ref, "/", parsed$subdir)
+      }
+      ref
+    },
+    gitlab = {
+      ref <- sprintf("gitlab::%s/%s", parsed$user, parsed$repo)
+      if (!is.null(parsed$subdir)) {
+        ref <- paste0(ref, "/-/", parsed$subdir)
+      }
+      ref
+    },
+    bioc = sprintf("bioc::%s", parsed$repo),
+    git = sprintf("git::%s", parsed$original),
+    bitbucket = {
+      # Backward compatibility: translate bitbucket:: to git:: URL
+      ref <- sprintf("git::https://bitbucket.org/%s/%s.git", parsed$user, parsed$repo)
+      if (!is.null(parsed$subdir)) {
+        warning("Subdirectories are not supported for Bitbucket legacy references. Using repository root.")
+      }
+      ref
+    },
+    # Transparent pass-through for other pak types
+    sprintf("%s::%s", parsed$type, parsed$original)
+  )
+
+  if (!is.null(parsed$ref)) {
+    pak_ref <- paste0(pak_ref, "@", parsed$ref)
+  }
+
+  pak_ref
+}
+
+#' Build a human-readable label for a parsed remote
+#' @keywords internal
+#' @noRd
+remote_display_name <- function(parsed) {
+  if (parsed$type %in% c("bioc", "git") || is.na(parsed$user %||% NA)) {
+    return(parsed$original %||% parsed$repo)
+  }
+  sprintf("%s/%s", parsed$user, parsed$repo)
+}
+
 #' Parse GitHub or GitLab Web URL
 #'
 #' @param url The full URL string
@@ -220,7 +335,15 @@ parse_remote_url <- function(url) {
   } else if (grepl("gitlab\\.com", url)) {
     type <- "gitlab"
   } else {
-    stop("Only GitHub and GitLab URLs are currently supported.")
+    # For other URLs, treat as a generic git:: source for pak
+    return(list(
+      type = "git",
+      user = NA_character_,
+      repo = NA_character_,
+      ref = NULL,
+      subdir = NULL,
+      original = url
+    ))
   }
 
   # GitHub: https://github.com/user/repo/tree/ref/subdir
@@ -254,23 +377,33 @@ parse_remote_url <- function(url) {
     ))
   }
 
-  # Heuristic to split ref and subdir
-  # 1. Common branches at the start
-  common_branches <- c("main", "master", "develop", "dev", "trunk")
+  # Heuristic to split ref and subdir. This is intentionally limited; for
+  # ambiguous refs, prefer the explicit "user/repo@ref/subdir" form.
+  ref_parts <- strsplit(ref_and_subdir, "/")[[1]]
   ref <- NULL
   subdir <- NULL
 
-  # Split by slash
-  ref_parts <- strsplit(ref_and_subdir, "/")[[1]]
+  # Common single-segment branches and version-tag-like first segments are
+  # treated as a complete ref.
+  common_branches <- c(
+    "main", "master", "develop", "dev", "trunk", "HEAD"
+  )
+  conventional_prefixes <- c(
+    "feature", "release", "hotfix", "patch",
+    "chore", "fix", "feat", "refactor", "test", "docs",
+    "ci", "build", "perf", "style", "revert",
+    "renovate", "dependabot"
+  )
+  is_version_tag <- grepl("^v?\\d+(\\Dots+)*([._-][A-Za-z0-9.+-]+)?$", ref_parts[1])
 
-  if (ref_parts[1] %in% common_branches) {
+  if (ref_parts[1] %in% common_branches || is_version_tag) {
     ref <- ref_parts[1]
     if (length(ref_parts) > 1) {
       subdir <- paste(ref_parts[2:length(ref_parts)], collapse = "/")
     }
   } else if (length(ref_parts) >= 2 &&
-             ref_parts[1] %in% c("feature", "release", "hotfix", "patch")) {
-    # Pattern: feature/branch-name/subdir
+             ref_parts[1] %in% conventional_prefixes) {
+    # Pattern: <prefix>/<branch-name>[/subdir]
     ref <- paste(ref_parts[1:2], collapse = "/")
     if (length(ref_parts) > 2) {
       subdir <- paste(ref_parts[3:length(ref_parts)], collapse = "/")
@@ -293,51 +426,6 @@ parse_remote_url <- function(url) {
   )
 }
 
-#' Create Remote Object for remotes Package
-#'
-#' @param parsed Parsed reference from parse_remote_ref()
-#' @return Remote object suitable for remotes::remote_download()
-#' @keywords internal
-create_remote <- function(parsed) {
-  switch(
-    parsed$type,
-    github = remotes::github_remote(
-      repo = paste(parsed$user, parsed$repo, sep = "/"),
-      ref = parsed$ref %||% "HEAD",
-      subdir = parsed$subdir
-    ),
-    gitlab = structure(
-      list(
-        host = "gitlab.com",
-        repo = parsed$repo,
-        subdir = parsed$subdir,
-        username = parsed$user,
-        ref = parsed$ref %||% "HEAD",
-        sha = NULL,
-        auth_token = NULL
-      ),
-      class = c("gitlab_remote", "remote")
-    ),
-    bitbucket = structure(
-      list(
-        host = "api.bitbucket.org/2.0",
-        repo = parsed$repo,
-        subdir = parsed$subdir,
-        username = parsed$user,
-        ref = parsed$ref %||% "HEAD",
-        sha = NULL,
-        auth_user = NULL,
-        password = NULL
-      ),
-      class = c("bitbucket_remote", "remote")
-    ),
-    stop(sprintf(
-      "Unsupported remote type '%s'. Supported: github, gitlab, bitbucket",
-      parsed$type
-    ))
-  )
-}
-
 #' Get Cache Directory for Remote Package
 #'
 #' @param parsed Parsed reference
@@ -352,18 +440,20 @@ get_remote_cache_dir <- function(parsed, cache_path) {
     } else {
       ""
     }
+    user_part <- if (is.na(parsed$user %||% NA)) "" else parsed$user
 
     dir_name <- paste(
       parsed$type,
-      parsed$user,
+      user_part,
       parsed$repo,
       ref_suffix,
       subdir_suffix,
       sep = "_"
     )
+    dir_name <- gsub("_+", "_", dir_name)
     dir_name <- gsub("_$", "", dir_name)
 
-    file.path(cache_path, "remotes", dir_name)
+    file.path(cache_path, "pak", dir_name)
   } else {
     tempfile(pattern = paste0("remote_", parsed$type, "_"))
   }
@@ -416,13 +506,13 @@ is_remote_reference <- function(pkg) {
     return(FALSE)
   }
 
-  # Check for explicit type prefix
-  if (grepl("^(github|gitlab|bitbucket|git|bioc)::", pkg)) {
+  # Check for explicit type prefix (any type::)
+  if (grepl("^[a-zA-Z0-9]+::", pkg)) {
     return(TRUE)
   }
 
   # Check for web URLs
-  if (grepl("^https?://(github\\.com|gitlab\\.com)/", pkg)) {
+  if (grepl("^https?://", pkg)) {
     return(TRUE)
   }
 
@@ -440,8 +530,3 @@ is_remote_reference <- function(pkg) {
 
   FALSE
 }
-
-#' Helper: NULL default operator
-#' @keywords internal
-#' @noRd
-`%||%` <- function(x, y) if (is.null(x)) y else x

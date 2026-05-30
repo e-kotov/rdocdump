@@ -9,15 +9,7 @@ test_that("cleanup_files respects keep_files policy", {
   dir.create(extracted_path)
   writeLines("dummy file", file.path(extracted_path, "DESCRIPTION"))
 
-  pkg_info <- list(
-    tar_path = tar_path,
-    extracted_path = extracted_path
-  )
-
   # keep_files = "none" (default)
-  # Actually, cleanup_files is called with the policy.
-  # Let's test "none"
-  # I'll use copies for each test case
   t1 <- tempfile(fileext = ".tar.gz")
   file.copy(tar_path, t1)
   e1_p <- tempfile()
@@ -28,7 +20,7 @@ test_that("cleanup_files respects keep_files policy", {
 
   cleanup_files(list(tar_path = t1, extracted_path = e1), "none")
   expect_false(file.exists(t1))
-  expect_false(dir.exists(e1_p))
+  expect_false(dir.exists(e1))
 
   # keep_files = "tgz"
   t2 <- tempfile(fileext = ".tar.gz")
@@ -40,7 +32,7 @@ test_that("cleanup_files respects keep_files policy", {
 
   cleanup_files(list(tar_path = t2, extracted_path = e2), "tgz")
   expect_true(file.exists(t2))
-  expect_false(dir.exists(e2_p))
+  expect_false(dir.exists(e2))
   unlink(t2)
 
   # keep_files = "extracted"
@@ -53,7 +45,7 @@ test_that("cleanup_files respects keep_files policy", {
 
   cleanup_files(list(tar_path = t3, extracted_path = e3), "extracted")
   expect_false(file.exists(t3))
-  expect_true(dir.exists(e3_p))
+  expect_true(dir.exists(e3))
   unlink(e3_p, recursive = TRUE)
 
   # keep_files = "both"
@@ -66,7 +58,7 @@ test_that("cleanup_files respects keep_files policy", {
 
   cleanup_files(list(tar_path = t4, extracted_path = e4), "both")
   expect_true(file.exists(t4))
-  expect_true(dir.exists(e4_p))
+  expect_true(dir.exists(e4))
   unlink(t4)
   unlink(e4_p, recursive = TRUE)
 

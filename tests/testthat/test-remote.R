@@ -7,6 +7,7 @@ test_that("is_remote_reference detects remote references correctly", {
   # Explicit types
   expect_true(is_remote_reference("github::user/repo"))
   expect_true(is_remote_reference("gitlab::user/repo"))
+  # Recognized so users get a clear unsupported-remote error.
   expect_true(is_remote_reference("bitbucket::user/repo"))
 
   # With refs
@@ -55,13 +56,6 @@ test_that("parse_remote_ref parses GitLab correctly", {
   expect_equal(p$repo, "repo")
 })
 
-test_that("parse_remote_ref parses Bitbucket correctly", {
-  p <- parse_remote_ref("bitbucket::user/repo")
-  expect_equal(p$type, "bitbucket")
-  expect_equal(p$user, "user")
-  expect_equal(p$repo, "repo")
-})
-
 test_that("parse_remote_ref handles refs correctly", {
   p <- parse_remote_ref("user/repo@main")
   expect_equal(p$ref, "main")
@@ -72,6 +66,93 @@ test_that("parse_remote_ref handles refs correctly", {
 
   p <- parse_remote_ref("user/repo@abc123def")
   expect_equal(p$ref, "abc123def")
+})
+
+test_that("build_pak_remote_ref formats supported remotes correctly", {
+  expect_equal(
+    build_pak_remote_ref(parse_remote_ref("user/repo/subdir@main")),
+    "github::user/repo/subdir@main"
+  )
+
+  expect_equal(
+    build_pak_remote_ref(parse_remote_ref("gitlab::user/repo/subdir@main")),
+    "gitlab::user/repo/-/subdir@main"
+  )
+})
+
+test_that("build_pak_remote_ref translates Bitbucket refs for backward compatibility", {
+  ref <- build_pak_remote_ref(parse_remote_ref("bitbucket::user/repo"))
+  expect_equal(ref, "git::https://bitbucket.org/user/repo.git")
+})
+
+test_that("build_pak_remote_ref passes through unknown types transparently", {
+  ref <- build_pak_remote_ref(parse_remote_ref("url::https://example.com/pkg.tar.gz"))
+  expect_equal(ref, "url::https://example.com/pkg.tar.gz")
+})
+
+test_that("build_pak_remote_ref formats Bioconductor refs", {
+  expect_equal(
+    build_pak_remote_ref(parse_remote_ref("bioc::Biobase")),
+    "bioc::Biobase"
+  )
+})
+
+test_that("build_pak_remote_ref passes git:: URLs through", {
+  ref <- build_pak_remote_ref(
+    parse_remote_ref("git::https://example.com/user/repo.git")
+  )
+  expect_equal(ref, "git::https://example.com/user/repo.git")
+})
+
+test_that("parse_remote_ref rejects multi-segment bioc refs", {
+  expect_error(
+    parse_remote_ref("bioc::Bio/Base"),
+    "Invalid Bioconductor reference"
+  )
+})
+
+test_that("is_remote_reference recognizes bioc and git prefixes", {
+  expect_true(is_remote_reference("bioc::Biobase"))
+  expect_true(is_remote_reference("git::https://example.com/repo.git"))
+})
+
+test_that("select_pak_download_archive uses pak target, not cache scans", {
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  stale_pkg <- file.path(cache, "stale")
+  dir.create(stale_pkg)
+  writeLines("Package: stale\nVersion: 1.0.0", file.path(stale_pkg, "DESCRIPTION"))
+  stale_archive <- file.path(cache, "stale_1.0.0.tar.gz")
+  withr::with_dir(cache, {
+    utils::tar(stale_archive, "stale", tar = "internal")
+  })
+
+  target_tree <- file.path(cache, "src", "contrib", "good_1.0.0.tar.gz-t")
+  good_pkg <- file.path(target_tree, "good")
+  dir.create(good_pkg, recursive = TRUE)
+  writeLines("Package: good\nVersion: 1.0.0", file.path(good_pkg, "DESCRIPTION"))
+
+  dl_info <- data.frame(
+    ref = "good",
+    direct = TRUE,
+    package = "good",
+    target = "src/contrib/good_1.0.0.tar.gz",
+    fulltarget = file.path(cache, "src", "contrib", "good_1.0.0.tar.gz"),
+    stringsAsFactors = FALSE
+  )
+
+  archive <- select_pak_download_archive(dl_info, cache, "good")
+  extract_dir <- file.path(cache, "extracted")
+  dir.create(extract_dir)
+  utils::untar(archive, exdir = extract_dir)
+
+  expect_equal(basename(archive), "good_1.0.0.tar.gz")
+  expect_match(
+    readLines(file.path(extract_dir, "good", "DESCRIPTION"), n = 1),
+    "Package: good"
+  )
 })
 
 test_that("parse_remote_ref handles subdirectories correctly", {
@@ -94,10 +175,8 @@ test_that("parse_remote_ref handles combined refs and subdirs", {
 test_that("parse_remote_ref errors on invalid references", {
   expect_error(parse_remote_ref("invalid"), "Invalid remote reference")
   expect_error(parse_remote_ref("user"), "Invalid remote reference")
-  # Note: "/user/repo" is not detected as remote by is_remote_reference
-  # but parse_remote_ref will error because it only has one part after
-  # removing type
 })
+
 test_that("get_remote_cache_dir creates correct paths", {
   p <- list(
     type = "github",
@@ -107,11 +186,11 @@ test_that("get_remote_cache_dir creates correct paths", {
     subdir = NULL
   )
   path <- get_remote_cache_dir(p, "/cache")
-  expect_match(path, "/cache/remotes/github_tidyverse_ggplot2_HEAD$")
+  expect_match(path, "/cache/pak/github_tidyverse_ggplot2_HEAD$")
 
   p$ref <- "main"
   path <- get_remote_cache_dir(p, "/cache")
-  expect_match(path, "/cache/remotes/github_tidyverse_ggplot2_main$")
+  expect_match(path, "/cache/pak/github_tidyverse_ggplot2_main$")
 
   p$subdir <- "pkg/subdir"
   path <- get_remote_cache_dir(p, "/cache")
@@ -185,7 +264,24 @@ test_that("parse_remote_url parses GitHub URLs correctly", {
   )
   expect_equal(p$ref, "feature/cool-stuff")
   expect_equal(p$subdir, "pkg")
+
+  # Modern conventional prefixes
+  p <- parse_remote_url("https://github.com/user/repo/tree/feat/new-thing/pkg")
+  expect_equal(p$ref, "feat/new-thing")
+  expect_equal(p$subdir, "pkg")
+
+  p <- parse_remote_url(
+    "https://github.com/user/repo/tree/renovate/dep-1.x/sub"
+  )
+  expect_equal(p$ref, "renovate/dep-1.x")
+  expect_equal(p$subdir, "sub")
+
+  # Version tags treated as single-segment refs
+  p <- parse_remote_url("https://github.com/user/repo/tree/v1.2.3/pkg")
+  expect_equal(p$ref, "v1.2.3")
+  expect_equal(p$subdir, "pkg")
 })
+
 test_that("parse_remote_url parses GitLab URLs correctly", {
   p <- parse_remote_url("https://gitlab.com/user/repo/-/tree/main/subdir")
   expect_equal(p$type, "gitlab")
@@ -195,59 +291,11 @@ test_that("parse_remote_url parses GitLab URLs correctly", {
   expect_equal(p$subdir, "subdir")
 })
 
-test_that("create_remote creates correct remote objects", {
-  # GitHub
-  p <- list(
-    type = "github",
-    user = "r-lib",
-    repo = "rlang",
-    ref = "main",
-    subdir = NULL
-  )
-  remote <- create_remote(p)
-  expect_s3_class(remote, "github_remote")
-
-  # GitLab
-  p <- list(
-    type = "gitlab",
-    user = "user",
-    repo = "repo",
-    ref = "HEAD",
-    subdir = NULL
-  )
-  remote <- create_remote(p)
-  expect_s3_class(remote, "gitlab_remote")
-  expect_equal(remote$host, "gitlab.com")
-  expect_equal(remote$repo, "repo")
-
-  # Bitbucket
-  p <- list(
-    type = "bitbucket",
-    user = "user",
-    repo = "repo",
-    ref = "HEAD",
-    subdir = NULL
-  )
-  remote <- create_remote(p)
-  expect_s3_class(remote, "bitbucket_remote")
-  expect_equal(remote$host, "api.bitbucket.org/2.0")
-  expect_equal(remote$repo, "repo")
-
-  # Unsupported type
-  p <- list(
-    type = "unknown",
-    user = "user",
-    repo = "repo",
-    ref = NULL,
-    subdir = NULL
-  )
-  expect_error(create_remote(p), "Unsupported remote type")
-})
-
 # Integration tests - only run when online
 test_that("resolve_remote_pkg downloads GitHub package correctly", {
   skip_if_offline()
   skip_on_cran()
+  if (!requireNamespace("pak", quietly = TRUE)) skip("pak not installed")
 
   cache <- tempfile()
   dir.create(cache)
@@ -269,6 +317,7 @@ test_that("resolve_remote_pkg downloads GitHub package correctly", {
 test_that("resolve_remote_pkg handles branches correctly", {
   skip_if_offline()
   skip_on_cran()
+  if (!requireNamespace("pak", quietly = TRUE)) skip("pak not installed")
 
   cache <- tempfile()
   dir.create(cache)
@@ -284,6 +333,7 @@ test_that("resolve_remote_pkg handles branches correctly", {
 test_that("resolve_remote_pkg caches correctly", {
   skip_if_offline()
   skip_on_cran()
+  if (!requireNamespace("pak", quietly = TRUE)) skip("pak not installed")
 
   cache <- tempfile()
   dir.create(cache)
@@ -304,22 +354,101 @@ test_that("resolve_remote_pkg fails on binary repositories", {
   skip_if_offline()
   skip_on_cran()
 
-  # We mock a remote download by creating a directory that looks like a 
-  # downloaded repo but contains binary files.
-  # Since resolve_remote_pkg uses remotes::remote_download, we can't easily 
-  # mock the download without mocking the whole remotes package,
-  # but we can test check_if_binary directly to ensure it works for remotes too.
-  
   # Create a dummy binary package directory
   bin_pkg <- tempfile("bin_remote_pkg")
   dir.create(bin_pkg)
   writeLines("Package: binpkg\nVersion: 1.0", file.path(bin_pkg, "DESCRIPTION"))
   dir.create(file.path(bin_pkg, "Meta"))
-  
+
   expect_error(
     check_if_binary(bin_pkg),
     "appears to be a pre-built binary"
   )
-  
+
   unlink(bin_pkg, recursive = TRUE)
 })
+
+test_that("resolve_remote_pkg handles invalid arguments", {
+  expect_error(resolve_remote_pkg(123), "must be a single character string")
+  expect_error(resolve_remote_pkg(c("a", "b")), "must be a single character string")
+})
+
+test_that("resolve_remote_pkg handles pak download errors", {
+  skip_if_not_installed("pak")
+  local_mocked_bindings(
+    pkg_download = function(...) stop("Network error"),
+    .package = "pak"
+  )
+  expect_error(resolve_remote_pkg("user/repo"), "Failed to download remote package")
+})
+
+test_that("resolve_remote_pkg handles missing DESCRIPTION", {
+  skip_if_not_installed("pak")
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  # Mock a successful download but empty extraction
+  local_mocked_bindings(
+    pkg_download = function(pkg, dest_dir, ...) {
+      tar_path <- file.path(dest_dir, "empty.tar.gz")
+      # Create dummy tarball
+      empty_dir <- file.path(cache, "empty")
+      dir.create(empty_dir)
+      withr::with_dir(cache, utils::tar(tar_path, "empty", tar = "internal"))
+      data.frame(package="empty", version="1.0", fulltarget=tar_path, stringsAsFactors=FALSE)
+    },
+    .package = "pak"
+  )
+
+  expect_error(resolve_remote_pkg("user/repo", cache_path = cache), "no DESCRIPTION found")
+})
+
+test_that("resolve_remote_pkg handles missing subdirectories", {
+  skip_if_not_installed("pak")
+  cache <- tempfile()
+  dir.create(cache)
+  on.exit(unlink(cache, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    pkg_download = function(pkg, dest_dir, ...) {
+      tar_path <- file.path(dest_dir, "pkg.tar.gz")
+      pkg_dir <- file.path(cache, "pkg")
+      dir.create(pkg_dir)
+      writeLines("Package: pkg", file.path(pkg_dir, "DESCRIPTION"))
+      withr::with_dir(cache, utils::tar(tar_path, "pkg", tar = "internal"))
+      data.frame(package="pkg", version="1.0", fulltarget=tar_path, stringsAsFactors=FALSE)
+    },
+    .package = "pak"
+  )
+
+  expect_error(resolve_remote_pkg("user/repo/missing", cache_path = cache), "Specified subdirectory 'missing' not found")
+})
+
+test_that("pak_row_value handles missing or NULL columns", {
+  row <- data.frame(a = 1, stringsAsFactors = FALSE)
+  expect_true(is.na(pak_row_value(row, "missing")))
+  
+  row_null <- list(a = NULL) # data frames can't really have NULL cells easily, but list-cols or malformed ones can
+  expect_true(is.na(pak_row_value(as.data.frame(row_null), "a")))
+})
+
+test_that("is_remote_reference handles edge cases", {
+  expect_false(is_remote_reference(character(0)))
+  expect_false(is_remote_reference(c("user/repo", "other/repo")))
+})
+
+test_that("parse_remote_url handles generic URLs as git::", {
+  p <- parse_remote_url("https://example.com/repo.git")
+  expect_equal(p$type, "git")
+  expect_equal(p$original, "https://example.com/repo.git")
+})
+
+test_that("remote_display_name handles NA users and original refs", {
+  p <- list(type = "git", original = "https://example.com/repo", user = NA_character_)
+  expect_equal(remote_display_name(p), "https://example.com/repo")
+  
+  p_bioc <- list(type = "bioc", repo = "Biobase", user = NA_character_)
+  expect_equal(remote_display_name(p_bioc), "Biobase")
+})
+

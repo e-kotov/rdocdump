@@ -15,6 +15,9 @@ package.
 }
 \description{
 This function retrieves all functions from the package namespace and
-deparses them to get their source code.
+deparses them to get their source code. Note that extracting from an
+installed package silently skips S4 classes, R6 classes, environment
+objects, and datasets since it filters for \code{is.function()}. For more
+complete code extraction, prefer extracting from source packages.
 }
 \keyword{internal}

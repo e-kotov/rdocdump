@@ -2,18 +2,21 @@
 % Please edit documentation in R/util_resolve_remote.R
 \name{resolve_remote_pkg}
 \alias{resolve_remote_pkg}
-\title{Resolve Remote Package References (GitHub, GitLab, Bitbucket)}
+\title{Resolve Remote Package References (GitHub, GitLab, Bioconductor, etc.)}
 \usage{
 resolve_remote_pkg(pkg_ref, cache_path = NULL)
 }
 \arguments{
 \item{pkg_ref}{A character string specifying the remote package reference.
-Supports formats like:
+Supports any format supported by \code{pak}. See \code{?pak::pak_package_sources}
+for a full list of supported formats. Examples:
 \itemize{
 \item \code{"user/repo"} - GitHub shorthand (default)
 \item \code{"github::user/repo"} - Explicit GitHub
 \item \code{"gitlab::user/repo"} - GitLab
-\item \code{"bitbucket::user/repo"} - Bitbucket
+\item \code{"bioc::pkgname"} - Bioconductor
+\item \code{"git::https://..."} - Arbitrary Git URL
+\item \code{"bitbucket::user/repo"} - Bitbucket (translated to \verb{git::})
 \item \code{"user/repo@ref"} - Specific commit, branch, or tag
 \item \code{"user/repo/subdir"} - Package in subdirectory
 }}
@@ -28,11 +31,13 @@ A list containing:
 \item \code{extracted_path}: Path to the extracted bundle
 \item \code{tar_path}: Path to the downloaded tarball
 \item \code{is_installed}: FALSE (always FALSE for remote packages)
+\item \code{pkg_name}: Package name reported by pak (or repo slug fallback)
+\item \code{pkg_version}: Package version reported by pak, if available
 \item \code{remote_info}: Parsed remote reference information
 }
 }
 \description{
-Downloads package source from remote repositories (GitHub, GitLab, Bitbucket)
-without installing the package. Uses the \code{remotes} package for downloading.
+Downloads package source from remote repositories without installing the
+package. Uses the \code{pak} package for downloading.
 }
 \keyword{internal}
