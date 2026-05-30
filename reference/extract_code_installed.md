@@ -1,7 +1,11 @@
 # Extract code from an installed package using its namespace.
 
 This function retrieves all functions from the package namespace and
-deparses them to get their source code.
+deparses them to get their source code. Note that extracting from an
+installed package silently skips S4 classes, R6 classes, environment
+objects, and datasets since it filters for
+[`is.function()`](https://rdrr.io/r/base/is.function.html). For more
+complete code extraction, prefer extracting from source packages.
 
 ## Usage
 

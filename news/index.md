@@ -2,6 +2,29 @@
 
 ## rdocdump (development version)
 
+#### New Features
+
+- Migrated to `pak` for remote package resolution and downloads.
+
+- Added auto-discovery of R packages in subdirectories for remote
+  repositories.
+
+#### Improvements
+
+- Enhanced robustness of remote package resolution with automatic
+  fallbacks (e.g., `git clone`).
+
+- Improved cross-platform compatibility by using internal `tar`
+  operations.
+
+- Expanded support for various remote URL formats and platforms
+  (Bioconductor, GitLab, etc.).
+
+#### Bug Fixes
+
+- Fixed directory cleanup logic and improved performance of vignette
+  concatenation.
+
 ## rdocdump 0.2.0 (2026-04-29)
 
 CRAN release: 2026-04-29

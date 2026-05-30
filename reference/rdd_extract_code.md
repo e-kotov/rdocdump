@@ -115,6 +115,14 @@ rdd_extract_code(
 A single string containing the combined R source code (and, optionally,
 roxygen2 documentation) from the package.
 
+## Details
+
+For remote repositories, `rdocdump` uses `pak` for resolution. If `pak`
+cannot find an R package at the root or the specified subdirectory, the
+function will automatically fall back to downloading the full repository
+and searching for the shallowest directory containing a `DESCRIPTION`
+file.
+
 ## Examples
 
 ``` r
@@ -160,7 +168,7 @@ cat(substr(code, 1, 1000))
 # \donttest{
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpoeRqAr/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/Rtmp3eZRvK/rdocdump_cache
 
 local({
 code_with_roxygen <- rdd_extract_code(
@@ -172,6 +180,14 @@ repos = c("CRAN" = "https://cran.r-project.org")
 cat(substr(code_with_roxygen, 1, 1000))
 })
 #> Fetching package source from CRAN...
+#> 
+#> ✔ Updated metadata database: 3.59 MB in 8 files.
+#> 
+#> ℹ Updating metadata database
+#> ✔ Updating metadata database ... done
+#> 
+#> ℹ Getting 1 pkg (3.49 kB)
+#> ✔ Got ini 0.3.1 (source) (3.49 kB)
 #> 
 #> --------------------------------------------------------------------------------
 #> File: ini.R
@@ -227,6 +243,7 @@ repos = c("CRAN" = "https://cran.r-project.org")
 cat(substr(code_with_tests, 1, 1000))
 })
 #> Fetching package source from CRAN...
+#> ℹ No downloads are needed, 1 pkg (3.49 kB) is cached
 #> 
 #> --------------------------------------------------------------------------------
 #> File: ini.R

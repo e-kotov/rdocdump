@@ -85,3 +85,7 @@ A list containing:
 - `tar_path`: Path to the tarball if it was downloaded.
 
 - `is_installed`: Logical indicating if the package is installed.
+
+- `pkg_name`: Package name (always populated when known).
+
+- `pkg_version`: Package version (NULL if not known).
