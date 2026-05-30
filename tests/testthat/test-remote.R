@@ -146,7 +146,7 @@ test_that("select_pak_download_archive uses pak target, not cache scans", {
   archive <- select_pak_download_archive(dl_info, cache, "good")
   extract_dir <- file.path(cache, "extracted")
   dir.create(extract_dir)
-  utils::untar(archive, exdir = extract_dir)
+  utils::untar(archive, exdir = extract_dir, tar = "internal")
 
   expect_equal(basename(archive), "good_1.0.0.tar.gz")
   expect_match(

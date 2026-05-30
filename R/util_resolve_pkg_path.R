@@ -93,7 +93,7 @@ resolve_pkg_path <- function(
       if (!dir.exists(extract_dir)) {
         dir.create(extract_dir, recursive = TRUE)
       }
-      res <- utils::untar(pkg, exdir = extract_dir)
+      res <- utils::untar(pkg, exdir = extract_dir, tar = "internal")
       if (!identical(as.integer(res), 0L)) {
         stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
       }
@@ -218,7 +218,7 @@ resolve_pkg_path <- function(
         }
       }, add = TRUE)
 
-      res <- utils::untar(archive, exdir = extract_dir)
+      res <- utils::untar(archive, exdir = extract_dir, tar = "internal")
       if (!identical(as.integer(res), 0L)) {
         stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
       }

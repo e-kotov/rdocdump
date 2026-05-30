@@ -164,14 +164,11 @@ tar_pak_tree <- function(tree_path, archive) {
   old_wd <- setwd(tree_path)
   on.exit(setwd(old_wd), add = TRUE)
 
-  # Prefer a system tar (env var or auto-detected) so long paths and non-ASCII
-  # names are handled correctly; fall back to R's internal ustar implementation.
-  tar_cmd <- Sys.getenv("TAR", "internal")
   utils::tar(
     tarfile = archive,
     files = files,
     compression = "gzip",
-    tar = tar_cmd
+    tar = "internal"
   )
 
   if (!file.exists(archive)) {

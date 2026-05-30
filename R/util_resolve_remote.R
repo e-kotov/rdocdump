@@ -109,7 +109,7 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     }
   }, add = TRUE)
 
-  res <- utils::untar(bundle_path, exdir = extract_dir)
+  res <- utils::untar(bundle_path, exdir = extract_dir, tar = "internal")
   if (!identical(as.integer(res), 0L)) {
     stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
   }
