@@ -109,9 +109,18 @@ resolve_remote_pkg <- function(pkg_ref, cache_path = NULL) {
     }
   }, add = TRUE)
 
-  res <- utils::untar(bundle_path, exdir = extract_dir, tar = "internal")
-  if (!identical(as.integer(res), 0L)) {
-    stop(sprintf("Extraction failed: utils::untar() returned non-zero status code %s.", res))
+  first_bytes <- readBin(bundle_path, raw(), n = 2L)
+  if (length(first_bytes) == 2L &&
+      identical(first_bytes, as.raw(c(0x50, 0x4b)))) {
+    utils::unzip(bundle_path, exdir = extract_dir)
+  } else {
+    res <- utils::untar(bundle_path, exdir = extract_dir, tar = "internal")
+    if (!identical(as.integer(res), 0L)) {
+      stop(sprintf(
+        "Extraction failed: utils::untar() returned non-zero status code %s.",
+        res
+      ))
+    }
   }
 
   # Flatten extra top-level folder if necessary (common in GitHub/GitLab
