@@ -1,6 +1,6 @@
 Package: rdocdump
 Title: Dump 'R' Package Source, Documentation, and Vignettes into One File
-Version: 0.2.0.9000
+Version: 0.3.0
 Authors@R: 
     person("Egor", "Kotov", , "kotov.egor@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-6690-5345"))
@@ -18,8 +18,8 @@ URL: https://github.com/e-kotov/rdocdump, https://www.ekotov.pro/rdocdump/
 BugReports: https://github.com/e-kotov/rdocdump/issues
 Suggests:
     curl,
-    quarto,
     pak,
+    quarto,
     testthat (>= 3.0.0),
     withr
 VignetteBuilder: 

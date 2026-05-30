@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/e-kotov/rdocdump",
   "issueTracker": "https://github.com/e-kotov/rdocdump/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "0.2.0.9000",
+  "version": "0.3.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -63,6 +63,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "pak",
+      "name": "pak",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=pak"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "quarto",
       "name": "quarto",
       "provider": {
@@ -72,19 +84,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=quarto"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "remotes",
-      "name": "remotes",
-      "version": ">= 2.2.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=remotes"
     },
     {
       "@type": "SoftwareApplication",
@@ -115,7 +114,7 @@
   "softwareRequirements": {
     "SystemRequirements": null
   },
-  "fileSize": "289.194KB",
+  "fileSize": "326.965KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

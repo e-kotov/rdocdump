@@ -9,7 +9,7 @@ type: software
 license: MIT
 title: 'rdocdump: Dump ''R'' Package Source, Documentation, and Vignettes into One
   File'
-version: 0.2.0.9000
+version: 0.3.0
 doi: 10.32614/CRAN.package.rdocdump
 identifiers:
 - type: doi
@@ -65,6 +65,20 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.curl
 - type: software
+  title: pak
+  abstract: 'pak: Another Approach to Package Installation'
+  notes: Suggests
+  url: https://pak.r-lib.org/
+  repository: https://CRAN.R-project.org/package=pak
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  - family-names: Hester
+    given-names: Jim
+  year: '2026'
+  doi: 10.32614/CRAN.package.pak
+- type: software
   title: quarto
   abstract: 'quarto: R Interface to ''Quarto'' Markdown Publishing System'
   notes: Suggests
@@ -81,29 +95,6 @@ references:
     orcid: https://orcid.org/0000-0003-4474-2498
   year: '2026'
   doi: 10.32614/CRAN.package.quarto
-- type: software
-  title: remotes
-  abstract: 'remotes: R Package Installation from Remote Repositories, Including ''GitHub'''
-  notes: Suggests
-  url: https://remotes.r-lib.org
-  repository: https://CRAN.R-project.org/package=remotes
-  authors:
-  - family-names: Csárdi
-    given-names: Gábor
-    email: csardi.gabor@gmail.com
-  - family-names: Hester
-    given-names: Jim
-  - family-names: Wickham
-    given-names: Hadley
-  - family-names: Chang
-    given-names: Winston
-  - family-names: Morgan
-    given-names: Martin
-  - family-names: Tenenbaum
-    given-names: Dan
-  year: '2026'
-  doi: 10.32614/CRAN.package.remotes
-  version: '>= 2.2.0'
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'
