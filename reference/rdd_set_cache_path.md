@@ -29,7 +29,7 @@ Invisibly returns the new cache path.
 ``` r
 # set cache directory for `rdocdump`
 rdd_set_cache_path(paste0(tempdir(), "/rdocdump_cache"))
-#> rdocdump.cache_path set to: /tmp/RtmpLQphKV/rdocdump_cache
+#> rdocdump.cache_path set to: /tmp/RtmpC8G3uK/rdocdump_cache
 # default cache directory
 unlink(getOption("rdocdump.cache_path"), recursive = TRUE)
 ```

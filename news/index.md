@@ -2,6 +2,8 @@
 
 ## rdocdump 0.3.0
 
+CRAN release: 2026-05-30
+
 #### New Features
 
 - Migrated to `pak` for remote package resolution and downloads.
