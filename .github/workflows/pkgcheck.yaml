@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   # Run after other checks
   workflow_run:
-    workflows: ["R-CMD-check", "R-CMD-check-HTML5"]
+    workflows: ["R-CMD-check"]
     types:
       - completed
 
@@ -21,18 +21,7 @@ jobs:
     permissions:
       contents: read
       issues: write
-      pull-requests: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: ropensci-review-tools/pkgcheck-action@main
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 0
-
-      - name: Run pkgcheck
-        uses: ropensci-review-tools/pkgcheck-action@main
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          post-to-issue: true
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
